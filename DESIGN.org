@@ -1,0 +1,67 @@
+
+* NETWORK layer on top of RakNet. Get inspiration from Biribit. Keep it simple.
+
+** Player
+** Session
+** Room
+** Server
+** EventHandler: different handlers for different types of events (inherit templated class?)
+** EventDispatcher
+** Event
+** EventFactory (wrapper protocol buffers)
+
+   
+* SERVER
+
+** Database
+
+** World
+   - initialization
+   - container of things
+   - handles login of new sessions onLogin(PlayerSession)
+     
+** PlayerSession:
+   - etityId
+   - player
+   - eventDispatcher
+   - dbConnectionPool
+   - scriptEngine
+   - other stuff!
+   - gets messages to broadcast back to the player
+    
+** ScriptContext:
+   - interface that the script needs to do whatever:
+       + database thread pool
+       + player session
+
+** Scene: 
+   - puts players together (player sessions to broadcast) (Room specialization?)
+
+
+* CLIENT
+
+Client should only send text (in principle)
+V1: screen split -> 2D SDL tilemap + text terminal
+
+----------------------------------------------------------------------------------
+
+- How would a server loop work like?
+  1. Wait for client messages
+  2. Decode messages into semantic chunks 
+  3. Initialize script context with whatever data 
+  4. Run corresponding script   
+  5. Run world scripts (AI, weather system, etc...)
+
+- How to handle tasks that are not instantaneous (walk to point)?
+  1. Have the script run all the time? overkill? maybe not!
+     we can define a init method and a run method
+
+  2. Have a set of common tasks implemented within task pools in C++: things like walk etc...
+  
+
+
+
+
+
+
+

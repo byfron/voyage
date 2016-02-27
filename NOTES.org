@@ -1,0 +1,273 @@
+** Relational dataset of entity-component-action relationships (review IsleOfMan).
+** Minimalistic graphic interface.
+** Dataset contains minimal geometry of every entity (or a script that generates it)
+** Establish a more or less direct relationship between the components and a Natural Language Grammar:
+*** Entity: Sustantives
+*** Component: Adjectives (qualities)
+*** Action: Verbs
+
+** Create a parsing-engine language processor that interacts with the entities. 
+
+** Survival
+
+** For instance: Make a fire camp in the forest.
+
+- We need to pick up an axe, find some tree, cut some wood, pile it and light it up.
+
+The component entity system (within the dataset) makes the logic possible right away.
+
+*** A tree is made of wood. 
+*** Wood component generates a log entity when cut.
+*** Axe cuts things.
+*** Log is also made of wood.
+*** Wood burns when lit up.
+
+We could write something like: 
+
+- Look for an axe.
+- Go to axe.
+- Pick up axe.
+- Look for a tree.
+- Go to tree.
+- Cut tree.
+- Look.
+- Pick up logs.
+- Go back to the hut.
+- Drop logs.
+- Light up logs.
+
+(boring, tyring)
+
+==============================
+
+However it would be much nicer to write it as a story. Moreover, the text we write should be 
+blended with other descriptive text. For instance:
+
+- He had to make a fire, so he started looking for a tree to cut.
+- Went back next to the hut, right outside. Looked for a safe place to make a fire. 
+
+(very difficult to parse)
+
+==============================
+
+** The most innovative thing would be if we could not only perform actions but "tell the story" 
+ourselves. 
+
+For instance, if there are no trees, writting:
+
+- There was a lonely tree nearby. 
+
+Makes a tree appear, so that we can get wood. 
+
+It would be interesting to have "storytelling" points that are spend by creating things, so the 
+user has to be careful what he creates. Entities would have certain storytelling points to be 
+created. We can use a special word sequence to create things. For instance the name of the character:
+
+"Susan saw" a river with fresh water.
+"Susan found" a yellow dog"
+"A boy came from the north"
+"The boy was naked"
+"There was ..."
+
+"For instance if we could classify imperative intention, or past sentences"
+
+or... 
+
+"Lukily there was a tree nearby", or "He walked a bit until finding a river".
+
+"It started snowing"
+
+==============================
+** Graphics
+For instance, screen divided in two: Half for text and half for a diamond-like graphics. 
+The graphical interface is a visual help to ease the experience, but not necessary to enjoy 
+fully the game. 
+
+Look: Displays things around (textual or graphical)
+Examine: Looks an object
+Inventory: Shows inventory
+
+
+** NLP:
+
+The simplest idea would be the following:
+
+Use NTLK in python. Given a sentence, chunk it. Try to match the different parts with the set of entities/components/actions using wordnet synonims as well (this can be pre-computed). Perform the most
+likely output, or even give the user different options when in doubt.
+
+Sentences that should be easy to parse:
+
+- Walk to nearest tree
+- Put the book in the red box
+
+Book -> "put in" -> red box
+
+
+** Architecture:
+
+Client-Server arch. 
+
+*** Server
+Server contains database and sends messages from/to client
+Implements a very thin layer of C++ to take care of the 
+component-listening-to-actions framework and other stuff. 
+
+*** Client
+
+Client implements the interface and the parser. Text is parsed, chunked, 
+and sent to the server with a well-defined format, for instance:
+> entity (does) action [on entity]
+Server contains a dataset with:
+
+*** Data
+-Entities
+-Components (attributes/qualities)
+-Actions: Verbs usually associated to the input verbs (open)
+-EntityComponents
+-ComponentAction: relates components with actions and their script (openable)
+These components are listening to their corresponding actions, and will run 
+their corresponding script when the action is broadcasted to the entity that 
+contains them.
+-EntityAction: actions executed by an entity (knife cuts)
+
+** NETWORKING: 
+
+- Racknet
+
+** SERVER:
+
+*** Python Scripts:
+
+- Access to database.
+- Send back messages to client.
+(that's it)
+
+*** C++ code:
+
+- Keeps dataset
+- Gets messages from client, looks in database 
+  and calls corresponding python scripts
+- Runs whatever world logic scripts
+
+
+** CLIENT:
+
+*** C++
+
+- Implements interface (3D or plain text)
+- Keeps updated copy of dataset (if necessary)
+- Performs parsing of the user input (TurboParser or python)
+- Gets and interprets messages.
+- Builds and sends messages to server with the state updates
+
+Examples of response messages:
+
+* DisplayText 
+* MoveObject
+* PlayAnimation
+* RemoveObject
+* SetGraphicalProperty
+* PlaySound
+
+
+
+** Does this make sense?
+
+It kinda starts to:
+
+- Graphics:
+Totally plug-and-play. We can have a very minimal text-based graphics, a very complex UE4 client, 
+or mobile versions.
+
+The client is quite agnostic and the server contains all the necessary resources for a puzzle.
+
+The messages from the server should indicate the state of the visual assets at a quite low level. 
+For instance, animations, movements etc...
+
+The map should have an internal tile-based structure to ease location of things.
+
+Think of minimal DF graphics. The dataset entries can refer to standard tiles or new ones.
+
+WTF is the game about? 
+
+* Anything?
+* Different modes:
+- Endless survival
+- Puzzles
+- RPG?
+
+* Combine text with clicks in order to choose specific instances.
+
+For instance: 
+- Cut - then click - and the word tree is filled.
+
+* It seems bothering to write everything but actually it can be cool for high-level orders:
+
+- Leave axe in the house.
+- Craft 20 arrows.
+- Susan, craft 20 arrows.
+
+* Once a character has done all the steps required 
+  for instance to craft an arrow:
+      - Collect wood, collect bla...
+  The instruction can be high-level: craft an arrow, and the character will
+try to find all the material by itself (similar to DF)
+
+
+* Control several characters simultaneously. Put the name fn one to give an order. Either that,
+* or make the main character give "actual" orders (say: Susan go to the house).
+
+- Susan go to the house.
+
+* Name areas of the map with keywords.
+
+* Separating the different screens for each character also gives back info of what each character
+* sees or happens to it.
+
+* Text screen can be arranged tiled or tabbed.
+
+- Stop time to have time to write things in critical situations.
+
+
+* Communication and moods
+
+- Pos/neg connotation in the way we speak to other characters may influence the chars accepting or not.
+- It seems more interesting to have a principal character that can communicate with the rest.
+- It'd be cool to control a small set of characters let's say...a family, and interact with npcs.
+
+* What kind of situations????
+
+- Survival (version 1.0):
+* Collect resources
+* Fight threats
+* Protect family
+* Reinforce house
+* Gather/Farm food
+* Craft stuff
+- NO SANDBOX!!!
+
+- Adventure (goal should be story-driven with rpg aspects):
+* Talk to people
+* Get community jobs done (fix electricity, bury corpses, look for meds)
+* Buy/Craft stuff
+
+* Go to Smallville : character starts walking there
+* Look : shows everything around
+* Follow Susan
+* Susan: Follow me
+* Susan gather wood
+* Susan: In the morning, put the logs in the house
+
+
+* Users: could they create a complex game logic with no scripts, 
+* Just by expressing what the characters do? no way
+* 
+
+
+FOCUS IN: 
+- SURVIVAL
+- TWO PEOPLE
+- A FEW ITEMS
+- SOME THREATS
+- WEATHER/TIME
+- SCRIPTED EVENTS
