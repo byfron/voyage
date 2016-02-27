@@ -1,8 +1,16 @@
-add_library(graphicsSystem SHARED
+add_library(graphics SHARED
   GraphicsSystem.h
   GraphicsSystem.cpp
-  )
-
-target_link_libraries(graphicsSystem ${OGRE_LIBRARIES})
-
-target_include_directories(graphicsSystem PUBLIC ../common)
+  BaseSystem.h
+  BaseSystem.cpp
+  GameEntity.h
+  GameState.h
+  InputListeners.h
+  MainEntryPointHelper.h
+  SdlInputHandler.h
+  SdlInputHandler.cpp
+  GameEntityManager.h
+  GameEntityManager.cpp
+  Threading/MessageQueueSystem.h
+  Threading/MessageQueueSystem.cpp)
+  
