@@ -6,7 +6,7 @@ class ClientLoginHandler : public PacketHandler {
 
 public:
 
-	HandlerId getType() { return CLIENT_LOGIN_HANDLER; }       
-	void onPacket(LoginMessage *m);
-	
+	void onMessage(Message::Ptr m) {	       
+		std::cout << *m << std::endl;
+	}
 };

@@ -6,7 +6,6 @@ class ClientDataHandler : public PacketHandler {
 
 public:
 
-	void onPacket(DataMessage *p) {};
-	HandlerId getType() { return CLIENT_DATA_HANDLER; }
+	void onPacket(Message *p) {};	
 	
 };

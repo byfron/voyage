@@ -12,12 +12,35 @@ find_library(RAKNET_LIB RakNetLibStatic PATHS ${RAKNET_ROOT}/Lib/RakNetLibStatic
 include_directories(${RAKNET_ROOT}/include/raknet)
 find_package(Threads REQUIRED)
 
+include(CMake/GTest.cmake)
+
+set(DB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/datasets")
+set(SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/scripts")
+add_definitions(-DDB_DIR="${DB_DIR}")
+add_definitions(-DSCRIPTS_DIR="${SCRIPTS_DIR}")
+
+set(CMAKE_MODULE_PATH
+  "${CMAKE_SOURCE_DIR}/CMake"
+  "${CMAKE_SOURCE_DIR}/CMake/Utils"
+  "${CMAKE_SOURCE_DIR}/CMake/Packages"
+  )
+
+SET(PYTHON_INCLUDE_PATH /usr/include/python2.7)
+SET(PYTHON_LIBRARIES /usr/lib/python2.7/config-x86_64-linux-gnu/libpython2.7.so)
+
+FIND_PACKAGE(Boost 1.45.0)
+IF(Boost_FOUND)
+  INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}" "/usr/include/python2.6")
+  SET(Boost_USE_STATIC_LIBS OFF)
+  SET(Boost_USE_MULTITHREADED ON)
+  SET(Boost_USE_STATIC_RUNTIME OFF)
+  FIND_PACKAGE(Boost 1.45.0 COMPONENTS python)
+ENDIF()
+
+#find_package(SQLite3)
+find_library(SQLITE3_LIBRARY sqlite3)
+
 if (BUILD_VOYAGE3D)  
-  set(CMAKE_MODULE_PATH
-    "${CMAKE_SOURCE_DIR}/CMake"
-    "${CMAKE_SOURCE_DIR}/CMake/Utils"
-    "${CMAKE_SOURCE_DIR}/CMake/Packages"
-    )
 
   include(OgreAddTargets)
   include(CMakeDependentOption)

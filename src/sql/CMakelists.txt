@@ -1,0 +1,6 @@
+add_library(database
+  DatabaseConnectionPool.hpp
+  DatabaseConnectionPool.cpp
+  DatabaseConnection.hpp
+  DatabaseConnection.cpp
+  )

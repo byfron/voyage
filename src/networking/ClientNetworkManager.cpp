@@ -1,6 +1,4 @@
 #include "ClientNetworkManager.hpp"
-#include "ClientLoginHandler.hpp"
-#include "ClientDataHandler.hpp"
 
 ClientNetworkManager::ClientNetworkManager()
 {
@@ -11,27 +9,25 @@ ClientNetworkManager::~ClientNetworkManager()
 	RakNet::RakPeerInterface::DestroyInstance(_peer);
 }
 
-void ClientNetworkManager::registerHandler(PacketHandlerPtr h) {
-	_handlers[h->getType()] = h;
+void ClientNetworkManager::registerHandler(PacketHandler::Ptr h) {
+	_handlers[h->getId()] = h;
 }
 
-void ClientNetworkManager::start()
+void ClientNetworkManager::start(const char *address, const int port)
 {
+	_remoteIPAddress = address;
+	_port = port;
 	RakNet::SocketDescriptor socketDescriptor;
 	socketDescriptor.port=0;
 	RakNet::StartupResult b = _peer->Startup(1,&socketDescriptor,1);
 	RakAssert(b==RAKNET_STARTED);
-	_isConnected=false;
-
-	registerHandler(std::make_shared<ClientLoginHandler>());
-	registerHandler(std::make_shared<ClientDataHandler>());
-	
+	_isConnected=false;		
 }
 
 void ClientNetworkManager::connect()
 {
 	bool b;
-	b = _peer->Connect(_remoteIPAddress, (unsigned short) SERVER_PORT, 0, 0, 0)==RakNet::CONNECTION_ATTEMPT_STARTED;
+	b = _peer->Connect(_remoteIPAddress, (unsigned short) _port, 0, 0, 0)==RakNet::CONNECTION_ATTEMPT_STARTED;
 	if (b==false)
 	{
 		printf("Client connect call failed!\n");
@@ -46,22 +42,33 @@ void ClientNetworkManager::disconnect(void)
 	_isConnected=false;
 }
 
+void ClientNetworkManager::sendData(MessageId id, const char *data) {
+	
+	Message::Ptr m = std::make_shared<Message>(id, data);
+	RakNet::BitStream bsOut;
+	m->toBitStream(bsOut);
+	_peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
+}
+
 void ClientNetworkManager::receiveData()
 {
 	Packet *p = _peer->Receive();
-
-	while(p) {
-		switch(p->data[0]) {
-		case ID_LOGIN_MESSAGE:
-			_handlers[CLIENT_LOGIN_HANDLER]->onPacket(std::make_shared<LoginMessage>(p));
+	for (p=_peer->Receive(); p; _peer->DeallocatePacket(p), p=_peer->Receive())
+	{
+		Message::Ptr m = std::make_shared<Message>(p);
+		
+		switch(m->getId()) {		
+					
+			/*case ID_LOGIN_MESSAGE:
+			_handlers[CLIENT_LOGIN_HANDLER]->onMessage(m);
 			break;
 
 		case ID_DATA_MESSAGE:
-			_handlers[CLIENT_DATA_HANDLER]->onPacket(std::make_shared<DataMessage>(p));
+			_handlers[CLIENT_DATA_HANDLER]->onMessage(m);
 			break;			
 		};
-		
-		_peer->DeallocatePacket(p);
-		p = _peer->Receive();
+			*/
+		};
 	}
+	
 }

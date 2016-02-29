@@ -4,21 +4,25 @@
 #include <memory>
 #include "Messages.hpp"
 
-enum HandlerId {
-	CLIENT_LOGIN_HANDLER,
-	CLIENT_DATA_HANDLER,
-	SERVER_LOGIN_HANDLER,
-	SERVER_DATA_HANDLER
-};
+class ServerNetworkManager;
 
 class PacketHandler {
 
 public:
-	PacketHandler() {};
-	virtual ~PacketHandler() {};
-	virtual HandlerId getType() {};
-	void onPacket(std::shared_ptr<LoginMessage> l) {};
-	void onPacket(std::shared_ptr<DataMessage> d) {};
+	PacketHandler() { isRegistered = false; }
+	virtual ~PacketHandler() {};	
+	virtual void onMessage(Message::Ptr) {};
+
+	int getId() { return _handlerId; }
+	typedef std::shared_ptr<PacketHandler> Ptr;
+
+	bool isRegistered;
+	
+protected:
+
+	int _handlerId;
+	
 };
 
-typedef std::shared_ptr<PacketHandler> PacketHandlerPtr;
+
+

@@ -15,17 +15,20 @@ class ClientNetworkManager
 public:
 	ClientNetworkManager();
 	~ClientNetworkManager();
-	void start();
+	void start(const char *address, const int port);
 	void connect();
 	void disconnect();
-	void registerHandler(PacketHandlerPtr h);
+	void registerHandler(PacketHandler::Ptr h);
 	void receiveData();
+	void sendData(MessageId id, const char *data);
 
 private:
+
 	bool _isConnected;
 	RakPeerInterface *_peer;
-	std::map<HandlerId, PacketHandlerPtr> _handlers;
-	char *_remoteIPAddress;
+	std::map<int, PacketHandler::Ptr> _handlers;
+	int _port;
+	const char *_remoteIPAddress;
 };
 
 #endif
