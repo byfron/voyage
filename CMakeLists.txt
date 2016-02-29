@@ -12,11 +12,12 @@ find_library(RAKNET_LIB RakNetLibStatic PATHS ${RAKNET_ROOT}/Lib/RakNetLibStatic
 include_directories(${RAKNET_ROOT}/include/raknet)
 find_package(Threads REQUIRED)
 
-include(CMake/GTest.cmake)
+set(DB_NAME "test.db")
+set(DB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/datasets/")
+set(SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/scripts/")
 
-set(DB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/datasets")
-set(SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/scripts")
 add_definitions(-DDB_DIR="${DB_DIR}")
+add_definitions(-DDB_NAME="${DB_NAME}")
 add_definitions(-DSCRIPTS_DIR="${SCRIPTS_DIR}")
 
 set(CMAKE_MODULE_PATH
@@ -27,6 +28,7 @@ set(CMAKE_MODULE_PATH
 
 SET(PYTHON_INCLUDE_PATH /usr/include/python2.7)
 SET(PYTHON_LIBRARIES /usr/lib/python2.7/config-x86_64-linux-gnu/libpython2.7.so)
+include(CMake/GTest.cmake)
 
 FIND_PACKAGE(Boost 1.45.0)
 IF(Boost_FOUND)

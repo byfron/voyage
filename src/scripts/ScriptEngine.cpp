@@ -10,27 +10,31 @@ using namespace boost::python;
 typedef boost::shared_ptr<ScriptContext> context_ptr;
 
 BOOST_PYTHON_MODULE(scontext)
-{
+{		
+	class_<DatabaseResult>("DatabaseResult")
+		.def("getData", &DatabaseResult::getData);
+	
         class_<ScriptContext, context_ptr >("ScriptContext")
 		.def("execute", &ScriptContext::execute)
-		.def("executeSelect", &ScriptContext::executeSelect);
+		.def("executeSelect", &ScriptContext::executeSelect)
+		.def("sendMessage", &ScriptContext::sendMessage);
+	       
 }
 
-ScriptEngine::ScriptEngine(DatabaseConnectionPool::Ptr pool) : _dbPool(pool) {
-	init();
-}
-
-ScriptEngine::~ScriptEngine() {
+void ScriptEngine::finalize() {
 	 Py_Finalize();
 }
 
-void ScriptEngine::init() {
+void ScriptEngine::init(DatabaseConnectionPool::Ptr pool) {
+
+	_dbPool = pool;
+	
 	// If you're going to use threads: PyEval_InitThreads();
         Py_Initialize();
-	setupContext();
+	_setupContext();
 }
 
-void ScriptEngine::setupContext() {
+void ScriptEngine::_setupContext() {
 
 	try {
 		PyRun_SimpleString(

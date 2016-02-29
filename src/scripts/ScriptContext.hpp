@@ -1,5 +1,9 @@
 #pragma once
 
+#include <serverEngine/PlayerSession.hpp>
+#include <sql/DatabaseConnection.hpp>
+
+
 /**
  * Object exposed to the python scripts with all the necessary handlers
  */
@@ -21,6 +25,10 @@ struct ScriptContext {
 	
 	DatabaseResult executeSelect(std::string query) {
 		return _dbCon->runSelectQuery(query.c_str());
+	}
+	
+	int sendMessage(std::string message) {
+		_playerSession->sendMessage(std::make_shared<Message>(message));
 	}
 	
 //private:

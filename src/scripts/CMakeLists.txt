@@ -13,6 +13,7 @@ target_include_directories(scriptEngine PUBLIC
 
 cxx_test(scriptTest scriptEngineTest.cpp
   scriptEngine
+  serverEngine
   database
   networking
   gtest_main)

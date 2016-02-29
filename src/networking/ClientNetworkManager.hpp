@@ -21,6 +21,7 @@ public:
 	void registerHandler(PacketHandler::Ptr h);
 	void receiveData();
 	void sendData(MessageId id, const char *data);
+	void sendData(MessageId id);
 
 private:
 

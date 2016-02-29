@@ -8,7 +8,7 @@ class ServerLoginHandler : public PacketHandler {
 
 public:
 
-	ServerLoginHandler(GameServer::Ptr);	
+	ServerLoginHandler(GameServer::Ptr);
 	void onMessage(Message::Ptr m);
 
 private:

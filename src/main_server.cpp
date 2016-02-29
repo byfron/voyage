@@ -1,8 +1,11 @@
 #include <serverEngine/GameServer.hpp>
+#include <spdlog/spdlog.h>
+
+namespace spd = spdlog;
 
 int main()
-{	
-	GameServer server;
-	server.init(1234);
+{
+	auto console = spd::stdout_logger_mt("Server");
+	GameServer server(1234, 100);
 	server.start();   
 }

@@ -19,8 +19,6 @@ public:
 	void receiveData();
 	void registerHandler(PacketHandler::Ptr, const std::list<int> & list);
 	unsigned connectionCount(void) const;
-	void createSession();
-	void removeSession();
 
 	RakNet::RakPeerInterface *getPeer() { return _peer; }
 	typedef std::shared_ptr<ServerNetworkManager> Ptr;

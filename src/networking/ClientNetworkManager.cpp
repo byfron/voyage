@@ -42,6 +42,15 @@ void ClientNetworkManager::disconnect(void)
 	_isConnected=false;
 }
 
+
+void ClientNetworkManager::sendData(MessageId id) {
+	
+	Message::Ptr m = std::make_shared<Message>(id);
+	RakNet::BitStream bsOut;
+	m->toBitStream(bsOut);
+	_peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
+}
+
 void ClientNetworkManager::sendData(MessageId id, const char *data) {
 	
 	Message::Ptr m = std::make_shared<Message>(id, data);

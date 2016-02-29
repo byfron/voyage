@@ -10,15 +10,11 @@ ServerLoginHandler::ServerLoginHandler(GameServer::Ptr gs) {
 	_gameServer = gs;
 }
 
-
-
 void ServerLoginHandler::onMessage(Message::Ptr m) {
 
-	spd::get("console")->info() << "Creating session: " << *m;
+	std::cout << "hey" << std::endl;
 	
-
 	// if logging is successful
-//	_gameServer->createPlayerSession();	
-	
+	_gameServer->createPlayerSession(m->getAddr());	
 	
 }

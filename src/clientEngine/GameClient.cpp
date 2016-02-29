@@ -17,6 +17,11 @@ void GameClient::start() {
 	console->info("Starting game client");
 
 	std::string cmd;
+
+	//TODO: if I don't sleep the message is not sent!!!
+	sleep(1);
+
+	_netManager.sendData(ID_LOGIN_MESSAGE);
 	
 	while (!_finished) {
 
@@ -25,7 +30,7 @@ void GameClient::start() {
 		std::getline(std::cin, cmd);
 		
 		//send messages to server
-		_netManager.sendData(ID_LOGIN_MESSAGE, cmd.c_str());
+		_netManager.sendData(ID_DATA_MESSAGE, cmd.c_str());
 
 		//receive messages from server
 		_netManager.receiveData();
