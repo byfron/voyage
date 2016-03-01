@@ -11,10 +11,15 @@ ServerDataHandler::ServerDataHandler(GameServer::Ptr gs) {
 void ServerDataHandler::onMessage(Message::Ptr m) {
 
 	spd::get("Server")->info() << "Received data:" << *m;
-
-
-	//send message to the corresponding playerSession
 	
+	PlayerSession::Ptr ps = _gameServer->getPlayerSession(m->getAddr());
+
+	//test:run script
+	ScriptEngine::Ptr se = _gameServer->getScriptEngine();
+
+	se->runScript(ps, SCRIPTS_DIR "/test.py");
+	
+	//send message to the corresponding playerSession	
 
 }
 

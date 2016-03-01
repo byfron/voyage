@@ -11,7 +11,7 @@ class PacketHandler {
 public:
 	PacketHandler() { isRegistered = false; }
 	virtual ~PacketHandler() {};	
-	virtual void onMessage(Message::Ptr) {};
+	virtual void onMessage(Message::Ptr) { assert(false); };
 
 	int getId() { return _handlerId; }
 	typedef std::shared_ptr<PacketHandler> Ptr;

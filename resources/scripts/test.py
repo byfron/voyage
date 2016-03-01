@@ -1,3 +1,4 @@
-print 'Hello World!'
+print 'Hello World2!'
 db = script_context.executeSelect('SELECT * FROM ENTITIES')
-print db.getData(0,1)
+script_context.sendMessage(db.getData(2,1))
+

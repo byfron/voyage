@@ -15,6 +15,8 @@ public:
 	PlayerSession(unsigned int id, RakNet::SystemAddress addr, GameServerPtr _gs);
 	
 	void sendMessage(Message::Ptr m);
+
+	int getId() { return _id; }
 	
 private:
 

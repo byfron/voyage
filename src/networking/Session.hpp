@@ -13,8 +13,11 @@ public:
 	void sendRakNetMessage(RakNet::RakPeerInterface *peer, Message::Ptr m) {
 		RakNet::BitStream bsOut;
 		m->toBitStream(bsOut);
+
+		std::cout << "sending:" << *m << std::endl;
+		
 		peer->Send(&bsOut, HIGH_PRIORITY,
-			   RELIABLE_ORDERED, 0,
+			   RELIABLE_WITH_ACK_RECEIPT, 0,
 			   _address, true);
 	};
 	

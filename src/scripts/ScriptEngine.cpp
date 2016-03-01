@@ -21,6 +21,8 @@ BOOST_PYTHON_MODULE(scontext)
 	       
 }
 
+ScriptEngine::ScriptEngine() {}
+
 void ScriptEngine::finalize() {
 	 Py_Finalize();
 }
@@ -65,14 +67,16 @@ void ScriptEngine::_setupContext() {
 
 void ScriptEngine::runScript(PlayerSession::Ptr ps, const std::string & script) {
 
+	try {
 	DatabaseConnection::Ptr con = _dbPool->requestConnection();
 	context_ptr cptr = boost::make_shared<ScriptContext>(con, ps);	
 	boost::python::object global(_main.attr("__dict__"));
-	
 	_context(cptr);
 	boost::python::object result = boost::python::exec_file(script.c_str(), global, global);
-	
-	
+		
 	_dbPool->returnConnection(con);
-	
+
+	}catch(error_already_set) {
+		PyErr_Print();
+	}	
 }

@@ -4,7 +4,7 @@ project(voyage)
 
 option(BUILD_VOYAGE3D "build 3d interface with OGRE library" OFF)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -pthread -march=native")
 
 # General dependencies
 set(RAKNET_ROOT "${CMAKE_SOURCE_DIR}/third-party/RakNet")

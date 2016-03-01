@@ -61,10 +61,12 @@ void ClientNetworkManager::sendData(MessageId id, const char *data) {
 
 void ClientNetworkManager::receiveData()
 {
-	Packet *p = _peer->Receive();
+	Packet *p;
 	for (p=_peer->Receive(); p; _peer->DeallocatePacket(p), p=_peer->Receive())
 	{
 		Message::Ptr m = std::make_shared<Message>(p);
+
+		std::cout << "receiving something:" << *m << std::endl;
 		
 		switch(m->getId()) {		
 					

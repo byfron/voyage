@@ -19,17 +19,19 @@ public:
 		return _playerSessionAddrMap[addr];
 	}
 	
-	RakNet::RakPeerInterface *getRakNetPeer() { _netManager.getPeer(); }
+	RakNet::RakPeerInterface *getRakNetPeer() { _netManagerPtr->getPeer(); }
 
+	ScriptEngine::Ptr getScriptEngine() { return _scriptEnginePtr; }	
+	
 	typedef std::shared_ptr<GameServer> Ptr;
 	
 	
 private:
 	void _init(int port);
 	
-	DatabaseConnectionPool _dbPool;
-	ScriptEngine _scriptEngine;
-	ServerNetworkManager _netManager;
+	DatabaseConnectionPool::Ptr _dbPoolPtr;
+	ScriptEngine::Ptr _scriptEnginePtr;
+	ServerNetworkManager::Ptr _netManagerPtr;
 
 	std::vector<PlayerSession::Ptr> _playerSessions;
 	std::map<RakNet::SystemAddress, PlayerSession::Ptr> _playerSessionAddrMap; 

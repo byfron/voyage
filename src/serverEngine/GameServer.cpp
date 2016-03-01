@@ -12,34 +12,37 @@ void break_loop(int s) {
 	finished_sig = true;
 }
 
-GameServer::GameServer(int portNum, int poolSize) : _dbPool(poolSize) {
-	_init(portNum);
+GameServer::GameServer(int portNum, int poolSize) :
+	_dbPoolPtr(std::make_shared<DatabaseConnectionPool>(poolSize)) {
 	_datasetName = DB_DIR DB_NAME;
+	_init(portNum);
 }
 
 void GameServer::_init(int port) {
 
 	//initialize server
-	_netManager.start(port);
+	_netManagerPtr = std::make_shared<ServerNetworkManager>();
+	_netManagerPtr->start(port);
 	_finished = false;
 
 	//initialize database pool
-	_dbPool.fillPool(_datasetName);
+	_dbPoolPtr->fillPool(_datasetName);
 
 	//initialize scripting engine
-	_scriptEngine.init(DatabaseConnectionPool::Ptr(&_dbPool));
+	_scriptEnginePtr = std::make_shared<ScriptEngine>();
+	_scriptEnginePtr->init(_dbPoolPtr);
 	
 	//register managers
-	_netManager.registerHandler(std::make_shared<ServerLoginHandler>(GameServer::Ptr(this)),
+	_netManagerPtr->registerHandler(std::make_shared<ServerLoginHandler>(GameServer::Ptr(this)),
 				    {ID_LOGIN_MESSAGE, ID_CLIENT_REQUEST_LOGIN});
 	
-	_netManager.registerHandler(std::make_shared<ServerDataHandler>(GameServer::Ptr(this)),
+	_netManagerPtr->registerHandler(std::make_shared<ServerDataHandler>(GameServer::Ptr(this)),
 				    {ID_DATA_MESSAGE});		
 }
 
 void GameServer::stop() {
-	_dbPool.drainPool();
-	_scriptEngine.finalize();
+	_dbPoolPtr->drainPool();
+	_scriptEnginePtr->finalize();
 }
 
 int GameServer::createPlayerSession(RakNet::SystemAddress addr) {
@@ -70,7 +73,7 @@ void GameServer::start() {
 
 		//check for client commands
 
-		_netManager.receiveData();
+		_netManagerPtr->receiveData();
 		
 		//    run AI
 //    move all entities

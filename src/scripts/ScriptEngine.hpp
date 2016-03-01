@@ -10,6 +10,7 @@ typedef std::shared_ptr<PlayerSession> PlayerSessionPtr;
 class ScriptEngine {
 public:
 
+	ScriptEngine();
 	void init(DatabaseConnectionPool::Ptr pool);
 	void finalize();
 	void runScript(PlayerSessionPtr ps, const std::string & script);
