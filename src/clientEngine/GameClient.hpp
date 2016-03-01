@@ -6,7 +6,7 @@ class GameClient {
 public:
 	void init();
 	void start();		
-
+	void clientLoop();
 private:
 
 	ClientNetworkManager _netManager;

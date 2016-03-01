@@ -1,5 +1,6 @@
 #include "GameClient.hpp"
 #include <spdlog/spdlog.h>
+#include <thread>
 
 namespace spd = spdlog;
 
@@ -10,27 +11,39 @@ void GameClient::init() {
 	_finished = false;
 }
 
+void GameClient::clientLoop() {
+
+	std::string cmd;
+
+	while (!_finished) {
+		std::cout << ">>";
+		std::getline(std::cin, cmd);
+	
+		_netManager.sendData(ID_DATA_MESSAGE, cmd.c_str());
+	}
+}
+
 //main loop
 void GameClient::start() {
 
 	auto console = spd::stdout_logger_mt("console");
 	console->info("Starting game client");
 
-	std::string cmd;
 
 	//TODO: if I don't sleep the message is not sent!!!
 	sleep(1);
 
 	_netManager.sendData(ID_LOGIN_MESSAGE);
+
+	//run thread that takes user input
+	std::thread p1( [this]() { clientLoop(); } );
 	
-	while (!_finished) {
+	while (1) {
 
 		//check for user input
-		std::cout << ">>";
-		std::getline(std::cin, cmd);
 		
 		//send messages to server
-		_netManager.sendData(ID_DATA_MESSAGE, cmd.c_str());
+		//_netManager.sendData(ID_DATA_MESSAGE, cmd.c_str());
 
 		//receive messages from server
 		_netManager.receiveData();
