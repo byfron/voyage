@@ -1,0 +1,10 @@
+add_library(gui
+  imconfig.h
+  imgui.h
+  imgui_internal.h
+  stb_rect_pack.h
+  stb_truetype.h
+  stb_textedit.h
+  imgui_draw.cpp
+  imgui_demo.cpp
+  imgui.cpp)

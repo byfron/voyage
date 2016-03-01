@@ -5,11 +5,16 @@
 
 add_executable(server main_server.cpp)
 target_link_libraries(server serverEngine)
-target_include_directories(server PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(server PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR})
+
 
 add_executable(client main_client.cpp)
-target_link_libraries(client clientEngine)
-target_include_directories(client PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(client
+  clientEngine)
+target_include_directories(client PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${SDL2_INCLUDE_DIR})
 
 add_executable(voyage voyage.cpp)
 
@@ -21,8 +26,7 @@ add_subdirectory(clientEngine)
 add_subdirectory(serverEngine)
 add_subdirectory(sql)
 add_subdirectory(scripts)
-  
-
+add_subdirectory(graphics)
 
 if (BUILD_VOYAGE3D)
   ogre_add_executable(voyage3d voyage3d.cpp)

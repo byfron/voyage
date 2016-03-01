@@ -1,16 +1,23 @@
 add_library(graphics SHARED
-  GraphicsSystem.h
-  GraphicsSystem.cpp
-  BaseSystem.h
-  BaseSystem.cpp
-  GameEntity.h
-  GameState.h
-  InputListeners.h
-  MainEntryPointHelper.h
-  SdlInputHandler.h
-  SdlInputHandler.cpp
-  GameEntityManager.h
-  GameEntityManager.cpp
-  Threading/MessageQueueSystem.h
-  Threading/MessageQueueSystem.cpp)
-  
+  SDL/SDLGraphicsEngine.hpp
+  SDL/SDLGraphicsEngine.cpp
+  SDL/SDLInputEngine.hpp
+  SDL/SDLInputEngine.cpp
+  SDL/ImguiInterface.hpp
+  SDL/ImguiInterface.cpp
+  Gui/Gui.hpp
+  Gui/Gui.cpp)
+
+MESSAGE(STATUS ${SDL2_INCLUDE_DIR})
+
+target_link_libraries(graphics
+  gui
+  ${SDL2_LIBRARY}
+  ${SDL2IMAGE_LIBRARY}
+  ${OPENGL_LIBRARIES})
+
+target_include_directories(graphics PUBLIC
+  ${SDL2_INCLUDE_DIR}
+  ${SDL2IMAGE_INCLUDE_DIR})
+
+add_subdirectory(Gui)

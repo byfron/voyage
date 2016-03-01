@@ -2,7 +2,9 @@
 
 int main() {
 
-	GameClient client;
+	
+	GameClient client;	
+	
 	client.init();
 	client.start();       
 

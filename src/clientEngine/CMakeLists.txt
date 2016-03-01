@@ -3,4 +3,6 @@ add_library(clientEngine
   GameClient.cpp
   )
 
-target_link_libraries(clientEngine networking)
+target_link_libraries(clientEngine
+  networking
+  graphics)

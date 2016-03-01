@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6.2)
 project(voyage)
 
 option(BUILD_VOYAGE3D "build 3d interface with OGRE library" OFF)
+option(BUILD_VOYAGE_SDL "build 2d interface with SDL library" ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -pthread -march=native")
 
@@ -15,10 +16,12 @@ find_package(Threads REQUIRED)
 set(DB_NAME "test.db")
 set(DB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/datasets/")
 set(SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/scripts/")
+set(GRAPHICS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/graphics/")
 
 add_definitions(-DDB_DIR="${DB_DIR}")
 add_definitions(-DDB_NAME="${DB_NAME}")
 add_definitions(-DSCRIPTS_DIR="${SCRIPTS_DIR}")
+add_definitions(-DGRAPHICS_DIR="${GRAPHICS_DIR}")
 
 set(CMAKE_MODULE_PATH
   "${CMAKE_SOURCE_DIR}/CMake"
@@ -39,6 +42,10 @@ IF(Boost_FOUND)
   FIND_PACKAGE(Boost 1.45.0 COMPONENTS python)
 ENDIF()
 
+find_package(SDL2)
+find_package(SDL2_image)
+find_package(OpenGL REQUIRED)
+
 #find_package(SQLite3)
 find_library(SQLITE3_LIBRARY sqlite3)
 
@@ -52,8 +59,7 @@ if (BUILD_VOYAGE3D)
   include(OgreConfigTargets)
   include(PreprocessorUtils)
 
-  find_package(OGRE)
-  find_package(SDL2)
+  find_package(OGRE)  
 
   include_directories(${OGRE_INCLUDE_DIR})
   include_directories(${SDL2_INCLUDE_DIR})
