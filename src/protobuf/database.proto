@@ -1,0 +1,15 @@
+package database;
+
+message entity {
+	required uint32 id = 1;
+}
+
+//message action {
+//}
+
+//message attribute {
+//}
+
+//message instance {
+//}
+
