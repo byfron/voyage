@@ -24,7 +24,7 @@ int TextureAtlas::loadTexture(std::string file) {
 	_spriteHeight = 16;
 
 
-	SDL_Texture *bmpTex = SDL_CreateTextureFromSurface(_renderer, _surface);
+/*	SDL_Texture *bmpTex = SDL_CreateTextureFromSurface(_renderer, _surface);
 	//Use SDL to render to texture. We can get create the renderer from the window
 	//Now render to the texture
 	SDL_Texture *texTarget = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGBA8888,
@@ -35,7 +35,7 @@ int TextureAtlas::loadTexture(std::string file) {
 	SDL_RenderClear(_renderer);
 	SDL_RenderCopy(_renderer, bmpTex, NULL, NULL);
 
-
+*/
 
 	//create texture
 	_textureId = 0;
@@ -46,7 +46,7 @@ int TextureAtlas::loadTexture(std::string file) {
 	if(_surface->format->BytesPerPixel == 4) {
 		Mode = GL_RGBA;
 	}
-	glTexImage2D(GL_TEXTURE_2D, 0, Mode, _surface->w, _surface->h, 0, Mode, GL_UNSIGNED_BYTE, bmpTex->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, Mode, _surface->w, _surface->h, 0, Mode, GL_UNSIGNED_BYTE, _surface->pixels);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
