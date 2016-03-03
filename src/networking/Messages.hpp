@@ -6,6 +6,9 @@
 #include <iostream>
 #include <MessageIdentifiers.h>
 #include <memory>
+#include <common/Generic.h>
+#include <iostream>
+#include <google/protobuf/message.h>
 
 enum MessageId {
 	ID_DEBUG = ID_USER_PACKET_ENUM+1,
@@ -25,34 +28,53 @@ public:
 
 	Message(MessageId id) {
 		_id = id;
-		_size = 0;
 		_addr = RakNet::UNASSIGNED_SYSTEM_ADDRESS;
+		_size = 0;
 	}
 
-	Message(MessageId id, const std::string data) {
+	Message(MessageId id, RakNet::BitStream bs) {
 		_id = id;
-		_buffer = data.c_str();
-		_size = data.size();
 		_addr = RakNet::UNASSIGNED_SYSTEM_ADDRESS;
+		_size = 0;
+		fromBitStream(bs);
+	}
+
+	Message(RakNet::BitStream & bs) {
+		fromBitStream(bs);
 	}
 	
 	Message(RakNet::Packet *p) {
 		_addr = p->systemAddress;
 		RakNet::BitStream bsIn(p->data, p->length, false);
-		_id = (MessageId)p->data[0];
-		bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-		bsIn.Read(_buffer);
-		_size = p->length;
+		fromBitStream(bsIn);
 	}
 
+	void fromBitStream(RakNet::BitStream & bs) {
+		Generic::TempBuffer buffer;
+		bs.Read((char*)&_id, (const unsigned int)1);
+		bs.IgnoreBytes(sizeof(RakNet::MessageID));
+		_size = BITS_TO_BYTES(bs.GetNumberOfUnreadBits());;
+		buffer.Ensure(_size);
+
+		bs.Read(buffer);
+		_content->ParseFromArray(buffer.data, _size);
+	}
+	
 	void toBitStream(RakNet::BitStream & bs) {
-		bs.Write((RakNet::MessageID) _id);
-		if (_size > 0)
-			bs.Write(_buffer);
-	}
 
-	const char * getData() { return _buffer;}
-	int getSize() { return _size;}
+		bs.Write((RakNet::MessageID)_id);
+		if (_size > 0) {
+			Generic::TempBuffer buffer;
+			buffer.Ensure(_size);
+			if (_content->SerializeToArray(buffer.data, _size))
+			{
+				bs.Write((RakNet::MessageID)_id);
+			}
+			else std::cout << "ERROR" << std::endl;
+		}
+
+	}      
+	
 	int getId() { return _id; }
 	RakNet::SystemAddress getAddr() { return _addr; }
 	
@@ -62,12 +84,12 @@ public:
 private:
 
 	MessageId _id;
-	int _size;
-	RakNet::RakString _buffer;
 	RakNet::SystemAddress _addr;
+	int _size;
+	google::protobuf::Message *_content;  //protobuf message
 };
 
 inline std::ostream& operator<< (std::ostream& stream, const Message msg) {
-	stream << msg._id << "-" << msg._buffer << std::endl;
+	stream << msg._id << "-";// << *msg._content << std::endl;
 	return stream;
 }

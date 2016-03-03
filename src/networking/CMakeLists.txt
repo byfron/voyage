@@ -5,5 +5,5 @@ add_library(networking
   ServerNetworkManager.cpp
   )
 
-target_link_libraries(networking pthread ${RAKNET_LIB})
+target_link_libraries(networking pthread common ${PROTOBUF_LIBRARIES} ${RAKNET_LIB})
 

@@ -28,7 +28,7 @@ struct ScriptContext {
 	}
 	
 	int sendMessage(std::string message) {
-		_playerSession->sendMessage(std::make_shared<Message>(message));
+//		_playerSession->sendMessage(std::make_shared<Message>(message));
 	}
 	
 //private:

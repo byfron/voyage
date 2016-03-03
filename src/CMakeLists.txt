@@ -21,6 +21,7 @@ add_executable(voyage clients/voyage.cpp)
 include_directories(.)
 include_directories(utils)
 
+add_subdirectory(common)
 add_subdirectory(networking)
 add_subdirectory(clientEngine)
 add_subdirectory(serverEngine)

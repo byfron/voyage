@@ -3,7 +3,7 @@
 
 //Tiny client
 #include <RakPeerInterface.h>
-#include "PacketHandler.hpp"
+//#include "PacketHandler.hpp"
 #include <map>
 #include "ServerNetworkManager.hpp"
 
