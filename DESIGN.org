@@ -1,3 +1,4 @@
+- OPEN-SOURCE GENERIC ENGINE FOR ONLINE ROGUE-LIKE STORYTELLING?
 
 * NETWORK layer on top of RakNet. Get inspiration from Biribit. Keep it simple.
 
@@ -37,7 +38,7 @@
 ** Scene: 
    - puts players together (player sessions to broadcast) (Room specialization?)
 
-
+ 
 * CLIENT
 
 Client should only send text (in principle)
@@ -62,6 +63,72 @@ V1: screen split -> 2D SDL tilemap + text terminal
 
 
 
+
+
+
+
+* CONSISTENCY CLIENT-SERVER
+
+** Instances have an "update" timestamp in the dataset 
+** Whenever an object is changed the timestamp is updated
+** The client can send a region request with the timestamp of the last time it download it
+** If things get deleted, how to update the client? Easy. we mark the tile as "dirty"
+** So the server sends any dirty tiles as well as entities with a newer timestamp
+** We'll have to provide python with convenient wrappers of the entity manipulation
+** The client should only request a new region when it seps on it
+** The data that changes dynamically in the region is "pushed" by the server
+***  with a broadcast message to all present players in the region (usually actions like moving)
+
+* CLIENT DATA
+
+** Client downloads the relevant data at the very beginning:
+*** List of entities, actions attributes, etc...
+** The region instances are downloaded on demand
+** We need different handlers in the client for different types of messages
+*** The region update message would take the data, update the dataset, and update the GUI
+
+* SERVER DATA:
+
+** SqlLite dataset
+** World Tilemap divided in square regions 
+** The attribute position would specify the tile where is in. 
+** Depending on how expensive is to keep the dataset updated 
+*** with the position for instance that changes a lot we can leave it as a special attribute
+*** in a cache-friendly array so that all entity positions are simultaneously updated 
+
+* LOTS OF MESSAGES NOW! YEAH
+- TODO: 
+** Nicely wrap the protocol buffers
+** Design a Client database cacher
+** Organize a bit better the whole concept of messages/handlers
+** Interface with python semantic analysis in the client (temporal?)
+** Implement the tilemap visualization
+** Doxygen doc generation
+** Design all messages:
+*** Login protocol 
+*** Data download on login
+*** Request/Response of new mapRegion (or updated)
+*** Send user input: should be the same format if it comes from written text or screen
+** Establish a minimal playable scenario
+*** A single static region that fits the screen. 
+*** Main character
+*** Some trees and objects
+*** User input with some graphical features like dynamic display of action possibilities
+*** Map loading from server as well as some action messages (i.e pick up axe)
+
+* WHY TO USE TEXT IF WE CAN CLICK ON THE SCENE?
+
+The screen should only make easier the input of instructions: For instance, if we click on a tree,
+the console can fill the word tree and wait for us to introduce the rest of the sentence.
+
+It should help also to fill instructions with location components:
+If the user types "Walk to" and then clicks on a tile, the player will go there. 
+If it writes: "Kick" and then clicks on a character it will kick it. 
+It would be interesting if the interface shows stuff that can be "kicked" also.
+E.g: Use axe with , and then trees are selected. 
+
+If we left-click on an tile: a name/description is shown.
+If we right-click on an tile: fills the console and waits for input
 
 
 
