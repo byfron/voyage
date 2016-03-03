@@ -30,7 +30,7 @@ private:
 	SDLInputEngine _input;
 	GameClient::Ptr _gameClient;
 	Gui::Ptr _gui;
-	TileMap::Ptr _tilemap;
+	TileMapLayer::Ptr _tilemapLayer;
 	
 	SDL_Window *_window;
 	SDL_GLContext _glcontext;

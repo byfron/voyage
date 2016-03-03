@@ -5,8 +5,8 @@ add_library(graphics SHARED
   SDL/SDLInputEngine.cpp
   SDL/ImguiInterface.hpp
   SDL/ImguiInterface.cpp
-  SDL/TileMap.hpp
-  SDL/TileMap.cpp
+  SDL/TileMapLayer.hpp
+  SDL/TileMapLayer.cpp
   SDL/TextureAtlas.hpp
   SDL/TextureAtlas.cpp
   Gui/Gui.hpp
@@ -18,7 +18,8 @@ target_link_libraries(graphics
   gui
   ${SDL2_LIBRARY}
   ${SDL2IMAGE_LIBRARY}
-  ${OPENGL_LIBRARIES})
+  ${OPENGL_LIBRARIES}
+  GLEW)
 
 target_include_directories(graphics PUBLIC
   ${OPENGL_INCLUDE_DIR}

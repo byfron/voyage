@@ -2,7 +2,7 @@
 
 #include <graphics/SDL/ImguiInterface.hpp>
 #include <graphics/Gui/imgui.h>
-#include <graphics/SDL/TileMap.hpp>
+#include <graphics/SDL/TileMapLayer.hpp>
 #include <memory>
 
 class Gui {
@@ -12,13 +12,16 @@ public:
 	void display();
 	void displayConsole();
 	void displayMain();
-	void displayMap(TileMap::Ptr);
+	void displayMap(TileMapLayer::Ptr);
 	void clear();
 
 	int getWindowWidth() { return _window_width; }
 	int getWindowHeight() { return _window_height; }
 	typedef std::shared_ptr<Gui> Ptr;
 
+	int getTileLayerWidth() { return _tilelayer_width; }
+	int getTileLayerHeight() { return _tilelayer_height; }
+	
 
 	void debug_load_im();
 
@@ -29,6 +32,8 @@ private:
 	ImVec4 _clear_color;
 	int _window_width;
 	int _window_height;
+	int _tilelayer_width;
+	int _tilelayer_height;
 	bool _fullscreen;
 	float _window_alpha;
 

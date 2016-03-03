@@ -9,54 +9,28 @@ void Gui::init() {
 	_clear_color = ImColor(114, 144, 154);
 	_window_width = 1280;
 	_window_height = 768;
+	_tilelayer_height = _window_height;
+	_tilelayer_width = _window_width/2.0;
 	_fullscreen = false;
 	_console_window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 	_map_window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;;
-	_window_alpha = -0.01f; // <0: default
+	_window_alpha = -0.01f; // <0: default	
 }
 
-void Gui::displayMap(TileMap::Ptr tm) {
+void Gui::displayMap(TileMapLayer::Ptr tm) {
 
 	bool opened = true;	
-	ImGui::SetNextWindowPos(ImVec2(_window_width/2, 0), ImGuiSetCond_FirstUseEver);
-	if (!ImGui::Begin("Map", &opened, ImVec2(_window_width/2,_window_height),
+	ImGui::SetNextWindowPos(ImVec2(_tilelayer_width, 0), ImGuiSetCond_FirstUseEver);
+	if (!ImGui::Begin("Map", &opened, ImVec2(_tilelayer_width, _window_height),
 	 		  _window_alpha, _map_window_flags))
 	{
 	 	ImGui::End();
 	 	return;
 	}
+		
+	tm->render();
 
-
-
-	
-
-	
-	//tm->render();
-	
-//	ImGui::Image(tm->getTextureId(), ImVec2(32, 32), ImVec2(0,0), ImVec2(0.1,0.1), ImColor(255,255,255,255), ImColor(255,255,255,128));
-	
-
-	ImVec2 a(0,0); // topLeft
-	ImVec2 c(36, 36); // bottom right
-	ImVec2 b(0, 36); // topRight
-	ImVec2 d(36, 0 ); // bottomLeft // CW order
-
-	ImVec2 uv_a(0, 0), uv_c(0.1, 0.1);
-	ImVec2 uv_b(uv_c.x, uv_a.y), uv_d(uv_a.x, uv_c.y);
-
-	ImDrawList * drawList=ImGui::GetWindowDrawList();
-
-	const bool push_texture_id = drawList->_TextureIdStack.empty() || tm->getTextureId() != drawList->_TextureIdStack.back();
-	if (tm->getTextureId())
-		drawList->PushTextureID(tm->getTextureId());
-
-//	drawList->PushTextureID(tm->getTextureId());
-	drawList->PrimReserve(6,4);
-	drawList->PrimQuadUV(a,b,c,d,uv_b,uv_c,uv_d,uv_a, 0xFFFFFFFF);
-
-	if (tm->getTextureId())
-		drawList->PopTextureID();
-	
+	ImGui::Image(tm->getTextureId(), ImVec2(_tilelayer_width-17, _tilelayer_height-17), ImVec2(0,0), ImVec2(1,1), ImColor(255,255,255,255), ImColor(255,255,255,128));
 	ImGui::End();	
 }
 

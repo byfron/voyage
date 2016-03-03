@@ -26,9 +26,9 @@ void SDLGraphicsEngine::init() {
 	_gui->init();
 
 	//create tilemap
-	_tilemap = std::make_shared<TileMap>();
-	_tilemap->init();
-
+	_tilemapLayer = std::make_shared<TileMapLayer>();
+	_tilemapLayer->init();
+	
 	// Setup window
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -37,14 +37,17 @@ void SDLGraphicsEngine::init() {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	SDL_DisplayMode current;
 	SDL_GetCurrentDisplayMode(0, &current);
-	_window = SDL_CreateWindow("Voyage", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _gui->getWindowWidth(), _gui->getWindowHeight(), SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+	_window = SDL_CreateWindow("Voyage", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _gui->getWindowWidth(), _gui->getWindowHeight(), SDL_WINDOW_OPENGL);
 	_glcontext = SDL_GL_CreateContext(_window);
 
 	// Setup input and ImGui binding
 	_input.init(_window);
 
-	_tilemap->loadTextureAtlas();
-	_tilemap->getAtlas()->createSDLRenderer(_window);
+	_tilemapLayer->setLayerSize(_gui->getTileLayerWidth(), _gui->getTileLayerHeight());
+	_tilemapLayer->setScreenSize(_gui->getWindowWidth(), _gui->getWindowHeight());
+	_tilemapLayer->loadTextureAtlas();
+	_tilemapLayer->createTileMapGLTexture();
+	
 	
 	ImGuiIO& io = ImGui::GetIO();
 	io.RenderDrawListsFn = ImGuiRenderDrawLists;
@@ -144,8 +147,8 @@ void SDLGraphicsEngine::run() {
 	//_gui->displayMain();
 	//_gui->displayConsole();
 
-	//display map
-	_gui->displayMap(_tilemap);
+	_tilemapLayer->updateTileMap(_gameClient->getTileMap());
+	_gui->displayMap(_tilemapLayer);
 	
 	// Rendering
         glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
