@@ -16,21 +16,12 @@ enum MessageId {
 };
 
 
-//TODO: Have this and also a ProtoMessage??
-
 /**
- * Generic text message
+ * Wrap of protobuf messages
  */
 class Message {
 
 public:
-
-	Message(const std::string data) {
-		_id = ID_DATA_MESSAGE;
-		_buffer = data.c_str();
-		_size = data.size();
-		_addr = RakNet::UNASSIGNED_SYSTEM_ADDRESS;
-	}
 
 	Message(MessageId id) {
 		_id = id;

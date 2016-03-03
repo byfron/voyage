@@ -96,6 +96,8 @@ V1: screen split -> 2D SDL tilemap + text terminal
 *** with the position for instance that changes a lot we can leave it as a special attribute
 *** in a cache-friendly array so that all entity positions are simultaneously updated 
 
+
+
 * LOTS OF MESSAGES NOW! YEAH
 - TODO: 
 ** Nicely wrap the protocol buffers
@@ -115,6 +117,8 @@ V1: screen split -> 2D SDL tilemap + text terminal
 *** Some trees and objects
 *** User input with some graphical features like dynamic display of action possibilities
 *** Map loading from server as well as some action messages (i.e pick up axe)
+
+
 
 * WHY TO USE TEXT IF WE CAN CLICK ON THE SCENE?
 
