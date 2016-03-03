@@ -45,6 +45,7 @@ ENDIF()
 find_package(SDL2)
 find_package(SDL2_image)
 find_package(OpenGL REQUIRED)
+FIND_PACKAGE(Protobuf REQUIRED)
 
 #find_package(SQLite3)
 find_library(SQLITE3_LIBRARY sqlite3)

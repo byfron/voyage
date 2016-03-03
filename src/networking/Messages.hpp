@@ -15,6 +15,9 @@ enum MessageId {
 	ID_CLIENT_SEND_LOGIN_CREDENTIALS
 };
 
+
+//TODO: Have this and also a ProtoMessage??
+
 /**
  * Generic text message
  */

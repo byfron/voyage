@@ -1,5 +1,6 @@
 #include "SDLGraphicsEngine.hpp"
 #include "ImguiInterface.hpp"
+#include "TextureAtlas.hpp"
 #include <graphics/Gui/imgui.h>
 #include <SDL_image.h>
 
@@ -20,6 +21,14 @@ void SDLGraphicsEngine::init() {
 		printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
 	}
 
+	// Create Gui object. Only loads low-level data (i.e window size)
+	_gui = std::make_shared<Gui>();
+	_gui->init();
+
+	//create tilemap
+	_tilemap = std::make_shared<TileMap>();
+	_tilemap->init();
+
 	// Setup window
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -28,46 +37,26 @@ void SDLGraphicsEngine::init() {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	SDL_DisplayMode current;
 	SDL_GetCurrentDisplayMode(0, &current);
-	_window = SDL_CreateWindow("Voyage", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+	_window = SDL_CreateWindow("Voyage", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _gui->getWindowWidth(), _gui->getWindowHeight(), SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 	_glcontext = SDL_GL_CreateContext(_window);
 
 	// Setup input and ImGui binding
 	_input.init(_window);
 
+	_tilemap->loadTextureAtlas();
+	_tilemap->getAtlas()->createSDLRenderer(_window);
+	
 	ImGuiIO& io = ImGui::GetIO();
 	io.RenderDrawListsFn = ImGuiRenderDrawLists;
 	io.SetClipboardTextFn = ImGuiSetClipboardText;
 	io.GetClipboardTextFn = ImGuiGetClipboardText;
 
-	// Setup gui object
-	_gui = Gui::Ptr(new Gui());
-	_gui->init();
-
+	//load texture atlas after all the imgui initialization!
+//	_gui->displayMap(_tilemap);
 	
-	//DEBUG STUFF AS WELL!
-	
+	//DEBUG STUFF AS WELL!	
 	_show_test_window = true;
 	_show_another_window = false;
-	
-	//draw sdl surface into opengl texture
-	std::cout << "loading image " << GRAPHICS_DIR "mayday.png" << std::endl;
-	_surface = IMG_Load(GRAPHICS_DIR "/mayday.png");
-
-	if (_surface == NULL) std::cout << "Error loading image:" << IMG_GetError() << std::endl;
-	
-	_sdlOverlayTexId = 0;
-	glGenTextures(1, &_sdlOverlayTexId);
-	glBindTexture(GL_TEXTURE_2D, _sdlOverlayTexId);
-	int Mode = GL_RGB;
- 
-	if(_surface->format->BytesPerPixel == 4) {
-		Mode = GL_RGBA;
-	}
-	glTexImage2D(GL_TEXTURE_2D, 0, Mode, _surface->w, _surface->h, 0, Mode, GL_UNSIGNED_BYTE, _surface->pixels);
- 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
- 
 	
 }
 
@@ -152,17 +141,11 @@ void SDLGraphicsEngine::run() {
 	newFrame();
 
 	//displayGUI
-	_gui->display();
-	       
-	// ImTextureID tex_id = (void *)(intptr_t) _sdlOverlayTexId;	
-	// ImGui::Image(tex_id, ImVec2(256, 256), ImVec2(0,0), ImVec2(1,1), ImColor(255,255,255,255), ImColor(255,255,255,128));
-	
-	// //Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-        // if (_show_test_window)
-        // {
-	//ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-	//ImGui::ShowTestWindow(&_show_test_window);
-        // }
+	//_gui->displayMain();
+	//_gui->displayConsole();
+
+	//display map
+	_gui->displayMap(_tilemap);
 	
 	// Rendering
         glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
@@ -174,6 +157,9 @@ void SDLGraphicsEngine::run() {
 
 
 void SDLGraphicsEngine::stop() {
+
+	_gameClient->requestQuit();
+	
 	// Cleanup
 	if (g_FontTexture)
 	{

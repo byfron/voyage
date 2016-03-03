@@ -6,6 +6,7 @@ class SDLGraphicsEngine;
 
 class GameClient {
 public:
+	~GameClient() {}
 	void init();
 	void start();		
 	void clientLoop();

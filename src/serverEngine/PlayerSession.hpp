@@ -1,7 +1,7 @@
 #pragma once
 
 #include <networking/Session.hpp>
-#include <sql/DatabaseConnectionPool.hpp>
+#include <database/DatabaseConnectionPool.hpp>
 
 class GameServer;
 typedef std::shared_ptr<GameServer> GameServerPtr;

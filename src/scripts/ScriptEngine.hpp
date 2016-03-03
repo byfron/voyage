@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <sql/DatabaseConnectionPool.hpp>
+#include <database/DatabaseConnectionPool.hpp>
 #include <boost/python.hpp>
 
 class PlayerSession;

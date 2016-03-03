@@ -27,8 +27,7 @@ int DatabaseConnection::connect(const std::string & db_name) {
 }
 
 int DatabaseConnection::runQuery(const char* query) {
-
-	
+	//mark as dirty when modified	
 }
 
 DatabaseResult DatabaseConnection::runSelectQuery(const char* query) {

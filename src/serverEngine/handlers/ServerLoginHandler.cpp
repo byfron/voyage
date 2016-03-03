@@ -6,7 +6,7 @@
 namespace spd = spdlog;
 
 ServerLoginHandler::ServerLoginHandler(GameServer::Ptr gs) {
-	_handlerId = SERVER_LOGIN_HANDLER;
+	_handlerId = 	SERVER_LOGIN_REQ_HANDLER;
 	_gameServer = gs;
 }
 

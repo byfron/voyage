@@ -1,5 +1,5 @@
 #include "ScriptEngine.hpp"
-#include <sql/DatabaseConnectionPool.hpp>
+#include <database/DatabaseConnectionPool.hpp>
 #include <spdlog/spdlog.h>
 #include <gtest/gtest.h>
 #include <serverEngine/PlayerSession.hpp>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <serverEngine/PlayerSession.hpp>
-#include <sql/DatabaseConnection.hpp>
+#include <database/DatabaseConnection.hpp>
 
 
 /**

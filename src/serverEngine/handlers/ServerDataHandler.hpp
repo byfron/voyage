@@ -15,3 +15,4 @@ private:
 	GameServer::Ptr _gameServer;
 	
 };
+

@@ -3,7 +3,7 @@
 #include <RakPeerInterface.h>
 #include <networking/ServerNetworkManager.hpp>
 #include <scripts/ScriptEngine.hpp>
-#include <sql/DatabaseConnectionPool.hpp>
+#include <database/DatabaseConnectionPool.hpp>
 #include "PlayerSession.hpp"
 
 class GameServer {

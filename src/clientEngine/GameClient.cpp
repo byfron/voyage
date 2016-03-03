@@ -41,18 +41,12 @@ void GameClient::start() {
 	auto console = spd::stdout_logger_mt("console");
 	console->info("Starting game client");
 
-
 	//TODO: if I don't sleep the message is not sent!!!
 	sleep(1);
 
 	signal(SIGINT, exit);
 	
 	_netManager.sendData(ID_LOGIN_MESSAGE);
-
-	//run thread that takes user input
-	//std::thread p1( [this]() { clientLoop(); } );
-
-	
 	
 	while (_running && gRunning) {
 

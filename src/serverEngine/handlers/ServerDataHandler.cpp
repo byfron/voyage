@@ -5,7 +5,7 @@
 namespace spd = spdlog;
 
 ServerDataHandler::ServerDataHandler(GameServer::Ptr gs) {
-	_handlerId = SERVER_DATA_HANDLER;
+	_handlerId = SERVER_USER_ACTION_HANDLER;
 	_gameServer = gs;
 }
 void ServerDataHandler::onMessage(Message::Ptr m) {
