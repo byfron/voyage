@@ -9,7 +9,7 @@ class ServerLoginHandler : public PacketHandler {
 public:
 
 	ServerLoginHandler(GameServer::Ptr);
-	void onMessage(Message::Ptr m);
+	void onMessage(RakNet::Packet *p);
 
 private:
 

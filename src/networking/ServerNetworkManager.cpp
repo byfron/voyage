@@ -41,9 +41,18 @@ void ServerNetworkManager::receiveData()
 	RakNet::Packet *p;
 	for (p=_peer->Receive(); p; _peer->DeallocatePacket(p), p=_peer->Receive())
 	{
-		Message::Ptr m = std::make_shared<Message>(p);
 
-		if (_msgHandlersMap.count(m->getId()))
-			_handlers[_msgHandlersMap[m->getId()]]->onMessage(m);
+		//get id from first byte of package:
+
+		//call corresponding handler with the package and generate
+		//message within the handler
+		
+
+		int id = p->data[0];
+//		Message::Ptr m = std::make_shared<Message>(id);
+		
+
+		if (_msgHandlersMap.count(id))
+			_handlers[_msgHandlersMap[id]]->onMessage(p);
 	}
 }

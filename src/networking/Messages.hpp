@@ -22,6 +22,7 @@ enum MessageId {
 /**
  * Wrap of protobuf messages
  */
+template <typename T>
 class Message {
 
 public:
@@ -57,7 +58,7 @@ public:
 		buffer.Ensure(_size);
 
 		bs.Read(buffer);
-		_content->ParseFromArray(buffer.data, _size);
+		_content.ParseFromArray(buffer.data, _size);
 	}
 	
 	void toBitStream(RakNet::BitStream & bs) {
@@ -66,7 +67,7 @@ public:
 		if (_size > 0) {
 			Generic::TempBuffer buffer;
 			buffer.Ensure(_size);
-			if (_content->SerializeToArray(buffer.data, _size))
+			if (_content.SerializeToArray(buffer.data, _size))
 			{
 				bs.Write((RakNet::MessageID)_id);
 			}
@@ -78,7 +79,7 @@ public:
 	int getId() { return _id; }
 	RakNet::SystemAddress getAddr() { return _addr; }
 	
-	friend std::ostream& operator<< (std::ostream& stream, const Message msg);
+//	friend std::ostream& operator<< (std::ostream& stream, const Message msg);
 
 	typedef std::shared_ptr<Message> Ptr;	
 private:
@@ -86,10 +87,10 @@ private:
 	MessageId _id;
 	RakNet::SystemAddress _addr;
 	int _size;
-	google::protobuf::Message *_content;  //protobuf message
+	T _content;  //protobuf message
 };
 
-inline std::ostream& operator<< (std::ostream& stream, const Message msg) {
-	stream << msg._id << "-";// << *msg._content << std::endl;
-	return stream;
-}
+//inline std::ostream& operator<< (std::ostream& stream, const Message msg) {
+//	stream << msg._id << "-";// << *msg._content << std::endl;
+//	return stream;
+//}

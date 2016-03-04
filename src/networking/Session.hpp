@@ -10,7 +10,8 @@ class Session {
 public:
 
 	typedef std::shared_ptr<Session> Ptr;
-	void sendRakNetMessage(RakNet::RakPeerInterface *peer, Message::Ptr m) {
+	template <typename T>
+	void sendRakNetMessage(RakNet::RakPeerInterface *peer, std::shared_ptr< Message<T> >  m) {
 		RakNet::BitStream bsOut;
 		m->toBitStream(bsOut);
 

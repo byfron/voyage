@@ -10,11 +10,13 @@ ServerLoginHandler::ServerLoginHandler(GameServer::Ptr gs) {
 	_gameServer = gs;
 }
 
-void ServerLoginHandler::onMessage(Message::Ptr m) {
+void ServerLoginHandler::onMessage(RakNet::Packet *p) {
 
 	std::cout << "hey" << std::endl;
+
+//	switch(p->data[
 	
 	// if logging is successful
-	_gameServer->createPlayerSession(m->getAddr());	
+//	_gameServer->createPlayerSession(m->getAddr());	
 	
 }

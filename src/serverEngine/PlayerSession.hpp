@@ -13,8 +13,9 @@ public:
 	typedef std::shared_ptr<PlayerSession> Ptr;
 
 	PlayerSession(unsigned int id, RakNet::SystemAddress addr, GameServerPtr _gs);
-	
-	void sendMessage(Message::Ptr m);
+
+	template <typename T>
+	void sendMessage(std::shared_ptr< Message<T> > );
 
 	int getId() { return _id; }
 	

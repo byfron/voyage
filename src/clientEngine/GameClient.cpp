@@ -46,7 +46,7 @@ void GameClient::start() {
 
 	signal(SIGINT, exit);
 	
-	_netManager.sendData(ID_LOGIN_MESSAGE);
+//	_netManager.sendData(ID_LOGIN_MESSAGE);
 	
 	while (_running && gRunning) {
 

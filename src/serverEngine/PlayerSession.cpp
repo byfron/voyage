@@ -11,7 +11,8 @@ PlayerSession::PlayerSession(unsigned int id, RakNet::SystemAddress addr, GameSe
 	
 }
 
-void PlayerSession::sendMessage(Message::Ptr m)
+template <typename T>
+void PlayerSession::sendMessage(std::shared_ptr< Message<T> > m)
 {
 	if (_gameServer)
 		sendRakNetMessage(_gameServer->getRakNetPeer(), m);

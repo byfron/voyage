@@ -13,6 +13,7 @@ target_link_libraries(serverEngine
   networking
   database
   scriptEngine
+  proto
   ${PYTHON_LIBRARIES})
 
-target_include_directories(serverEngine PUBLIC ${PYTHON_INCLUDE_PATH})
+target_include_directories(serverEngine PUBLIC ${PYTHON_INCLUDE_PATH} ${CMAKE_BINARY_DIR}/src/protobuf)

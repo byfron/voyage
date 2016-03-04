@@ -45,10 +45,10 @@ void ClientNetworkManager::disconnect(void)
 
 void ClientNetworkManager::sendData(MessageId id) {
 	
-	Message::Ptr m = std::make_shared<Message>(id);
-	RakNet::BitStream bsOut;
-	m->toBitStream(bsOut);
-	_peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
+	//Message::Ptr m = std::make_shared<Message>(id);
+	//RakNet::BitStream bsOut;
+	//m->toBitStream(bsOut);
+	//_peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
 }
 
 // void ClientNetworkManager::sendData(MessageId id, const char *data) {
@@ -64,11 +64,11 @@ void ClientNetworkManager::receiveData()
 	Packet *p;
 	for (p=_peer->Receive(); p; _peer->DeallocatePacket(p), p=_peer->Receive())
 	{
-		Message::Ptr m = std::make_shared<Message>(p);
+		//	Message::Ptr m = std::make_shared<Message>(p);
 
-		std::cout << "receiving something:" << *m << std::endl;
+//		std::cout << "receiving something:" << *m << std::endl;
 		
-		switch(m->getId()) {		
+		switch(p->data[0]) {		
 					
 			/*case ID_LOGIN_MESSAGE:
 			_handlers[CLIENT_LOGIN_HANDLER]->onMessage(m);

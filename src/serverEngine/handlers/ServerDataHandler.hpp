@@ -8,7 +8,7 @@ class ServerDataHandler : public PacketHandler {
 
 public:
 	ServerDataHandler(GameServer::Ptr);	
-	void onMessage(Message::Ptr m);
+	void onMessage(RakNet::Packet *);
 
 private:
 
