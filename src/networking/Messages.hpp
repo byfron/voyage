@@ -10,15 +10,6 @@
 #include <iostream>
 #include <google/protobuf/message.h>
 
-enum MessageId {
-	ID_DEBUG = ID_USER_PACKET_ENUM+1,
-	ID_LOGIN_MESSAGE,
-	ID_DATA_MESSAGE,
-	ID_CLIENT_REQUEST_LOGIN,
-	ID_CLIENT_SEND_LOGIN_CREDENTIALS
-};
-
-
 /**
  * Wrap of protobuf messages
  */
@@ -27,13 +18,20 @@ class Message {
 
 public:
 
-	Message(MessageId id) {
+	Message(RakNet::MessageID id, T content) {
+		_id = id;
+		_size = content.ByteSize();
+		_content = content;
+		_addr = RakNet::UNASSIGNED_SYSTEM_ADDRESS;
+	}
+	
+	Message(RakNet::MessageID id) {
 		_id = id;
 		_addr = RakNet::UNASSIGNED_SYSTEM_ADDRESS;
 		_size = 0;
 	}
 
-	Message(MessageId id, RakNet::BitStream bs) {
+	Message(RakNet::MessageID id, RakNet::BitStream bs) {
 		_id = id;
 		_addr = RakNet::UNASSIGNED_SYSTEM_ADDRESS;
 		_size = 0;
@@ -53,11 +51,9 @@ public:
 	void fromBitStream(RakNet::BitStream & bs) {
 		Generic::TempBuffer buffer;
 		bs.Read((char*)&_id, (const unsigned int)1);
-		bs.IgnoreBytes(sizeof(RakNet::MessageID));
 		_size = BITS_TO_BYTES(bs.GetNumberOfUnreadBits());;
 		buffer.Ensure(_size);
-
-		bs.Read(buffer);
+		bs.Read(buffer.data, _size);		
 		_content.ParseFromArray(buffer.data, _size);
 	}
 	
@@ -67,30 +63,32 @@ public:
 		if (_size > 0) {
 			Generic::TempBuffer buffer;
 			buffer.Ensure(_size);
-			if (_content.SerializeToArray(buffer.data, _size))
+			if (_content.SerializeToArray(buffer.data, buffer.size))
 			{
-				bs.Write((RakNet::MessageID)_id);
+				bs.Write(buffer.data, buffer.size);
 			}
 			else std::cout << "ERROR" << std::endl;
 		}
-
 	}      
 	
 	int getId() { return _id; }
 	RakNet::SystemAddress getAddr() { return _addr; }
-	
-//	friend std::ostream& operator<< (std::ostream& stream, const Message msg);
 
-	typedef std::shared_ptr<Message> Ptr;	
+	template <typename J>
+	friend std::ostream& operator<< (std::ostream& stream, const Message<J> msg);
+
+	typedef typename std::shared_ptr< Message<T> > Ptr;	
 private:
 
-	MessageId _id;
+	RakNet::MessageID _id;
 	RakNet::SystemAddress _addr;
 	int _size;
 	T _content;  //protobuf message
 };
 
-//inline std::ostream& operator<< (std::ostream& stream, const Message msg) {
-//	stream << msg._id << "-";// << *msg._content << std::endl;
-//	return stream;
-//}
+template <typename T>
+inline std::ostream& operator<< (std::ostream& stream, const Message<T> msg) {
+	stream << (int)msg._id << "-";
+	msg._content.SerializeToOstream(&stream);
+	return stream;
+}

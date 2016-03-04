@@ -3,6 +3,7 @@
 #include "handlers/ServerLoginHandler.hpp"
 #include "handlers/ServerDataHandler.hpp"
 #include <signal.h>
+#include <common/GameMessages.hpp>
 
 namespace spd = spdlog;
 
@@ -34,15 +35,18 @@ void GameServer::_init(int port) {
 	
 	//register managers
 	_netManagerPtr->registerHandler(std::make_shared<ServerLoginHandler>(GameServer::Ptr(this)),
-				    {ID_LOGIN_MESSAGE, ID_CLIENT_REQUEST_LOGIN});
+				    {ID_CS_LOGIN_REQUEST});
 	
-	_netManagerPtr->registerHandler(std::make_shared<ServerDataHandler>(GameServer::Ptr(this)),
-				    {ID_DATA_MESSAGE});		
+//	_netManagerPtr->registerHandler(std::make_shared<ServerDataHandler>(GameServer::Ptr(this)),
+//				    {ID_DATA_MESSAGE});		
 }
 
 void GameServer::stop() {
 	_dbPoolPtr->drainPool();
 	_scriptEnginePtr->finalize();
+
+	google::protobuf::ShutdownProtobufLibrary();
+
 }
 
 int GameServer::createPlayerSession(RakNet::SystemAddress addr) {

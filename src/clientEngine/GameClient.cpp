@@ -3,6 +3,8 @@
 #include <thread>
 #include <signal.h>
 #include <graphics/SDL/SDLGraphicsEngine.hpp>
+#include <common/GameMessages.hpp>
+#include "voyage.pb.h"
 
 namespace spd = spdlog;
 
@@ -45,8 +47,11 @@ void GameClient::start() {
 	sleep(1);
 
 	signal(SIGINT, exit);
-	
-//	_netManager.sendData(ID_LOGIN_MESSAGE);
+
+	voyage::cs_LoginRequest msg;
+	msg.set_username("jose");
+	msg.set_password("1234");
+	_netManager.sendData<voyage::cs_LoginRequest>(ID_CS_LOGIN_REQUEST, msg);
 	
 	while (_running && gRunning) {
 

@@ -1,4 +1,5 @@
 #include "ServerNetworkManager.hpp"
+#include <common/GameMessages.hpp>
 
 ServerNetworkManager::ServerNetworkManager()
 {
@@ -41,17 +42,7 @@ void ServerNetworkManager::receiveData()
 	RakNet::Packet *p;
 	for (p=_peer->Receive(); p; _peer->DeallocatePacket(p), p=_peer->Receive())
 	{
-
-		//get id from first byte of package:
-
-		//call corresponding handler with the package and generate
-		//message within the handler
-		
-
-		int id = p->data[0];
-//		Message::Ptr m = std::make_shared<Message>(id);
-		
-
+		RakNet::MessageID id = p->data[0];				
 		if (_msgHandlersMap.count(id))
 			_handlers[_msgHandlersMap[id]]->onMessage(p);
 	}

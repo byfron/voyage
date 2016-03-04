@@ -25,8 +25,8 @@ public:
 	
 private:
 	RakNet::RakPeerInterface *_peer;
-	std::map<int, int> _msgHandlersMap;
-	std::map<int, PacketHandler::Ptr> _handlers;
+	std::map<RakNet::MessageID, int> _msgHandlersMap;
+	std::map<RakNet::MessageID, PacketHandler::Ptr> _handlers;
 	bool _server_running;
 };
 

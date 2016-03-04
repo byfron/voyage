@@ -1,4 +1,9 @@
 #include "ClientNetworkManager.hpp"
+#include <common/GameMessages.hpp>
+#include "voyage.pb.h"
+
+//TODO: we can move up the hirearchy plenty of common functionality
+//of this and the servernetworkmanager
 
 ClientNetworkManager::ClientNetworkManager()
 {
@@ -9,8 +14,15 @@ ClientNetworkManager::~ClientNetworkManager()
 	RakNet::RakPeerInterface::DestroyInstance(_peer);
 }
 
-void ClientNetworkManager::registerHandler(PacketHandler::Ptr h) {
-	_handlers[h->getId()] = h;
+void ClientNetworkManager::registerHandler(PacketHandler::Ptr h, const std::list<int> & list) {
+
+	h->isRegistered = true;
+
+	for (auto m : list) {
+		_msgHandlersMap[m] = h->getId();
+	}
+	
+	_handlers[h->getId()] = h;	
 }
 
 void ClientNetworkManager::start(const char *address, const int port)
@@ -42,21 +54,25 @@ void ClientNetworkManager::disconnect(void)
 	_isConnected=false;
 }
 
+// template <typename T>
+// void ClientNetworkManager::sendData(RakNet::MessageID id, const T & content) {
 
-void ClientNetworkManager::sendData(MessageId id) {
-	
-	//Message::Ptr m = std::make_shared<Message>(id);
-	//RakNet::BitStream bsOut;
-	//m->toBitStream(bsOut);
-	//_peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
-}
-
-// void ClientNetworkManager::sendData(MessageId id, const char *data) {
-	
-// 	Message::Ptr m = std::make_shared<Message>(id, data);
 // 	RakNet::BitStream bsOut;
-// 	m->toBitStream(bsOut);
+
+// 	Message<T>::Ptr m = std::make_shared<T>(id, content);
 // 	_peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
+// /*	
+// 	switch(id) {
+
+// 		case ID_CS_LOGIN_REQUEST:			
+// 			Message<voyage::cs_LoginRequest>::Ptr m =
+// 				std::make_shared< Message<voyage::cs_LoginRequest> >(id);
+// 			m->toBitStream(bsOut);
+// 			break;
+
+// 	};		
+// */	
+
 // }
 
 void ClientNetworkManager::receiveData()
@@ -64,22 +80,8 @@ void ClientNetworkManager::receiveData()
 	Packet *p;
 	for (p=_peer->Receive(); p; _peer->DeallocatePacket(p), p=_peer->Receive())
 	{
-		//	Message::Ptr m = std::make_shared<Message>(p);
-
-//		std::cout << "receiving something:" << *m << std::endl;
-		
-		switch(p->data[0]) {		
-					
-			/*case ID_LOGIN_MESSAGE:
-			_handlers[CLIENT_LOGIN_HANDLER]->onMessage(m);
-			break;
-
-		case ID_DATA_MESSAGE:
-			_handlers[CLIENT_DATA_HANDLER]->onMessage(m);
-			break;			
-		};
-			*/
-		};
+		int id = p->data[0];
+		if (_msgHandlersMap.count(id))
+			_handlers[_msgHandlersMap[id]]->onMessage(p);
 	}
-	
 }
