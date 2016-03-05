@@ -8,11 +8,18 @@ void TileMapLayer::init() {
 	_frameBufferId = 0;
 	_layerW = 500;
 	_layerH = 500;
+
+	_debug_colors[200][200];
+	for (int i = 0; i < 200; i++)
+		for (int j = 0; j < 200; j++) {
+			float g = (std::rand()/(RAND_MAX*3.) + 0.3);
+			_debug_colors[i][j] = g;
+		}
 }
 
 void TileMapLayer::loadTextureAtlas() {	
 	//create texture of the tilemap
-	_texAtlas = std::make_shared<TextureAtlas>("/Spacefox.png");
+	_texAtlas = std::make_shared<TextureAtlas>("/Spacefox_trans.png");
 }
 
 void TileMapLayer::createTileMapGLTexture() {
@@ -41,6 +48,21 @@ void TileMapLayer::createTileMapGLTexture() {
 	  	std::cout << "something bad happened" << std::endl;
 
 	_tex_id = (void *)(intptr_t) _renderedTex;
+}
+
+
+void TileMapLayer::renderTile(int x, int y, GLfloat r, GLfloat g, GLfloat b) {
+
+	float x_pix = x * _texAtlas->getSpriteW();
+	float y_pix = y * _texAtlas->getSpriteH();
+
+	glColor3f(r,g,b);
+	glBegin(GL_QUADS);	
+	glVertex3f(x_pix, y_pix, 0);	
+	glVertex3f(x_pix + _texAtlas->getSpriteW(), y_pix, 0);	
+	glVertex3f(x_pix + _texAtlas->getSpriteW(), y_pix + _texAtlas->getSpriteH(), 0);	
+	glVertex3f(x_pix, y_pix + _texAtlas->getSpriteH(), 0);	
+	glEnd();
 }
 
 void TileMapLayer::renderTile(int x, int y, int tileId) {
@@ -72,9 +94,9 @@ void TileMapLayer::updateTileMap(TileMap::Ptr tilemap) {
 void TileMapLayer::render() {
 
 	glBindFramebuffer(GL_FRAMEBUFFER, _fb);
-	glClearColor(1.0, 0.0, 0.0, 0.0);
+	glClearColor(1.0, 1.0, 1.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);	
-//	glEnable(GL_ALPHA);
+	glEnable(GL_ALPHA);
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
@@ -82,11 +104,19 @@ void TileMapLayer::render() {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glEnable(GL_TEXTURE_2D);
+
+	for (int i = 0; i < 200; i++)
+		for (int j = 0; j < 200; j++)
+			renderTile(i, j, 0.0, _debug_colors[i][j], 0.0);
+		
+
+	glColor3f(1.0,1.0,1.0);
 	glBindTexture(GL_TEXTURE_2D, _texAtlas->getTextureId());
 
 	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//-	glBlendFunc (GL_SRC_COLOR, GL_DST_COLOR);
+//	glBlendFunc (GL_SRC_COLOR, GL_ZERO);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// std::vector<int> tileIds = tilemap->getVisibleTiles(_ntilesW, _ntilesH);
 	// int c = 0;
@@ -95,6 +125,13 @@ void TileMapLayer::render() {
 	// 		renderTile(i,j tileIds[c]);
 	// 		c++;
 	// 	}
+
+
+	//1. render tile layer
+
+
+	//2. render object layer
+	
 	
 	renderTile(0,0,5);
 	renderTile(0,1,11);
@@ -106,5 +143,7 @@ void TileMapLayer::render() {
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

@@ -100,13 +100,19 @@ V1: screen split -> 2D SDL tilemap + text terminal
 
 * LOTS OF MESSAGES NOW! YEAH
 - TODO: 
-** Nicely wrap the protocol buffers
-** Design a Client database cacher
-** Organize a bit better the whole concept of messages/handlers
-** Interface with python semantic analysis in the client (temporal?)
-** Implement the tilemap visualization
+** TODO Implement the tilemap in the server
+** TODO Implement the: query for region, reply with region protocol
+** TODO visualize region with contents from dataset
+** DONE Nicely wrap the protocol buffers
+   CLOSED: [2016-03-04 Fri 10:11]
+
+** TODO Design a Client database cacher
+** DONE Organize a bit better the whole concept of messages/handlers
+   CLOSED: [2016-03-04 Fri 10:11]
+** TODO Implement the tilemap visualization
+** TODO Interface with python semantic analysis in the client (temporal?)
 ** Doxygen doc generation
-** Design all messages:
+** TODO Design all messages:
 *** Login protocol 
 *** Data download on login
 *** Request/Response of new mapRegion (or updated)

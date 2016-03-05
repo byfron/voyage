@@ -73,6 +73,7 @@ public:
 	
 	int getId() { return _id; }
 	RakNet::SystemAddress getAddr() { return _addr; }
+	T getContent() { return _content; }
 
 	template <typename J>
 	friend std::ostream& operator<< (std::ostream& stream, const Message<J> msg);

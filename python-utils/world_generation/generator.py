@@ -32,91 +32,124 @@ from scipy.spatial.distance import squareform, pdist, cdist
 import networkx as nx
 from PIL import Image, ImageDraw, ImageFilter
 import math
+from utils_voronoi import voronoi_finite_polygons_2d
 
-def voronoi_finite_polygons_2d(vor, radius=None):
-    """
-    Reconstruct infinite voronoi regions in a 2D diagram to finite
-    regions.
-
-    Parameters
-    ----------
-    vor : Voronoi
-        Input diagram
-    radius : float, optional
-        Distance to 'points at infinity'.
-
-    Returns
-    -------
-    regions : list of tuples
-        Indices of vertices in each revised Voronoi regions.
-    vertices : list of tuples
-        Coordinates for revised Voronoi vertices. Same as coordinates
-        of input vertices, with 'points at infinity' appended to the
-        end.
-
-    """
-
-    if vor.points.shape[1] != 2:
-        raise ValueError("Requires 2D input")
-
-    new_regions = []
-    new_vertices = vor.vertices.tolist()
-
-    center = vor.points.mean(axis=0)
-    if radius is None:
-        radius = vor.points.ptp().max()
-
-    # Construct a map containing all ridges for a given point
-    all_ridges = {}
-    for (p1, p2), (v1, v2) in zip(vor.ridge_points, vor.ridge_vertices):
-        all_ridges.setdefault(p1, []).append((p2, v1, v2))
-        all_ridges.setdefault(p2, []).append((p1, v1, v2))
-
-    # Reconstruct infinite regions
-    for p1, region in enumerate(vor.point_region):
-        vertices = vor.regions[region]
-
-        if all(v >= 0 for v in vertices):
-            # finite region
-            new_regions.append(vertices)
-            continue
-
-        # reconstruct a non-finite region
-        ridges = all_ridges[p1]
-        new_region = [v for v in vertices if v >= 0]
-
-        for p2, v1, v2 in ridges:
-            if v2 < 0:
-                v1, v2 = v2, v1
-            if v1 >= 0:
-                # finite ridge: already in the region
-                continue
-
-            # Compute the missing endpoint of an infinite ridge
-
-            t = vor.points[p2] - vor.points[p1] # tangent
-            t /= np.linalg.norm(t)
-            n = np.array([-t[1], t[0]])  # normal
-
-            midpoint = vor.points[[p1, p2]].mean(axis=0)
-            direction = np.sign(np.dot(midpoint - center, n)) * n
-            far_point = vor.vertices[v2] + direction * radius
-
-            new_region.append(len(new_vertices))
-            new_vertices.append(far_point.tolist())
-
-        # sort region counterclockwise
-        vs = np.asarray([new_vertices[v] for v in new_region])
-        c = vs.mean(axis=0)
-        angles = np.arctan2(vs[:,1] - c[1], vs[:,0] - c[0])
-        new_region = np.array(new_region)[np.argsort(angles)]
-
-        # finish
-        new_regions.append(new_region.tolist())
-
-    return new_regions, np.asarray(new_vertices)
+class Region:
+    def __init__(self):
+        self.moist = []
+        self.height = []
+        self.biome = []
+        self.polygon = []
+        self.edge_list = []    
 
 
+class TileMap:
+    def __init__(self, w, h):
+        self.w = w
+        self.h = h
+
+    def create(self):
+        pass
+
+        
+class World:
+    def __init__(self, npoints):
+        self.N = npoints
+        self.points = np.random.rand(N,2)
+        self.vor = Voronoi(self.points)
+        self.land_regions = []
+        self.water_regions = []
+
+    def createShape(self):
+        Y_vector = np.array([0,1]);
+        vectors = self.points - np.array([0.5,0.5]);
+        norm_vectors = (vectors.T/np.sqrt(np.sum(vectors**2,1))).T
+        dotynv = np.dot(Y_vector, norm_vectors.T)
+        detynv = Y_vector[0]*norm_vectors[:,1] - norm_vectors[:,0]*Y_vector[1]
+        angles = np.arctan2(detynv, dotynv)
+        seed = random.random()
+        
+        #sort in increasing angle
+        idx = np.argsort(angles)
+        base = 0.05
+
+        #generate a perlin noise vectors with the same elements as points
+        noise_vec = np.zeros(N)
+        for i in range(N):
+            noise_vec[i] = pnoise1(float(i)/N, 6, base=int(seed*100))
+
+        #rescale noise
+        noise_vec = np.abs(noise_vec) + base;
+        noise_vec = noise_vec/noise_vec.max()*0.6
+
+        #compute distances to the centroid of all points
+        distances = np.sqrt(np.sum((self.points - np.array([0.5, 0.5]))**2,1))
+
+        #make inverse indexing of points-voronoi regions
+        idx_regions_points = np.ones(self.vor.point_region.max()+1)*-1
+        idx_n = 0
+        for i in range(N):
+            idx_regions_points[self.vor.point_region[i]] = idx_n;
+            idx_n = idx_n + 1
+
+        #the corresponding point is land or water if its distance to the centroid is within the noise-range
+        max_dist = distances.max()
+        self.land_vector = np.zeros(N)
+        coast_vector = np.zeros(N)
+        self.land_index = []
+        self.land_points = np.empty((0,2), float)
+        self.water_points = np.empty((0,2), float)
+        idx_regions_land = []
+        idx_regions_water = []
+
+        for i in range(N):
+            if distances[idx[i]] > max_dist * noise_vec[i]:
+                self.land_vector[idx[i]] = 0
+                self.water_points = np.vstack([water_points, self.points[idx[i],:]])
+                idx_regions_water.append(i)
+            else:
+                self.land_vector[idx[i]] = 1
+                self.land_index.append(idx[i])
+                self.land_points = np.vstack([land_points, self.points[idx[i],:]])
+                idx_regions_land.append(i)
+
+    def createLakes(self):
+        
+        #point indices that are the closest to land points
+        distLandWater = cdist(self.points, water_points).min(1)
+        distLandWater = distLandWater/distLandWater.max()
+        distLandWater = distLandWater/2.;
+
+        distWaterLandIdx = cdist(self.land_points, self.water_points).argmin(1) 
+
+        #add one or two random lake areas
+        #randomly choose a node that is not coastal
+        idx_lake_candidates = np.where(distLandWater[self.land_index] > 0.04)[0]
+        lake_pol = random.randint(0, len(idx_lake_candidates))
+        lake_index = self.land_index[idx_lake_candidates[lake_pol]];
+        idx = self.land_index.index(lake_index)
+        self.land_vector[lake_index] = 0
+        self.water_points = np.vstack((self.water_points, self.points[lake_index,:]))
+
+        closest_lake_regions = np.argsort(cdist([self.points[lake_index,:]], self.land_points)[0])
+        lake_size = random.randint(3, 10)
+        for i in range(lake_size):
+            lake_index = self.land_index[closest_lake_regions[i]]
+            self.land_vector[lake_index] = 0
+            self.water_points = np.vstack((self.water_points, self.points[lake_index,:]))
+            
+            for i in range(lake_size):    
+                self.land_index.remove(self.land_index[closest_lake_regions[i]])
+
+        #recompute height 
+        distLandWater = cdist(self.points, self.water_points).min(1)
+        distLandWater = distLandWater/distLandWater.max()
+        distLandWater = distLandWater/2.;
+        self.distLandWater = distLandWater
+
+
+
+        
 # make up data points
 N = 4000
 points = np.random.rand(N,2)
@@ -217,69 +250,10 @@ distLandWater = distLandWater/distLandWater.max()
 distLandWater = distLandWater/2.;
 
 
-#pdb.set_trace()
-
-#add some perlin noise to the non-zero elements:
-#generate a low resolution height-map, and query the image from the polygon centroids
 
 
 
-#land_points[
 
-
-        
-
-#build polygon list
-
-#create image mask of valid map area (pixels)
-coastline_points = cdist(water_points, points).min(1)
-coastline_points_idx = cdist(water_points, points).argmin(1)
-coastline_regions = vor.point_region[coastline_points_idx]
-
-coastline_vertices_idx = sum([vor.regions[i] for i in coastline_regions],[]);
-coastline_vertices = vor.vertices[coastline_vertices_idx]
-
-bottom_left = vor.vertices[coastline_vertices_idx].min(0)
-top_right = vor.vertices[coastline_vertices_idx].max(0)
-
-
-#transform everything to tilemaps by intersecting with the cropped voronoi
-min_x = vor.min_bound[0]
-max_x = vor.max_bound[0]
-min_y = vor.min_bound[1]
-max_y = vor.max_bound[1]
-
-#generate tilemap
-NTILES = 500
-TILESIZE = 16
-tilemap = np.zeros([NTILES, NTILES])
-A = np.meshgrid(np.arange(NTILES)/float(NTILES), np.arange(NTILES)/float(NTILES))
-centroids = np.array([A[0].ravel(), A[1].ravel()]).T
-
-#construct list of visible polygons
-polygons = []
-
-#remove the ones that exceed the point boundaries
-min_x = points[:,0].min()
-max_x = points[:,0].max()
-min_y = points[:,1].min()
-max_y = points[:,1].max()
-
-# valid_polygons = []
-# for po in polygon_list:
-#     valid = 1
-#     for i in range(po.shape[0]):
-#         p = po[i];
-#         if not(p[0] > min_x and p[0] < max_x and p[1] > min_y and p[1] < max_y):
-#             valid = 0
-
-#     if valid:    
-#         valid_polygons.append(po)
-
-
-#Disturb the height map with 2D perlin noise
-#snoise2
-#pdb.set_trace()
 regions, vertices = voronoi_finite_polygons_2d(vor)
 
 vor.regions.remove([])
@@ -308,6 +282,8 @@ bottom_right = all_polys.max(0)
 top_left = all_polys.min(0)
 max_range_w = bottom_right[1] - top_left[1];
 max_range_h = bottom_right[0] - top_left[0];
+
+NTILES = 500
 scale = [NTILES/max_range_h, NTILES/max_range_w]
 
 #generate perlin height map
@@ -395,7 +371,7 @@ while not(hit_water):
     v2 = vertexPixels[lower_vertex,:]
     ImageDraw.Draw(img).line(np.hstack((v1,v2)).tolist(), fill=0, width=3)
 
-    pdb.set_trace()
+
     #assign moist 4 levels to the regions
     
     
@@ -430,25 +406,9 @@ tropical_season_forest = [169,204,164] #M3,4
 subtropical_desert = [233,221,199] #M1
 
 
+#assign biomes depending on height
 
 
 
+#fill biomes with vegetation and items
 
-
-
-
-#imFiltered = im2.filter(ImageFilter.BLUR)
-#imFiltered.show()
-
-#him = Image.fromarray(np.uint8(hmap*255))
-#him.show()
-
-#plt.plot(points[:,0], points[:,1], 'ko')
-#plt.xlim(vor.min_bound[0] - 0.1, vor.max_bound[0] + 0.1)
-#plt.ylim(vor.min_bound[1] - 0.1, vor.max_bound[1] + 0.1)
-
-#plt.show()
-
-# # plot
-# voronoi_plot_2d(vor)
-# plt.show()

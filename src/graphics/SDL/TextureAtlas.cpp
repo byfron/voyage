@@ -6,7 +6,7 @@
 
 int TextureAtlas::loadTexture(std::string file) {
 
-	_surface = IMG_Load(GRAPHICS_DIR "/Spacefox.png");
+	_surface = IMG_Load(GRAPHICS_DIR "/Spacefox_trans.png");
 
 	if (_surface == NULL) std::cout << "Error loading image:" << IMG_GetError() << std::endl;
 

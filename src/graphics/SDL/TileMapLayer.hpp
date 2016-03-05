@@ -16,6 +16,8 @@ public:
 	void loadTextureAtlas();
 	void createTileMapGLTexture();
 	void renderTile(int x, int y, int tileId);
+//	void renderTile(int x, int y, GLfloat r, GLfloat g, GLfloat b, int tileId);
+	void renderTile(int x, int y, GLfloat r, GLfloat g, GLfloat b);
 	void render();
 	void updateTileMap(TileMap::Ptr tilemap);
 		
@@ -39,5 +41,7 @@ private:
 	int _layerW;
 	int _screenH;
 	int _screenW;
+
+	GLfloat _debug_colors[200][200];
 };
  
