@@ -1,5 +1,21 @@
 package voyage;
 
+message sc_entityPosition {
+	required uint32 entityId = 1;
+	required uint32 x = 2;
+	required uint32 y = 3;
+}
+
+message sc_playerInfo {
+	required uint32 entityId = 1;
+	optional string name = 2;
+}
+
+message sc_loginGranted {
+	optional sc_entityPosition playerPos = 1;
+	optional sc_playerInfo playerInfo = 2;		
+}
+
 message sc_initMapData {
 	required uint32 width = 1;
 	required uint32 height = 2;
@@ -26,7 +42,7 @@ message sc_regionUpdate {
 //	repeated entityInstanceField = 2; 
 }
 
-message cs_LoginRequest {
+message cs_loginRequest {
 	required string username = 1;
 	required string password = 2;
 }
@@ -35,6 +51,7 @@ message cs_regionRequest {
 	required uint32 region_id = 2;
 	optional uint64 timestamp = 1;	
 }
+
 
 //message cs_databaseRequest {
 //}

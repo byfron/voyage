@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <graphics/SDL/SDLGraphicsEngine.hpp>
 #include <common/GameMessages.hpp>
+#include "ClientLoginHandler.hpp"
 #include "voyage.pb.h"
 
 namespace spd = spdlog;
@@ -15,11 +16,15 @@ void exit(int s) {
 }
 
 void GameClient::init() {
-	
-	_netManager.start("127.0.0.1", 1234);
-	_netManager.connect();
+
+	_netManager = std::make_shared<ClientNetworkManager>();
+	_netManager->start("127.0.0.1", 1234);
+	_netManager->connect();
 	_running = true;
 
+	_netManager->registerHandler(std::make_shared<ClientLoginHandler>(GameClient::Ptr(this)),
+				     {ID_SC_LOGIN_ACCEPTED});
+	
 	_graphicsEngine = std::make_shared<SDLGraphicsEngine>(GameClient::Ptr(this));
 	_graphicsEngine->init();
 	
@@ -48,26 +53,27 @@ void GameClient::start() {
 
 	signal(SIGINT, exit);
 
-	voyage::cs_LoginRequest msg;
+	voyage::cs_loginRequest msg;
 	msg.set_username("jose");
 	msg.set_password("1234");
-	_netManager.sendData<voyage::cs_LoginRequest>(ID_CS_LOGIN_REQUEST, msg);
 	
+	_netManager->sendData<voyage::cs_loginRequest>(ID_CS_LOGIN_REQUEST, msg);
+
 	while (_running && gRunning) {
 
 		//check for user input
 		
-		//send messages to server
-		//_netManager.sendData(ID_DATA_MESSAGE, cmd.c_str());
-		_graphicsEngine->run();
+		//send messages to
 		
 		//receive messages from server
-		_netManager.receiveData();
+		_netManager->receiveData();
 
 		//update world
-
+		
+		
 		//display graphics
-
+		_graphicsEngine->run();
+		
 		//play sounds
 	}
 

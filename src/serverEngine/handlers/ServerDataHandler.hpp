@@ -2,7 +2,7 @@
 
 #include <networking/PacketHandler.hpp>
 #include "../GameServer.hpp"
-#include "handlers.hpp"
+#include <common/handlers.hpp>
 
 class ServerDataHandler : public PacketHandler {
 

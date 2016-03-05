@@ -1,8 +1,9 @@
 #include "ServerDataHandler.hpp"
-#include "handlers.hpp"
+#include <common/handlers.hpp>
 #include <spdlog/spdlog.h>
 #include "voyage.pb.h"
 #include <common/GameMessages.hpp>
+#include "../PlayerSession.hpp"
 
 namespace spd = spdlog;
 
@@ -20,8 +21,8 @@ void ServerDataHandler::onMessage(RakNet::Packet * p) {
 	switch(p->data[0]) {
 
 	case ID_CS_LOGIN_REQUEST:
-		Message<voyage::cs_LoginRequest>::Ptr m =
-			std::make_shared< Message<voyage::cs_LoginRequest> >(p);
+		Message<voyage::cs_loginRequest>::Ptr m =
+			std::make_shared< Message<voyage::cs_loginRequest> >(p);
 		ps = _gameServer->getPlayerSession(m->getAddr());
 		break;
 	}

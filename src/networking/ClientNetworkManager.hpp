@@ -32,6 +32,8 @@ public:
 	}
 //	void sendData(RakNet::MessageID id);
 
+	typedef std::shared_ptr<ClientNetworkManager> Ptr;
+
 private:
 
 	bool _isConnected;

@@ -21,7 +21,7 @@ public:
 private:
 
 	std::shared_ptr<SDLGraphicsEngine> _graphicsEngine;
-	ClientNetworkManager _netManager;
+	ClientNetworkManager::Ptr _netManager;
 	TileMap::Ptr _tileMap;
 	bool _running;
 	

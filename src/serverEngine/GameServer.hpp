@@ -4,7 +4,9 @@
 #include <networking/ServerNetworkManager.hpp>
 #include <scripts/ScriptEngine.hpp>
 #include <database/DatabaseConnectionPool.hpp>
-#include "PlayerSession.hpp"
+
+class PlayerSession;
+typedef std::shared_ptr<PlayerSession> PlayerSessionPtr;
 
 class GameServer {
 public:
@@ -12,10 +14,10 @@ public:
 
 	void start();
 	void stop();
-	int createPlayerSession(RakNet::SystemAddress);
+	PlayerSessionPtr createPlayerSession(RakNet::SystemAddress);
 	
 
-	PlayerSession::Ptr getPlayerSession(RakNet::SystemAddress addr) {
+	PlayerSessionPtr getPlayerSession(RakNet::SystemAddress addr) {
 		return _playerSessionAddrMap[addr];
 	}
 	
@@ -33,8 +35,8 @@ private:
 	ScriptEngine::Ptr _scriptEnginePtr;
 	ServerNetworkManager::Ptr _netManagerPtr;
 
-	std::vector<PlayerSession::Ptr> _playerSessions;
-	std::map<RakNet::SystemAddress, PlayerSession::Ptr> _playerSessionAddrMap; 
+	std::vector<PlayerSessionPtr> _playerSessions;
+	std::map<RakNet::SystemAddress, PlayerSessionPtr> _playerSessionAddrMap; 
 	
 	bool _finished;
 	std::string _datasetName;

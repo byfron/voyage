@@ -4,6 +4,7 @@
 #include "handlers/ServerDataHandler.hpp"
 #include <signal.h>
 #include <common/GameMessages.hpp>
+#include "PlayerSession.hpp"
 
 namespace spd = spdlog;
 
@@ -49,7 +50,7 @@ void GameServer::stop() {
 
 }
 
-int GameServer::createPlayerSession(RakNet::SystemAddress addr) {
+PlayerSession::Ptr GameServer::createPlayerSession(RakNet::SystemAddress addr) {
 
 	//make sure the address is not in the map yet
 	assert(_playerSessionAddrMap.count(addr) == 0);
@@ -64,8 +65,8 @@ int GameServer::createPlayerSession(RakNet::SystemAddress addr) {
 	_playerSessionAddrMap[addr] = psPtr;
 
 	spd::get("Server")->info() << "Player Session " << id << " successfully created";
-	
-	return 0;
+
+	return psPtr;
 }
 
 void GameServer::start() {
