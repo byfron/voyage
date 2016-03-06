@@ -1,10 +1,11 @@
 #include "GameServer.hpp"
 #include <spdlog/spdlog.h>
 #include "handlers/ServerLoginHandler.hpp"
-#include "handlers/ServerDataHandler.hpp"
+#include "handlers/ServerMapHandler.hpp"
 #include <signal.h>
 #include <common/GameMessages.hpp>
 #include "PlayerSession.hpp"
+#include <game/World.hpp>
 
 namespace spd = spdlog;
 
@@ -37,9 +38,14 @@ void GameServer::_init(int port) {
 	//register managers
 	_netManagerPtr->registerHandler(std::make_shared<ServerLoginHandler>(GameServer::Ptr(this)),
 				    {ID_CS_LOGIN_REQUEST});
+
+	_netManagerPtr->registerHandler(std::make_shared<ServerMapHandler>(GameServer::Ptr(this)),
+				    {ID_CS_REGION_REQUEST});
 	
-//	_netManagerPtr->registerHandler(std::make_shared<ServerDataHandler>(GameServer::Ptr(this)),
-//				    {ID_DATA_MESSAGE});		
+
+	//initialize world
+	_world = std::make_shared<World>();
+	
 }
 
 void GameServer::stop() {

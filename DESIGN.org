@@ -137,6 +137,9 @@ If it writes: "Kick" and then clicks on a character it will kick it.
 It would be interesting if the interface shows stuff that can be "kicked" also.
 E.g: Use axe with , and then trees are selected. 
 
+There should be short-cuts for the most common tasks: w: walk 
+The last short-cut stays selected for repeated moves
+
 If we left-click on an tile: a name/description is shown.
 If we right-click on an tile: fills the console and waits for input
 

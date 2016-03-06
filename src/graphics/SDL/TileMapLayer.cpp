@@ -86,7 +86,7 @@ void TileMapLayer::renderTile(int x, int y, int tileId) {
 
 }
 
-void TileMapLayer::updateTileMap(TileMap::Ptr tilemap) {
+void TileMapLayer::updateTileMap(ClientTileMap::Ptr tilemap) {
 
 	// std::vector<int> tileIds = tilemap->getVisibleTiles(_ntilesW, _ntilesH);
 }

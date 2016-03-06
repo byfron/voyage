@@ -2,7 +2,8 @@
 
 #include <GL/glew.h>  //ensure that we include glew before gl.h
 #include <networking/ClientNetworkManager.hpp>
-#include "TileMap.hpp"
+#include "PlayerData.hpp"
+#include "ClientTileMap.hpp"
 
 class SDLGraphicsEngine;
 
@@ -13,16 +14,20 @@ public:
 	void start();		
 	void clientLoop();
 	void requestQuit();
- 
-	TileMap::Ptr getTileMap() { return _tileMap; };
 
+	void initPlayer(PlayerData & playerData);
+	
+	ClientTileMap::Ptr getTileMap() { return _tileMap; };
+	ClientNetworkManager::Ptr getNetworkManager() { return _netManager; }
 	typedef std::shared_ptr<GameClient> Ptr;
 	
 private:
 
+	void _registerHandlers();
+	
 	std::shared_ptr<SDLGraphicsEngine> _graphicsEngine;
 	ClientNetworkManager::Ptr _netManager;
-	TileMap::Ptr _tileMap;
+	ClientTileMap::Ptr _tileMap;
 	bool _running;
 	
 };

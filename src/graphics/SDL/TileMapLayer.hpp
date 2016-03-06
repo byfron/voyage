@@ -2,7 +2,7 @@
 #include <vector>
 #include <SDL_opengl.h>
 #include <graphics/Gui/imgui.h>
-#include <clientEngine/TileMap.hpp>
+#include <clientEngine/ClientTileMap.hpp>
 #include <memory>
 
 class TextureAtlas;
@@ -19,7 +19,7 @@ public:
 //	void renderTile(int x, int y, GLfloat r, GLfloat g, GLfloat b, int tileId);
 	void renderTile(int x, int y, GLfloat r, GLfloat g, GLfloat b);
 	void render();
-	void updateTileMap(TileMap::Ptr tilemap);
+	void updateTileMap(ClientTileMap::Ptr tilemap);
 		
 	void setLayerSize(int w, int h) {_layerW = w; _layerH = h; }
 	void setScreenSize(int w, int h) {_screenW = w; _screenH = h; }

@@ -4,7 +4,8 @@
 #include <signal.h>
 #include <graphics/SDL/SDLGraphicsEngine.hpp>
 #include <common/GameMessages.hpp>
-#include "ClientLoginHandler.hpp"
+#include "handlers/ClientLoginHandler.hpp"
+#include "handlers/ClientMapHandler.hpp"
 #include "voyage.pb.h"
 
 namespace spd = spdlog;
@@ -22,12 +23,20 @@ void GameClient::init() {
 	_netManager->connect();
 	_running = true;
 
-	_netManager->registerHandler(std::make_shared<ClientLoginHandler>(GameClient::Ptr(this)),
-				     {ID_SC_LOGIN_ACCEPTED});
+	_registerHandlers();
 	
 	_graphicsEngine = std::make_shared<SDLGraphicsEngine>(GameClient::Ptr(this));
 	_graphicsEngine->init();
 	
+}
+
+void GameClient::_registerHandlers() {
+
+	_netManager->registerHandler(std::make_shared<ClientLoginHandler>(GameClient::Ptr(this)),
+				     {ID_SC_LOGIN_ACCEPTED});
+
+	_netManager->registerHandler(std::make_shared<ClientMapHandler>(GameClient::Ptr(this)),
+				     {ID_SC_REGION_DATA});
 }
 
 void GameClient::clientLoop() {
@@ -40,6 +49,10 @@ void GameClient::clientLoop() {
 
 void GameClient::requestQuit() {
 	_running = false;
+}
+
+void GameClient::initPlayer(PlayerData & playerData) {
+
 }
 
 //main loop
@@ -58,7 +71,7 @@ void GameClient::start() {
 	msg.set_password("1234");
 	
 	_netManager->sendData<voyage::cs_loginRequest>(ID_CS_LOGIN_REQUEST, msg);
-
+	
 	while (_running && gRunning) {
 
 		//check for user input

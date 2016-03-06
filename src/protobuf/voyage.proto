@@ -11,14 +11,9 @@ message sc_playerInfo {
 	optional string name = 2;
 }
 
-message sc_loginGranted {
-	optional sc_entityPosition playerPos = 1;
-	optional sc_playerInfo playerInfo = 2;		
-}
-
-message sc_initMapData {
-	required uint32 width = 1;
-	required uint32 height = 2;
+message sc_regionData {
+	required uint32 rows = 1;
+	required uint32 cols = 2;
 	repeated uint32 tiles = 3 [packed=true];
 }
 
@@ -27,7 +22,8 @@ message sc_initDatabase {
 }
 
 message sc_loginAccepted {
-	
+	optional sc_entityPosition playerPos = 1;
+	optional sc_playerInfo playerInfo = 2;		
 }
 
 message sc_contentUpdate {
@@ -37,21 +33,16 @@ message sc_contentUpdate {
 //messge sc_weatherUpdate {
 //}
 
-message sc_regionUpdate {
-	required uint32 region_id = 1;
-//	repeated entityInstanceField = 2; 
+message cs_regionDataRequest {
+	required uint32 x = 1;
+	required uint32 y = 2;
+	optional uint64 timestamp = 3;		
 }
 
 message cs_loginRequest {
 	required string username = 1;
 	required string password = 2;
 }
-
-message cs_regionRequest {
-	required uint32 region_id = 2;
-	optional uint64 timestamp = 1;	
-}
-
 
 //message cs_databaseRequest {
 //}
