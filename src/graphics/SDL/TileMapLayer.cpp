@@ -88,7 +88,7 @@ void TileMapLayer::renderTile(int x, int y, int tileId) {
 
 void TileMapLayer::updateTileMap(ClientTileMap::Ptr tilemap) {
 
-	// std::vector<int> tileIds = tilemap->getVisibleTiles(_ntilesW, _ntilesH);
+//	std::vector<int> tileIds = tilemap->getVisibleTileColors(_ntilesW, _ntilesH);
 }
 
 void TileMapLayer::render() {
