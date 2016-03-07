@@ -23,10 +23,14 @@ void GameClient::init() {
 	_netManager->connect();
 	_running = true;
 
+	_tileMap = std::make_shared<ClientTileMap>();
+	
 	_registerHandlers();
 	
 	_graphicsEngine = std::make_shared<SDLGraphicsEngine>(GameClient::Ptr(this));
 	_graphicsEngine->init();
+
+	
 	
 }
 
