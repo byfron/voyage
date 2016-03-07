@@ -35,12 +35,13 @@ import math
 from utils_voronoi import voronoi_finite_polygons_2d
 
 class Region:
-    def __init__(self):
+    def __init__(self, polygon):
         self.moist = []
         self.height = []
         self.biome = []
-        self.polygon = []
-        self.edge_list = []    
+        self.polygon = polygon
+        self.edge_list = []
+        self.isWater = False
 
 
 class TileMap:
@@ -51,14 +52,22 @@ class TileMap:
     def create(self):
         pass
 
+
+class Graph:
+    def __init__(self, vor):
+        self.vertices = vor.vertices
+        self.vert_idx = range(0,vor.vertices.shape[0])
+        self.edges = vor.ridge_vertices
+    
         
 class World:
     def __init__(self, npoints):
         self.N = npoints
         self.points = np.random.rand(N,2)
         self.vor = Voronoi(self.points)
-        self.land_regions = []
-        self.water_regions = []
+        self.regions = []
+        self.graph = Graph(self.vor)
+        self.land_idx = np.zeros(npoints)        
 
     def createShape(self):
         Y_vector = np.array([0,1]);
@@ -83,180 +92,62 @@ class World:
         noise_vec = noise_vec/noise_vec.max()*0.6
 
         #compute distances to the centroid of all points
-        distances = np.sqrt(np.sum((self.points - np.array([0.5, 0.5]))**2,1))
-
-        #make inverse indexing of points-voronoi regions
-        idx_regions_points = np.ones(self.vor.point_region.max()+1)*-1
-        idx_n = 0
-        for i in range(N):
-            idx_regions_points[self.vor.point_region[i]] = idx_n;
-            idx_n = idx_n + 1
+        distances_to_center = np.sqrt(np.sum((self.points - np.array([0.5, 0.5]))**2,1))  
 
         #the corresponding point is land or water if its distance to the centroid is within the noise-range
-        max_dist = distances.max()
-        self.land_vector = np.zeros(N)
-        coast_vector = np.zeros(N)
-        self.land_index = []
-        self.land_points = np.empty((0,2), float)
-        self.water_points = np.empty((0,2), float)
-        idx_regions_land = []
-        idx_regions_water = []
+        max_dist = distances_to_center.max()
 
-        for i in range(N):
-            if distances[idx[i]] > max_dist * noise_vec[i]:
-                self.land_vector[idx[i]] = 0
-                self.water_points = np.vstack([water_points, self.points[idx[i],:]])
-                idx_regions_water.append(i)
-            else:
-                self.land_vector[idx[i]] = 1
-                self.land_index.append(idx[i])
-                self.land_points = np.vstack([land_points, self.points[idx[i],:]])
-                idx_regions_land.append(i)
+        point_idx = 0
+        for i in range(len(self.vor.regions)):                        
+            if self.vor.regions[i] != []:
+                region = Region(self.vor.vertices[self.vor.regions[i],:])                
+                if distances_to_center[idx[point_idx]] > max_dist * noise_vec[point_idx]:
+                    region.isWater = True
+                    self.land_idx[point_idx] = 0
+                else:
+                    region.isWater = False
+                    self.land_idx[point_idx] = 1
+                    
+                self.regions.append(region)
+                point_idx = point_idx + 1
 
     def createLakes(self):
-        
+
         #point indices that are the closest to land points
-        distLandWater = cdist(self.points, water_points).min(1)
+        distLandWater = cdist(self.points, self.points[self.land_idx.astype(bool)]).min(1)
         distLandWater = distLandWater/distLandWater.max()
-        distLandWater = distLandWater/2.;
-
-        distWaterLandIdx = cdist(self.land_points, self.water_points).argmin(1) 
-
-        #add one or two random lake areas
-        #randomly choose a node that is not coastal
-        idx_lake_candidates = np.where(distLandWater[self.land_index] > 0.04)[0]
+        distLandWater = distLandWater/2.;        
+        idx_lake_candidates = np.where(distLandWater[~self.land_idx.astype(bool)] > 0.04)[0]
         lake_pol = random.randint(0, len(idx_lake_candidates))
-        lake_index = self.land_index[idx_lake_candidates[lake_pol]];
-        idx = self.land_index.index(lake_index)
-        self.land_vector[lake_index] = 0
-        self.water_points = np.vstack((self.water_points, self.points[lake_index,:]))
-
-        closest_lake_regions = np.argsort(cdist([self.points[lake_index,:]], self.land_points)[0])
+        lake_index = idx_lake_candidates[lake_pol];
+        self.land_idx[lake_index] = 0
+        closest_lake_regions = np.argsort(cdist([self.points[lake_index,:]], self.points[self.land_idx.astype(bool)])[0])
         lake_size = random.randint(3, 10)
         for i in range(lake_size):
-            lake_index = self.land_index[closest_lake_regions[i]]
-            self.land_vector[lake_index] = 0
-            self.water_points = np.vstack((self.water_points, self.points[lake_index,:]))
-            
-            for i in range(lake_size):    
-                self.land_index.remove(self.land_index[closest_lake_regions[i]])
+            lake_index = self.land_idx[closest_lake_regions[i]]
+            self.land_idx[lake_index] = 0            
+            for i in range(lake_size):
+                self.land_idx[closest_lake_regions[i]] = 0
 
         #recompute height 
-        distLandWater = cdist(self.points, self.water_points).min(1)
+        distLandWater = cdist(self.points, self.points[~self.land_idx.astype(bool)]).min(1)
         distLandWater = distLandWater/distLandWater.max()
         distLandWater = distLandWater/2.;
         self.distLandWater = distLandWater
 
 
 
+
         
 # make up data points
 N = 4000
-points = np.random.rand(N,2)
+world = World(N)
+world.createShape()
+world.createLakes()
 
-# compute Voronoi tesselation
-vor = Voronoi(points)
+regions, vertices = voronoi_finite_polygons_2d(world.vor)
 
-#from the centroid takes all polygons intersecting with a line which
-#length depends on a noise function
-#iterate through polygons clockwise from the centroid
-Y_vector = np.array([0,1]);
-vectors = points - np.array([0.5,0.5]);
-norm_vectors = (vectors.T/np.sqrt(np.sum(vectors**2,1))).T
-dotynv = np.dot(Y_vector, norm_vectors.T)
-detynv = Y_vector[0]*norm_vectors[:,1] - norm_vectors[:,0]*Y_vector[1]
-angles = np.arctan2(detynv, dotynv)
-seed = random.random()
-#sort in increasing angle
-idx = np.argsort(angles)
-base = 0.05
-
-#generate a perlin noise vectors with the same elements as points
-noise_vec = np.zeros(N)
-for i in range(N):
-    noise_vec[i] = pnoise1(float(i)/N, 6, base=int(seed*100))
-
-#rescale noise
-noise_vec = np.abs(noise_vec) + base;
-noise_vec = noise_vec/noise_vec.max()*0.6
-
-#compute distances to the centroid of all points
-distances = np.sqrt(np.sum((points - np.array([0.5, 0.5]))**2,1))
-
-#make inverse indexing of points-voronoi regions
-idx_regions_points = np.ones(vor.point_region.max()+1)*-1
-idx_n = 0
-for i in range(N):
-    idx_regions_points[vor.point_region[i]] = idx_n;
-    idx_n = idx_n + 1
-
-#the corresponding point is land or water if its distance to the centroid is within the noise-range
-max_dist = distances.max()
-land_vector = np.zeros(N)
-coast_vector = np.zeros(N)
-land_index = []
-land_points = np.empty((0,2), float)
-water_points = np.empty((0,2), float)
-
-
-
-idx_regions_land = []
-idx_regions_water = []
-
-for i in range(N):
-    if distances[idx[i]] > max_dist * noise_vec[i]:
-        land_vector[idx[i]] = 0
-        water_points = np.vstack([water_points, points[idx[i],:]])
-        idx_regions_water.append(i)
-    else:
-        land_vector[idx[i]] = 1
-        land_index.append(idx[i])
-        land_points = np.vstack([land_points, points[idx[i],:]])
-        idx_regions_land.append(i)
-
-
-
-#point indices that are the closest to land points
-distLandWater = cdist(points, water_points).min(1)
-distLandWater = distLandWater/distLandWater.max()
-distLandWater = distLandWater/2.;
-
-distWaterLandIdx = cdist(land_points, water_points).argmin(1) 
-
-
-        
-#add one or two random lake areas
-#randomly choose a node that is not coastal
-idx_lake_candidates = np.where(distLandWater[land_index] > 0.04)[0]
-lake_pol = random.randint(0, len(idx_lake_candidates))
-lake_index = land_index[idx_lake_candidates[lake_pol]];
-idx = land_index.index(lake_index)
-land_vector[lake_index] = 0
-water_points = np.vstack((water_points, points[lake_index,:]))
-
-closest_lake_regions = np.argsort(cdist([points[lake_index,:]], land_points)[0])
-lake_size = random.randint(3, 10)
-for i in range(lake_size):
-    lake_index = land_index[closest_lake_regions[i]]
-    land_vector[lake_index] = 0
-    water_points = np.vstack((water_points, points[lake_index,:]))
-
-for i in range(lake_size):    
-    land_index.remove(land_index[closest_lake_regions[i]])
-
-#recompute height 
-distLandWater = cdist(points, water_points).min(1)
-distLandWater = distLandWater/distLandWater.max()
-distLandWater = distLandWater/2.;
-
-
-
-
-
-
-regions, vertices = voronoi_finite_polygons_2d(vor)
-
-vor.regions.remove([])
+world.vor.regions.remove([])
 
 # colorize
 idx = 0
@@ -264,11 +155,12 @@ idx_land = 0
 polygon_list = []
 color_list = []
 for region in regions:
+
     polygon = vertices[region]
-    if land_vector[idx] == 0:
+    if world.land_idx[idx] == 0:
         plt.fill(*zip(*polygon), color='blue', alpha=0.4)
     else:
-        c = distLandWater[idx]
+        c = world.distLandWater[idx]
         polygon_list.append(polygon);
         color_list.append(c)
 
@@ -283,9 +175,11 @@ top_left = all_polys.min(0)
 max_range_w = bottom_right[1] - top_left[1];
 max_range_h = bottom_right[0] - top_left[0];
 
+pdb.set_trace()
+
 NTILES = 500
 scale = [NTILES/max_range_h, NTILES/max_range_w]
-
+seed = random.random()
 #generate perlin height map
 hmap = np.zeros((NTILES, NTILES))
 freq = NTILES * .2
@@ -325,6 +219,8 @@ for polygon in polygon_list:
 #img2 = Image.fromarray(img + .0*255*hmap)
 img.show()
 
+exit;
+
 #make rivers!
 img_arr = np.asarray(img)
 vertexMatrix = vertices
@@ -336,7 +232,7 @@ vertexPixels = ((vertexMatrix - top_left) * scale).astype(int)
 #vertexPixels[~valid,:] = 0
 #vertexHeights = img_arr[vertexPixels[:,0], vertexPixels[:,1]]
 
-ridgeMatrix = np.asarray(vor.ridge_vertices)
+ridgeMatrix = np.asarray(world.vor.ridge_vertices)
 
 #filter valid ridges
 #validRidgeMatrix = ridgeMatrix[np.logical_and(np.in1d(ridgeMatrix[:,0], valid),np.in1d(ridgeMatrix[:,1], valid)),:]
@@ -347,9 +243,9 @@ ridgeMatrix = np.asarray(vor.ridge_vertices)
 #ridges = np.where(validRidgeMatrix[:,0] == valid[highest_vertex_idx])[0]
 
 #make all water distance 0
-distLandWater[~land_vector.astype(bool)] = 0
-point_river_start = np.array(distLandWater).argmax()
-river_start = cdist([points[point_river_start,:]], vertices).argmin()
+world.distLandWater[~world.land_idx.astype(bool)] = 0
+point_river_start = np.array(world.distLandWater).argmax()
+river_start = cdist([world.points[point_river_start,:]], vertices).argmin()
 
 ridges0 = np.where(ridgeMatrix[:,0] == river_start)[0]
 ridges1 = np.where(ridgeMatrix[:,1] == river_start)[0]
