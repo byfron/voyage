@@ -34,11 +34,7 @@ void ServerMapHandler::handleRegionDataRequest(PlayerSession::Ptr session, const
 	//get region and send it back to the client
 	int tilex = content.x();
 	int tiley = content.y();
-
 	TileMap::Ptr tmap = _gameServer->getWorld()->getTileMap();
-
-	std::cout << "gathering region from tile " << tilex << "," << tiley << std::endl;
-	
 	MapRegion::Ptr reg = tmap->getMapRegionFromTile(tilex, tiley);
 	
 	//if the "region" timestamp is old or "dirty", send it together with all the instances
@@ -51,10 +47,11 @@ void ServerMapHandler::handleRegionDataRequest(PlayerSession::Ptr session, const
 
 	msgRegData.set_rows(tmap->getRegionW());
 	msgRegData.set_cols(tmap->getRegionH());
+	msgRegData.set_topleftx(reg->getTopLeft().tilex);
+	msgRegData.set_toplefty(reg->getTopLeft().tiley);	
 	//}
 
-	session->sendMessage<sc_regionData>(std::make_shared< Message<sc_regionData> >(ID_SC_REGION_DATA, msgRegData));
-			     
+	session->sendMessage<sc_regionData>(std::make_shared< Message<sc_regionData> >(ID_SC_REGION_DATA, msgRegData));			     
 	
 	
 	//if any instance timestamp is old, send it (i.e deleted tree)
