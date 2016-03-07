@@ -12,9 +12,11 @@ message sc_playerInfo {
 }
 
 message sc_regionData {
-	required uint32 rows = 1;
-	required uint32 cols = 2;
-	repeated uint32 tiles = 3 [packed=true];
+	required uint32 topleftx = 1;
+	required uint32 toplefty = 2;
+	required uint32 rows = 3;
+	required uint32 cols = 4;
+	repeated uint32 tiles = 5 [packed=true];
 }
 
 message sc_initDatabase {
