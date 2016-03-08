@@ -1,59 +1,54 @@
-import pyglet
-from pyglet.gl import *
-from noise import pnoise1
-import sys
+import pdb
+from graphUtils import RegionGraph
+from procWorld import World
+import math
+from noise import pnoise1, pnoise2, snoise2
+import random
+import numpy as np
+import numpy.matlib
+import matplotlib.pyplot as plt
+from PIL import Image
 
-window = pyglet.window.Window(visible=False, resizable=True)
+N = 300
+g = RegionGraph(N)
+w = World(g, [])
+im = w.generateImage(1200)
 
-def on_resize(width, height):
-	"""Setup 3D viewport"""
-	glViewport(0, 0, width, height)
-	glMatrixMode(GL_PROJECTION)
-	glLoadIdentity()
-	gluPerspective(70, 1.0*width/height, 0.1, 1000.0)
-	glMatrixMode(GL_MODELVIEW)
-	glLoadIdentity()
-window.on_resize = on_resize
-window.set_visible()
+#Add a layer of noise to make the colors more realistic
+cols, rows = im.size
+freq = rows/10.
+seed = random.random()
+nmap = np.zeros((rows, cols, 3))
+for i in range(rows):
+    for j in range(cols):
+        nmap[i,j,0] = pnoise2(float(i)/freq, float(j)/freq, 12, base=int(seed*1))
+        nmap[i,j,1] = nmap[i,j,0]
+        nmap[i,j,2] = nmap[i,j,0]
 
-points = 256
-span = 5.0
-speed = 1.0
 
-if len(sys.argv) > 1:
-	octaves = int(sys.argv[1])
-else:
-	octaves = 1
+#nmap = (nmap - nmap.min())
+#nmap = nmap/nmap.max()
 
-base = 0
-min = max = 0
+#mask water out
+npim = np.asarray(im)
+water_mask = (npim == [0,0,255]).all(2)
+noise_im = ~water_mask[:,:,np.newaxis]*nmap + npim
 
-@window.event
-def on_draw():
-	global min,max
-	window.clear()
-	glLoadIdentity()
-	glTranslatef(0, 0, -1)
-	r = range(256)
-	glBegin(GL_LINE_STRIP)
-	for i in r:
-		x = float(i) * span / points - 0.5 * span
-		y = pnoise1(x + base, octaves)
-		glVertex3f(x * 2.0 / span, y, 0)
-	glEnd()
+pdb.set_trace()
 
-def update(dt):
-	global base
-	base += dt * speed
-pyglet.clock.schedule_interval(update, 1.0/30.0)
+noise_scale = 30;
+A = (nmap*noise_scale).astype('uint8') + npim
 
-pyglet.app.run()
+pdb.set_trace()
 
-# class WorldGeneration:
+B = np.asarray(im);
+pdb.set_trace()
 
-#     def __init__(this):
-#         this.size = [100,100];
+plt.imshow(A)
+plt.show()
+     
+im2 = Image.fromarray(A)
+im2.show()
+#im.show()
+#im.save('test.bmp')
 
-#     def generate(this):
-#         print 'yay';
-    
