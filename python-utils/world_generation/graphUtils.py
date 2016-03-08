@@ -75,7 +75,7 @@ class RegionGraph:
             adj_regions = tmp_voronoi_regions_rep[np.where(np.hstack(np.array(self.voronoi_regions)) == v_idx)[0]]
             
             G.add_node(v_idx, adj_reg=adj_regions)            
-            G.add_edges_from(edges)                           
+            G.add_edges_from(edges, weight=0)                           
 
         self.nxgraph = G
         self.vor = vor

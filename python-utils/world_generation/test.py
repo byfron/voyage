@@ -1,59 +1,26 @@
-import pyglet
-from pyglet.gl import *
-from noise import pnoise1
-import sys
+import pdb
+from graphUtils import RegionGraph
+from procWorld import World
+import math
+from noise import pnoise1, pnoise2, snoise2
+import random
+import numpy as np
 
-window = pyglet.window.Window(visible=False, resizable=True)
+N = 500
+g = RegionGraph(N)
+w = World(g, [])
+im = w.generateImage(1200)
 
-def on_resize(width, height):
-	"""Setup 3D viewport"""
-	glViewport(0, 0, width, height)
-	glMatrixMode(GL_PROJECTION)
-	glLoadIdentity()
-	gluPerspective(70, 1.0*width/height, 0.1, 1000.0)
-	glMatrixMode(GL_MODELVIEW)
-	glLoadIdentity()
-window.on_resize = on_resize
-window.set_visible()
+#Add a layer of noise to make the colors more realistic
+rows, cols = im.size
+freq = rows*0.4
+seed = random.random()
+nmap = np.zeros((rows, cols))
+for i in range(rows):
+    for j in range(cols):
+        nmap[i,j] = pnoise2(float(i)/freq, float(j)/freq, 5, base=int(seed*100))
+        
+pdb.set_trace()
+im.show()
+im.save('test.bmp')
 
-points = 256
-span = 5.0
-speed = 1.0
-
-if len(sys.argv) > 1:
-	octaves = int(sys.argv[1])
-else:
-	octaves = 1
-
-base = 0
-min = max = 0
-
-@window.event
-def on_draw():
-	global min,max
-	window.clear()
-	glLoadIdentity()
-	glTranslatef(0, 0, -1)
-	r = range(256)
-	glBegin(GL_LINE_STRIP)
-	for i in r:
-		x = float(i) * span / points - 0.5 * span
-		y = pnoise1(x + base, octaves)
-		glVertex3f(x * 2.0 / span, y, 0)
-	glEnd()
-
-def update(dt):
-	global base
-	base += dt * speed
-pyglet.clock.schedule_interval(update, 1.0/30.0)
-
-pyglet.app.run()
-
-# class WorldGeneration:
-
-#     def __init__(this):
-#         this.size = [100,100];
-
-#     def generate(this):
-#         print 'yay';
-    
