@@ -31,6 +31,8 @@ class RegionGraph:
         self.voronoi_regions = []
         points_idx = []
         tmp_list_v_idx2 = []
+        tmp_voronoi_regions_rep = []
+        idx = 0
         for i in range(len(tmp_list)):
             p = tmp_list[i]            
             v_idx = tmp_region_idx[i]
@@ -41,7 +43,9 @@ class RegionGraph:
                                              p[:,1] < points.max(0)[1]-0.05)).all():
                 self.polygons.append(p)
                 self.voronoi_regions.append(v_idx)
-                points_idx.append(i)
+                tmp_voronoi_regions_rep.append(idx*np.ones(len(v_idx)))  
+                points_idx.append(tmp_point_idx[i])
+                idx = idx + 1
 
         #also filter points that are outside of the crop
         self.points = points[points_idx,:]
@@ -55,6 +59,8 @@ class RegionGraph:
         ridge_matrix = np.array(vor.ridge_vertices)
 
         G = nx.Graph()
+
+        tmp_voronoi_regions_rep = np.hstack(tmp_voronoi_regions_rep)
         
         #make a graph with the valid vertices and ridges
         for i in range(len(self.vor_vertex_idx)):
@@ -66,12 +72,13 @@ class RegionGraph:
             edges = np.vstack((A,B))
 
             #anotate the node with the index of the adjacent regions/points
-            adj_regions = np.where(np.hstack(np.array(self.voronoi_regions)) == v_idx)[0]
+            adj_regions = tmp_voronoi_regions_rep[np.where(np.hstack(np.array(self.voronoi_regions)) == v_idx)[0]]
             
             G.add_node(v_idx, adj_reg=adj_regions)            
             G.add_edges_from(edges)                           
 
-        self.graph = G
+        self.nxgraph = G
+        self.vor = vor
         
 
     def show(self, ntiles):

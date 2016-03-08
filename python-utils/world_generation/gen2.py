@@ -4,7 +4,7 @@ from procWorld import World
 import math
 
 
-N = 1000
+N = 2000
 g = RegionGraph(N)
 w = World(g, [])
 w.show(500)
