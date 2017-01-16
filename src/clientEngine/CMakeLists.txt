@@ -1,10 +1,10 @@
 add_library(clientEngine
-  GameClient.hpp
-  GameClient.cpp
+  ClientEngine.hpp
+  ClientEngine.cpp
   ClientTileMap.hpp
   ClientTileMap.cpp
   )
 
 target_link_libraries(clientEngine
   networking
-  graphics)
+  cabbage)

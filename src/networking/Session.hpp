@@ -18,7 +18,7 @@ public:
 		std::cout << "sending:" << *m << std::endl;
 		
 		peer->Send(&bsOut, HIGH_PRIORITY,
-			   RELIABLE_WITH_ACK_RECEIPT, 0,
+			   RELIABLE_ORDERED, 0,
 			   _address, true);
 	};
 	

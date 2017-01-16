@@ -1,3 +1,5 @@
+MESSAGE(STATUS ${GTEST_INCLUDE_DIRS})
+
 add_library(database
   DatabaseConnectionPool.hpp
   DatabaseConnectionPool.cpp
@@ -10,6 +12,5 @@ add_library(database
 target_link_libraries(database
   ${SQLITE3_LIBRARY})
 
-cxx_test(databaseTest databaseTest.cpp
-  database
-  gtest_main)
+cxx_test(databaseTest databaseTest.cpp database)
+

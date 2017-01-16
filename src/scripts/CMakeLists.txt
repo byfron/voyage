@@ -11,7 +11,8 @@ target_link_libraries(scriptEngine
 target_include_directories(scriptEngine PUBLIC
   ${PYTHON_INCLUDE_PATH})
 
-cxx_test(scriptTest scriptEngineTest.cpp
+add_executable(scriptTest scriptEngineTest.cpp)
+target_link_libraries(scriptTest
   scriptEngine
   serverEngine
   database

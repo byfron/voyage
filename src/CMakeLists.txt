@@ -11,7 +11,11 @@ target_include_directories(server PUBLIC
 
 add_executable(client clients/main_client.cpp)
 target_link_libraries(client
-  clientEngine)
+  ${CMAKE_CURRENT_SOURCE_DIR}/../cabbage/bgfx/.build/linux64_gcc/bin/libexample-commonRelease.a #WHY?
+  clientEngine
+  EntitiesCore
+  cabbage)
+
 target_include_directories(client PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${SDL2_INCLUDE_DIR})
@@ -22,20 +26,11 @@ include_directories(.)
 include_directories(utils)
 
 add_subdirectory(common)
+add_subdirectory(entities)
 add_subdirectory(networking)
 add_subdirectory(clientEngine)
 add_subdirectory(serverEngine)
 add_subdirectory(game)
 add_subdirectory(database)
 add_subdirectory(scripts)
-add_subdirectory(graphics)
 add_subdirectory(protobuf)
-
-if (BUILD_VOYAGE3D)
-  ogre_add_executable(voyage3d clients/voyage3d.cpp)
-  target_link_libraries(voyage3d graphicsSystem common ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
-  target_include_directories(voyage3d PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-  add_subdirectory(graphics)
-endif()
-
-

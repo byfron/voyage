@@ -1,11 +1,4 @@
-#include <clientEngine/GameClient.hpp>
+#include "GameClient.hpp"
 
-int main() {
+ENTRY_IMPLEMENT_MAIN(GameClient);
 
-	
-	GameClient client;	
-	
-	client.init();
-	client.start();       
-
-}

@@ -9,9 +9,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -pthread -march=native"
 
 # General dependencies
 set(RAKNET_ROOT "${CMAKE_SOURCE_DIR}/third-party/RakNet")
-find_library(RAKNET_LIB RakNetLibStatic PATHS ${RAKNET_ROOT}/Lib/RakNetLibStatic)
+find_library(RAKNET_LIB RakNetLibStatic PATHS ${RAKNET_ROOT}/Lib/LibStatic)
 include_directories(${RAKNET_ROOT}/include/raknet)
 find_package(Threads REQUIRED)
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
+message(STATUS ${RAKNET_LIB})
 
 set(DB_NAME "test.db")
 set(DB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/datasets/")
@@ -31,7 +35,51 @@ set(CMAKE_MODULE_PATH
 
 SET(PYTHON_INCLUDE_PATH /usr/include/python2.7)
 SET(PYTHON_LIBRARIES /usr/lib/python2.7/config-x86_64-linux-gnu/libpython2.7.so)
-include(CMake/GTest.cmake)
+
+
+######## GTest #########
+
+include(CMake/DownloadProject.cmake)
+download_project(PROJ                googletest
+                 GIT_REPOSITORY      https://github.com/google/googletest.git
+                 GIT_TAG             master
+		 )
+
+
+# Prevent GoogleTest from overriding our compiler/linker options
+# when building with Visual Studio
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+
+function(cxx_test name sources)
+    add_executable(${name} ${sources})
+    target_link_libraries(${name} ${ARGN} gtest gmock_main ${CMAKE_THREAD_LIBS_INIT})
+    set_property(TARGET ${name} APPEND PROPERTY INCLUDE_DIRECTORIES
+        ${GTEST_INCLUDE_DIRS}
+        )
+
+    # add gtest as a dependency if we are building it ourselves
+    if(TARGET gtest)
+        add_dependencies(${name} gtest)
+    endif()
+    # Working directory: where the dlls are installed.
+    add_test(NAME ${name}
+        COMMAND ${name})
+    # For debugging, one can manually run the tests with the option
+    # --gtest_break_on_failure which will raise a segfault on the first error
+endfunction()
+
+
+#######################
+
+
+include_directories(src)
+include_directories(cabbage/src)
+include_directories(cabbage/bx/include)
+include_directories(cabbage/bgfx/include)
+include_directories(cabbage/bgfx/src)
+include_directories(cabbage/bgfx/3rdparty)
+include_directories(cabbage/bgfx/examples/)
 
 FIND_PACKAGE(Boost 1.45.0)
 IF(Boost_FOUND)
@@ -49,32 +97,6 @@ FIND_PACKAGE(Protobuf REQUIRED)
 
 #find_package(SQLite3)
 find_library(SQLITE3_LIBRARY sqlite3)
-
-if (BUILD_VOYAGE3D)  
-
-  include(OgreAddTargets)
-  include(CMakeDependentOption)
-  include(CheckCXXCompilerFlag)
-  include(MacroLogFeature)
-  include(OgreAddTargets)
-  include(OgreConfigTargets)
-  include(PreprocessorUtils)
-
-  find_package(OGRE)  
-
-  include_directories(${OGRE_INCLUDE_DIR})
-  include_directories(${SDL2_INCLUDE_DIR})
-
-  ogre_add_component_include_dir(Hlms/Pbs)
-  ogre_add_component_include_dir(Hlms/Unlit)
-  ogre_add_component_include_dir(Hlms/Common)
-
-  include_directories(${OGRE_INCLUDE_DIR}/Overlay)
-  include_directories(${OGRE_INCLUDE_DIR}/Hlms/Unlit)
-  include_directories(${OGRE_INCLUDE_DIR}/Hlms/Pbs)
-  
-  
-  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay OgreHlmsPbs OgreHlmsUnlit)
-endif()
-
+add_subdirectory(cabbage)
 add_subdirectory(src)
+#add_subdirectory(test)

@@ -5,6 +5,7 @@ enum GameMessageId {
 	ID_CS_LOGIN_REQUEST,
 	ID_SC_LOGIN_ACCEPTED,
 	ID_SC_REGION_DATA,
+	ID_SC_ENTITY_UPDATE, //Send updated components of a given entity
 	ID_SC_DATABASE,
 	ID_CS_REGION_REQUEST,
 	ID_SC_REGION_UPDATE,

@@ -41,6 +41,12 @@ void GameServer::_init(int port) {
 
 	_netManagerPtr->registerHandler(std::make_shared<ServerMapHandler>(GameServer::Ptr(this)),
 				    {ID_CS_REGION_REQUEST});
+
+
+	//initialize event manager
+
+
+	//initialize entity manager
 	
 
 	//initialize world
@@ -79,18 +85,19 @@ void GameServer::start() {
 
 	spd::get("Server")->info("Starting game server");
 	signal(SIGINT, break_loop);
-	
+	      	
 	while (!finished_sig && !_finished) {
 
 		//check for client commands
-
 		_netManagerPtr->receiveData();
-		
-		//    run AI
-//    move all entities
 
-//    send updates about the game to the clients
-		
+		// Update systems
+
+		// run AI
+
+		// move all entities
+
+		// send updates about the game to the clients		
 	}
 
 	stop();

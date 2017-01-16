@@ -1,7 +1,7 @@
 #pragma once
 
 #include <networking/PacketHandler.hpp>
-#include "../GameClient.hpp"
+#include "../ClientEngine.hpp"
 #include <common/handlers.hpp>
 #include <common/GameMessages.hpp>
 #include "voyage.pb.h"
@@ -10,7 +10,7 @@ class ClientLoginHandler : public PacketHandler {
 
 public:
 
-	ClientLoginHandler(GameClient::Ptr c) {
+	ClientLoginHandler(ClientEngine::Ptr c) {
 		_handlerId = CLIENT_LOGIN_HANDLER;
 		_client = c;
 	}
@@ -34,5 +34,5 @@ public:
 	}
 
 private:
-	GameClient::Ptr _client;
+	ClientEngine::Ptr _client;
 };

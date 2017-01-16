@@ -1,3 +1,28 @@
+* ENTITY COMPONENT SYSTEM
+
+* Components store data
+* Behaviors execute actions on components (sync or async)
+* Critical synchronous behaviors should be implemented in C++ and are a core part of the game
+* Non-critical asynchronous behaviors are implemented as python scripts
+* Game logic is python (item action, game events, character AI, ...)
+* Game mechanics is C++ (character movement, visibility, inventory, path finding...) 
+
+** Asynchronous updates :
+* Entities act as message dispatchers to its associated behaviors.
+* In most cases it will end running a python script.
+* Behaviors are "listening" to messages.
+
+** Synchronous updates:
+* Systems run a large array of components in a cache-friendly way.
+* If a system needs more than one component we should consider merging them.
+* Mostly implemented in fast C++. For instance updating character pos in map.
+* Components do not "listen".... right? How does the input modify speed vectors?
+
+** Database should be transformed into the entity-component?
+
+** Python scripts should be able to send messages to entities
+
+
 - OPEN-SOURCE GENERIC ENGINE FOR ONLINE ROGUE-LIKE STORYTELLING?
 
 * NETWORK layer on top of RakNet. Get inspiration from Biribit. Keep it simple.

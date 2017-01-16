@@ -1,0 +1,15 @@
+* Server
+* We can have a TCP and UDP simultaneously
+* Each Server registers a bunch of handlers, within a pipeline
+* A handler implements a way of handling certain messages, (overloaded function)
+* for instance a login message will be handled differently than a regular message
+* (can we do this just with polymorphism? or templates?)
+* We can have a generic Event class for every message that can happen (Raknet::Packet?)
+* To send back a message it's done through the PlayerSession
+  
+  
+  //too much shit here
+  
+* EventDispatcher: associated with a player session is able to send the messages to the 
+* different handlers. We may have only one. (SessionHandler that takes messages from client)
+  
