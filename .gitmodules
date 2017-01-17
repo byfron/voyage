@@ -1,3 +1,6 @@
 [submodule "RakNet"]
 	path = RakNet
 	url = https://github.com/OculusVR/RakNet.git
+[submodule "pumpkin"]
+	path = pumpkin
+	url = git@github.com:byfron/pumpkin.git
