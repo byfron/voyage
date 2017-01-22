@@ -14,6 +14,7 @@ public:
 	static Family _family_counter;
 };
 
+template <typename Derived>
 class System : public BaseSystem {
 public:
 	static Family family() {
@@ -33,7 +34,10 @@ public:
 
 	template <typename S>
 	void add(std::shared_ptr<S> system) {
+		std::cout << "adding system" << S::family() << std::endl;
 		_systems.insert(std::make_pair(S::family(), system));
+		std::cout << "systems size:" << _systems.size() << std::endl;
+			
 	}
 
 	template <typename S>

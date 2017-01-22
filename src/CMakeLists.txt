@@ -14,6 +14,7 @@ target_link_libraries(client
   ${CMAKE_CURRENT_SOURCE_DIR}/../pumpkin/bgfx/.build/linux64_gcc/bin/libexample-commonRelease.a #WHY?
   clientEngine
   EntitiesCore
+  proto
   cabbage)
 
 target_include_directories(client PUBLIC
@@ -33,4 +34,3 @@ add_subdirectory(serverEngine)
 add_subdirectory(game)
 add_subdirectory(database)
 add_subdirectory(scripts)
-add_subdirectory(protobuf)

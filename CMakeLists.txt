@@ -5,7 +5,7 @@ project(voyage)
 option(BUILD_VOYAGE3D "build 3d interface with OGRE library" OFF)
 option(BUILD_VOYAGE_SDL "build 2d interface with SDL library" ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -pthread -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC -pthread -march=native")
 
 # General dependencies
 set(RAKNET_ROOT "${CMAKE_SOURCE_DIR}/RakNet")
@@ -38,7 +38,7 @@ SET(PYTHON_LIBRARIES /usr/lib/python2.7/config-x86_64-linux-gnu/libpython2.7.so)
 
 
 ######## GTest #########
-
+if (BUILD_TESTS)
 include(CMake/DownloadProject.cmake)
 download_project(PROJ                googletest
                  GIT_REPOSITORY      https://github.com/google/googletest.git
@@ -68,11 +68,9 @@ function(cxx_test name sources)
     # For debugging, one can manually run the tests with the option
     # --gtest_break_on_failure which will raise a segfault on the first error
 endfunction()
-
+endif()
 
 #######################
-
-
 include_directories(src)
 include_directories(pumpkin/src)
 include_directories(pumpkin/bx/include)
@@ -80,6 +78,12 @@ include_directories(pumpkin/bgfx/include)
 include_directories(pumpkin/bgfx/src)
 include_directories(pumpkin/bgfx/3rdparty)
 include_directories(pumpkin/bgfx/examples/)
+
+#include the created files in the build sub-directory as a include
+set(PROTOBUF_GENEREATED_HEADERS ${CMAKE_BINARY_DIR}/protobuf)
+include_directories(${PROTOBUF_GENEREATED_HEADERS})
+message(STATUS ${PROTOBUF_GENEREATED_HEADERS})
+
 
 FIND_PACKAGE(Boost 1.45.0)
 IF(Boost_FOUND)
@@ -95,8 +99,8 @@ find_package(SDL2_image)
 find_package(OpenGL REQUIRED)
 FIND_PACKAGE(Protobuf REQUIRED)
 
-#find_package(SQLite3)
 find_library(SQLITE3_LIBRARY sqlite3)
-add_subdirectory(pumpkin)
+add_subdirectory(protobuf)
 add_subdirectory(src)
+add_subdirectory(pumpkin)
 #add_subdirectory(test)

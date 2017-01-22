@@ -1,6 +1,6 @@
 #include "ClientNetworkManager.hpp"
 #include <common/GameMessages.hpp>
-#include "voyage.pb.h"
+#include <voyage.pb.h>
 
 //TODO: we can move up the hirearchy plenty of common functionality
 //of this and the servernetworkmanager
