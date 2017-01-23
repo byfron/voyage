@@ -1,3 +1,5 @@
 build
 third-party
 tests
+build*
+*#*
