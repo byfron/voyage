@@ -1,0 +1,72 @@
+package voyage;
+
+message sc_entityPosition {
+	required uint32 entityId = 1;
+	required uint32 x = 2;
+	required uint32 y = 3;
+}
+
+message sc_playerInfo {
+	required uint32 entityId = 1;
+	optional string name = 2;
+}
+
+message sc_regionData {
+	required uint32 topleftx = 1;
+	required uint32 toplefty = 2;
+	required uint32 rows = 3;
+	required uint32 cols = 4;
+	repeated uint32 tiles = 5 [packed=true];
+}
+
+message sc_initDatabase {
+//	required database = 1;
+}
+
+message sc_loginAccepted {
+	optional sc_entityPosition playerPos = 1;
+	optional sc_playerInfo playerInfo = 2;		
+}
+
+message sc_contentUpdate {
+	repeated string contentText = 1;
+}
+
+//messge sc_weatherUpdate {
+//}
+
+message cs_regionDataRequest {
+	required uint32 x = 1;
+	required uint32 y = 2;
+	optional uint64 timestamp = 3;		
+}
+
+message cs_loginRequest {
+	required string username = 1;
+	required string password = 2;
+}
+
+//message cs_databaseRequest {
+//}
+
+//message cs_mapdataRequest {
+//}
+
+//message cs_mediaRequest {
+//}
+
+message cs_userChat {
+	required string message = 1;
+}
+
+message cs_userMoves {
+	required uint32 tile_x = 1;
+	required uint32 tile_y = 2;
+}
+
+message cs_userAction {
+	required uint32 action_id = 1;
+	optional uint32 instance1_id = 2;
+	optional uint32 instance2_id = 3;	
+	optional string action_content = 4;
+}
