@@ -44,9 +44,16 @@ public:
 	}
 
 	void computeOrientation() {
-		MultiInterval<float> mint(Interval<float>(-M_PI, M_PI), 4);
-		int idx = mint.indexContains(InputManager::m_mouse_angle);
-		m_direction = CardinalDirection(idx);
+
+		//if (USER_PRESSING_FIRE)
+		if (false) {
+			MultiInterval<float> mint(Interval<float>(-M_PI, M_PI), 4);
+			int idx = mint.indexContains(InputManager::m_mouse_angle);
+			m_direction = CardinalDirection(idx);
+		}
+		else {
+
+		}
 	}
 
 	void computeAction() {
@@ -75,45 +82,49 @@ public:
 			}
 		}
 	}
-	
+
 	Eigen::Vector3f getMoveDirection() {
 
 		Eigen::Vector3f direction = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
-			
+
 		if (InputManager::m_keys & KEY_MOVE_UP) {
 			direction += Engine::camera().getForwardDir();
+			m_direction = CardinalDirection::North;
 		}
 		if (InputManager::m_keys & KEY_MOVE_DOWN) {
 			direction += -Engine::camera().getForwardDir();
+			m_direction = CardinalDirection::South;
 		}
 		if (InputManager::m_keys & KEY_MOVE_RIGHT) {
 			direction += -Engine::camera().getRightDir();
+			m_direction = CardinalDirection::East;
 		}
 		if (InputManager::m_keys & KEY_MOVE_LEFT) {
 			direction += Engine::camera().getRightDir();
+			m_direction = CardinalDirection::West;
 		}
-		
+
 		return direction;
-		
+
 	}
 
 	Eigen::Vector3f getPosition() const {
 		return m_position;
 	}
-	
+
 	void update(float dt) {
 
-//		m_action = PlayerAction::Idle;		
+//		m_action = PlayerAction::Idle;
 		m_position += getMoveDirection()* m_moveSpeed * dt;
 		computeAction();
 		computeOrientation();
-		
+
 	}
 
 private:
 
 //	TileIndex m_tile;
-	 
+
 	float m_moveSpeed;
 	Eigen::Vector3f m_position;
 	CardinalDirection m_direction;
@@ -126,23 +137,23 @@ public:
 	void update(float delta ) {
 		m_mapChunk.update(delta);
 	}
-	
+
 private:
 
 	TileMapChunk m_mapChunk;
-	
+
 };
 
 // shall the graphic elements be organized per texture?
 class AnimationComponent {
 public:
-	AnimationComponent(const std::string & config_file) :		
+	AnimationComponent(const std::string & config_file) :
 		m_animation("", "", 0.5, 0.5) { //HOW to handle this?
 		// this details should be "hidden" in pumpkin
 		AnimationFactory factory(config_file);
 		factory.generate(&m_animation);
 	}
-	
+
 	void update(float delta ) {
 		m_animation.update(delta);
 	}
@@ -150,7 +161,7 @@ public:
 	Animation2D & getAnimation2D() {
 		return m_animation;
 	}
-	
+
 private:
 
 	uint32_t m_resource_id;
@@ -174,7 +185,7 @@ public:
 				 anim.getAnimation2D().switchToAnim(state.getAnimationId());
 //				 state.clean();
 //			 }
-			 
+
 			 // anim.getAnimation2D().setAnimation(
 			 //	 AnimationManager::actionToAnim(state.getAction()));
 			 anim.update(delta);
@@ -185,7 +196,7 @@ public:
 private:
 
 };
-	
+
 class MapSystem : public System<MapSystem> {
 public:
 	void update(EntityManager & em, /*EventManager &evm*/ float delta ) {
@@ -194,8 +205,8 @@ public:
 
 			       //update graphics with player state
 				map.update(delta);
-		});      	
-	}	
+		});
+	}
 };
 
 
@@ -208,8 +219,8 @@ class StateSystem : public System<StateSystem> {
 
 //		em.each<ObjectState>([delta](Entity entity,
 //
-//					     });      	
-	}	
+//					     });
+	}
 
 };
 
@@ -217,28 +228,28 @@ class GameClient : public Engine {
 public:
 
 	GameClient() {
-	
+
 	}
-	
+
 	~GameClient() {}
 
 	void init_engine() override {
 
 		_gameEngine.init() ; //ugly with a engine from pumpkin
 
-		Entity player1 = _gameEngine.entityManager().create();	      
+		Entity player1 = _gameEngine.entityManager().create();
 		Entity map = _gameEngine.entityManager().create(); //should be tiles?
-	
-		 
+
+
 		_gameEngine.entityManager().assign<AnimationComponent>(player1.id(),
 								       "config.cfg");
 
 		//NOTE: same speed as camera. TODO: Load from config file!!!
-		_gameEngine.entityManager().assign<PlayerState>(player1.id(), 5.0f); 
+		_gameEngine.entityManager().assign<PlayerState>(player1.id(), 5.0f);
 
 		_gameEngine.entityManager().assign<MapComponent>(map.id(),
 		 						 "map.cfg");
-		
+
 		_gameEngine.add<StateSystem>(std::make_shared<StateSystem>());
 		_gameEngine.add<AnimationSystem>(std::make_shared<AnimationSystem>());
 		_gameEngine.add<MapSystem>(std::make_shared<MapSystem>());
@@ -247,12 +258,12 @@ public:
 	}
 
 	void frame(const float dt) override {
-		_gameEngine.run_frame(dt);		
+		_gameEngine.run_frame(dt);
 	}
-	
+
 private:
 
 	ClientEngine _gameEngine;
 
-	
+
 };
