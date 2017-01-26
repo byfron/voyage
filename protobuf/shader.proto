@@ -1,0 +1,7 @@
+package voyage;
+
+message ShaderCfg {
+	required uint32 resource_id = 1;
+	required string fragment_shader = 2;
+	required string vertex_shader = 3;
+}
