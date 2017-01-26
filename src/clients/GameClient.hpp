@@ -1,199 +1,21 @@
 #pragma once
 
-#include <engine/ResourceManager.hpp>
-#include <engine/Engine.hpp>
+#include <components/PlayerComponent.hpp>
+#include <components/AnimationComponent.hpp>
 #include <clientEngine/ClientEngine.hpp>
-#include <entities/Entity.hpp>
-#include <entities/System.hpp>
-#include <entities/Animation2D.hpp>
-#include <entities/AnimationFactory.hpp>
-#include <engine/TileMapChunk.hpp>
+#include <pumpkin.hpp>
 #include <Eigen/Dense>
-#include <utils/Interval.hpp>
-
-// TODO:
-/*
-  * Fix installation of shaders/textures
-  * Clean up a bit/ write diagrams
-  * Implement simple map+two entities and move them with two clients
-*/
-enum class PlayerAction {
-	Idle,
-	Walking,
-	Rolling,
-	Shooting
-};
-
-enum class CardinalDirection {
-	East,
-	North,
-	West,
-	South,
-	// NorthEast,
-	// NorthWest,
-	// SouthWest,
-	// SouthEast,
-};
-
-class PlayerState {
-public:
-	PlayerState(float moveSpeed) : m_moveSpeed(moveSpeed) {
-		m_position = Eigen::Vector3f(0.0f,1.5f,0.0f);//initial position (cfg!)
-		m_direction = CardinalDirection::South;
-		m_action = PlayerAction::Walking;
-	}
-
-	void computeOrientation() {
-
-		//if (USER_PRESSING_FIRE)
-		if (false) {
-			MultiInterval<float> mint(Interval<float>(-M_PI, M_PI), 4);
-			int idx = mint.indexContains(InputManager::m_mouse_angle);
-			m_direction = CardinalDirection(idx);
-		}
-		else {
-
-		}
-	}
-
-	void computeAction() {
-		if (InputManager::m_keys != 0) {
-			m_action = PlayerAction::Walking;
-		}
-	}
-
-	AnimationId getAnimationId() {
-
-		if (m_action == PlayerAction::Walking) {
-			//TODO: read from a table
-			if (m_direction == CardinalDirection::East) {
-				return AnimationId::RIGHT;
-			}
-
-			if (m_direction == CardinalDirection::West) {
-				return AnimationId::LEFT;
-			}
-
-			if (m_direction == CardinalDirection::North) {
-				return AnimationId::TOP;
-			}
-			if (m_direction == CardinalDirection::South) {
-				return AnimationId::DOWN;
-			}
-		}
-	}
-
-	Eigen::Vector3f getMoveDirection() {
-
-		Eigen::Vector3f direction = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
-
-		if (InputManager::m_keys & KEY_MOVE_UP) {
-			direction += Engine::camera().getForwardDir();
-			m_direction = CardinalDirection::North;
-		}
-		if (InputManager::m_keys & KEY_MOVE_DOWN) {
-			direction += -Engine::camera().getForwardDir();
-			m_direction = CardinalDirection::South;
-		}
-		if (InputManager::m_keys & KEY_MOVE_RIGHT) {
-			direction += -Engine::camera().getRightDir();
-			m_direction = CardinalDirection::East;
-		}
-		if (InputManager::m_keys & KEY_MOVE_LEFT) {
-			direction += Engine::camera().getRightDir();
-			m_direction = CardinalDirection::West;
-		}
-
-		return direction;
-
-	}
-
-	Eigen::Vector3f getPosition() const {
-		return m_position;
-	}
-
-	void update(float dt) {
-
-//		m_action = PlayerAction::Idle;
-		m_position += getMoveDirection()* m_moveSpeed * dt;
-		computeAction();
-		computeOrientation();
-
-	}
-
-private:
-
-//	TileIndex m_tile;
-
-	float m_moveSpeed;
-	Eigen::Vector3f m_position;
-	CardinalDirection m_direction;
-	PlayerAction m_action;
-};
 
 class MapComponent {
 public:
-	MapComponent(const std::string & conf_file) : m_mapChunk(0,0,10,10) {}
+	MapComponent(const std::string & conf_file) : m_tileMap(conf_file) {}
 	void update(float delta ) {
-		m_mapChunk.update(delta);
+		m_tileMap.update(delta);
 	}
 
 private:
 
-	TileMapChunk m_mapChunk;
-
-};
-
-// shall the graphic elements be organized per texture?
-class AnimationComponent {
-public:
-	AnimationComponent(const std::string & config_file) :
-		m_animation("", "", 0.5, 0.5) { //HOW to handle this?
-		// this details should be "hidden" in pumpkin
-		AnimationFactory factory(config_file);
-		factory.generate(&m_animation);
-	}
-
-	void update(float delta ) {
-		m_animation.update(delta);
-	}
-
-	Animation2D & getAnimation2D() {
-		return m_animation;
-	}
-
-private:
-
-	uint32_t m_resource_id;
-	Animation2D m_animation;
-};
-
-
-// 1 modify PlayerState
-
-// 2 paint Object state
-
-class AnimationSystem : public System<AnimationSystem> {
-public:
-	void update(EntityManager & em, /*EventManager &evm*/ float delta ) {
-		em.each<AnimationComponent, PlayerState>([delta](Entity entity,
-								 AnimationComponent &anim,
-								 PlayerState & state) {
-
-//			 if (state.isDirty()) {
-				 anim.getAnimation2D().setPosition(state.getPosition());
-				 anim.getAnimation2D().switchToAnim(state.getAnimationId());
-//				 state.clean();
-//			 }
-
-			 // anim.getAnimation2D().setAnimation(
-			 //	 AnimationManager::actionToAnim(state.getAction()));
-			 anim.update(delta);
-			 // now we can do whatever logic in the system which is the point!
-		 });
-	}
-
-private:
+	pumpkin::TileMap m_tileMap;
 
 };
 
@@ -209,22 +31,7 @@ public:
 	}
 };
 
-
-class StateSystem : public System<StateSystem> {
-
-	void update(EntityManager & em, /*EventManager &evm*/ float delta ) {
-		em.each<PlayerState>([delta](Entity entity, PlayerState &state) {
-				state.update(delta);
- 	        });
-
-//		em.each<ObjectState>([delta](Entity entity,
-//
-//					     });
-	}
-
-};
-
-class GameClient : public Engine {
+class GameClient : public pumpkin::GraphicsEngine {
 public:
 
 	GameClient() {
@@ -233,6 +40,20 @@ public:
 
 	~GameClient() {}
 
+	void createPlayer(Entity::Id id) {
+
+		_gameEngine.entityManager().assign<AnimationComponent>(id,
+								       "main_character_anim.cfg");
+	       
+		//NOTE: same speed as camera. TODO: Load from config file!!!
+		_gameEngine.entityManager().assign<PlayerState>(id, 5.0f);
+	}
+
+	void createMap(Entity::Id id) {
+		_gameEngine.entityManager().assign<MapComponent>(id,
+								 "map.cfg");
+	}
+	
 	void init_engine() override {
 
 		_gameEngine.init() ; //ugly with a engine from pumpkin
@@ -240,21 +61,13 @@ public:
 		Entity player1 = _gameEngine.entityManager().create();
 		Entity map = _gameEngine.entityManager().create(); //should be tiles?
 
-
-		_gameEngine.entityManager().assign<AnimationComponent>(player1.id(),
-								       "config.cfg");
-
-		//NOTE: same speed as camera. TODO: Load from config file!!!
-		_gameEngine.entityManager().assign<PlayerState>(player1.id(), 5.0f);
-
-		_gameEngine.entityManager().assign<MapComponent>(map.id(),
-		 						 "map.cfg");
-
+		createPlayer(player1.id());
+		createMap(map.id());
+		
 		_gameEngine.add<StateSystem>(std::make_shared<StateSystem>());
 		_gameEngine.add<AnimationSystem>(std::make_shared<AnimationSystem>());
 		_gameEngine.add<MapSystem>(std::make_shared<MapSystem>());
 
-//		_gameEngine.add<SoundSystem>();
 	}
 
 	void frame(const float dt) override {

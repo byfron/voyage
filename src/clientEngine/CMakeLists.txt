@@ -7,4 +7,4 @@ add_library(clientEngine
 
 target_link_libraries(clientEngine
   networking
-  cabbage)
+  pumpkin_engine)

@@ -15,7 +15,7 @@ target_link_libraries(client
   clientEngine
   EntitiesCore
   proto
-  cabbage)
+  pumpkin_engine)
 
 target_include_directories(client PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
