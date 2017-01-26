@@ -39,7 +39,9 @@ public:
 	void computeOrientation() {
 
 		//if (USER_PRESSING_FIRE)
-		if (false) {
+
+		if (pumpkin::InputManager::isLeftMouseButtonPressed())
+		{
 			MultiInterval<float> mint(Interval<float>(-M_PI, M_PI), 4);
 			int idx = mint.indexContains(pumpkin::InputManager::m_mouse_angle);
 			m_direction = CardinalDirection(idx);
@@ -60,18 +62,18 @@ public:
 		if (m_action == PlayerAction::Walking) {
 			//TODO: read from a table
 			if (m_direction == CardinalDirection::East) {
-return 0;//AnimationId::RIGHT;
+				return 2;//AnimationId::RIGHT;
 			}
 
-if (m_direction == CardinalDirection::West) {
-return 1;//AnimationId::LEFT;
+			if (m_direction == CardinalDirection::West) {
+				return 3;//AnimationId::LEFT;
 			}
 
 			if (m_direction == CardinalDirection::North) {
-				return 2;//AnimationId::TOP;
+				return 1;//AnimationId::TOP;
 			}
 			if (m_direction == CardinalDirection::South) {
-				return 3;//AnimationId::DOWN;
+				return 0;//AnimationId::DOWN;
 			}
 		}
 	}
