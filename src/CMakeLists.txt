@@ -11,7 +11,6 @@ target_include_directories(server PUBLIC
 
 add_executable(client clients/main_client.cpp)
 target_link_libraries(client
-  ${CMAKE_CURRENT_SOURCE_DIR}/../pumpkin/bgfx/.build/linux64_gcc/bin/libexample-commonRelease.a #WHY?
   clientEngine
   EntitiesCore
   proto
