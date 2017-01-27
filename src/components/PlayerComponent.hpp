@@ -128,7 +128,7 @@ private:
 
 class StateSystem : public System<StateSystem> {
 
-	void update(EntityManager & em, /*EventManager &evm*/ float delta ) {
+	void update(EntityManager & em, EventManager &evm, float delta ) {
 		em.each<PlayerState>([delta](Entity entity, PlayerState &state) {
 				state.update(delta);
  	        });

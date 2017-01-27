@@ -10,6 +10,6 @@ BaseSystem::~BaseSystem() {
 void SystemManager::update_all(float dt) {
 	assert(_initialized && "SystemManager::configure() not called");
 	for (auto &pair : _systems) {
-		pair.second->update(_em, /*event_manager_,*/ dt);
+		pair.second->update(_em, _evm, dt);
 	}
 }

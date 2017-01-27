@@ -21,7 +21,7 @@ private:
 
 class MapSystem : public System<MapSystem> {
 public:
-	void update(EntityManager & em, /*EventManager &evm*/ float delta ) {
+	void update(EntityManager & em, EventManager &evm, float delta ) {
 		em.each<MapComponent>([delta](Entity entity,
 					      MapComponent &map) {
 

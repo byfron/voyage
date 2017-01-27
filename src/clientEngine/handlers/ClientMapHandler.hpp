@@ -16,7 +16,7 @@ public:
 
 	void onMessage(RakNet::Packet *p) {
 
-				
+
 		//fill tilemap with region tiles
 		Message<sc_regionData>::Ptr m =
 			std::make_shared< Message<sc_regionData> >(p);
@@ -29,7 +29,7 @@ public:
 		int h = content.rows();
 		std::vector<uint32_t> tiles;
 		int size = content.tiles().size();
-		assert(size  == w*h);		
+		assert(size  == w*h);
 		std::copy(content.tiles().begin(), content.tiles().end(), std::back_inserter(tiles));
 
 		std::cout << tiles.size() << w*h << std::endl;
@@ -37,12 +37,12 @@ public:
 
 		for (int i = 0; i < tiles.size(); i++)
 			std::cout << tiles[i] << std::endl;
-		
-		_client->getTileMap()->fill(x, y, w, h, tiles);
+
+		//	_client->getTileMap()->fill(x, y, w, h, tiles);
 	}
 
 private:
 
 	ClientEngine::Ptr _client;
-	
+
 };

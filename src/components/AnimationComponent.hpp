@@ -6,7 +6,7 @@
 // shall the graphic elements be organized per texture?
 class AnimationComponent {
 public:
-	AnimationComponent(const std::string & config_file) : 
+	AnimationComponent(const std::string & config_file) :
 		m_animation(config_file) {
 		m_animation.init();
 	}
@@ -28,7 +28,7 @@ private:
 
 class AnimationSystem : public System<AnimationSystem> {
 public:
-	void update(EntityManager & em, /*EventManager &evm*/ float delta ) {
+	void update(EntityManager & em, EventManager &evm, float delta ) {
 		em.each<AnimationComponent, PlayerState>([delta](Entity entity,
 								 AnimationComponent &anim,
 								 PlayerState & state) {

@@ -25,12 +25,13 @@ void ClientEngine::init() {
 	_netManager->connect();
 	_running = true;
 
-	_tileMap = std::make_shared<ClientTileMap>();
+//	_tileMap = std::make_shared<ClientTileMap>();
 
-	_systemManager = std::make_shared<SystemManager>(_entityManager);
-	
+	_systemManager = std::make_shared<SystemManager>(_entityManager,
+							 _eventManager);
+
 	_registerHandlers();
-	
+
 	//_graphicsEngine = std::make_shared<SDLGraphicsEngine>(ClientEngine::Ptr(this));
 	//_graphicsEngine->init();
 
@@ -39,7 +40,7 @@ void ClientEngine::init() {
 
 	// initialise entity manager (will have graphics/audio components here,
 	// but all the logic is in the server)
-	
+
 }
 
 void ClientEngine::_registerHandlers() {
@@ -64,17 +65,17 @@ void ClientEngine::processFrame() {
 	//check for user input
 
 	//update local entities
-		
+
 	//send messages to server
-		
+
 	//receive messages from server
 	_netManager->receiveData();
 
 	//update world
-				
+
 	//display graphics
 	//_graphicsEngine->run();
-		
+
 	//play sounds
 }
 
@@ -92,7 +93,7 @@ void ClientEngine::processFrame() {
 // 	// voyage::cs_loginRequest msg;
 // 	// msg.set_username("jose");
 // 	// msg.set_password("1234");
-	
+
 // //	_netManager->sendData<voyage::cs_loginRequest>(ID_CS_LOGIN_REQUEST, msg);
 
 // }
