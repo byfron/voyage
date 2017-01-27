@@ -6,7 +6,6 @@
 
 // TODO:
 /*
-  * Fix installation of shaders/textures
   * Clean up a bit/ write diagrams
   * Implement simple map+two entities and move them with two clients
 */
@@ -28,7 +27,7 @@ enum class CardinalDirection {
 	// SouthEast,
 };
 
-class PlayerState {
+class PlayerInput {
 public:
 	PlayerState(float moveSpeed) : m_moveSpeed(moveSpeed) {
 		m_position = Eigen::Vector3f(0.0f,1.5f,0.0f);//initial position (cfg!)
@@ -107,10 +106,12 @@ public:
 		return m_position;
 	}
 
-	void update(float dt) {
+	void update(float dt, const TileMap::CollisionMask & mask) {
 
-//		m_action = PlayerAction::Idle;
-		m_position += getMoveDirection()* m_moveSpeed * dt;
+
+		getMoveDirection() * m_moveSpeed * dt;
+
+		m_position += * m_moveSpeed * dt;
 		computeAction();
 		computeOrientation();
 
@@ -118,20 +119,36 @@ public:
 
 private:
 
-//	TileIndex m_tile;
-
 	float m_moveSpeed;
-	Eigen::Vector3f m_position;
 	CardinalDirection m_direction;
 	PlayerAction m_action;
 };
 
 class StateSystem : public System<StateSystem> {
 
+	StateSystem(World & world) : m_world(world) {
+
+	}
+
 	void update(EntityManager & em, EventManager &evm, float delta ) {
-		em.each<PlayerState>([delta](Entity entity, PlayerState &state) {
-				state.update(delta);
+
+		TileMap::CollisionMask mask = m_world.getTilemapCollisionMask();
+
+		em.each<PlayerInput, BodyComponent>([delta](Entity entity,
+							    PlayerInput &pinput,
+							    BodyComponent &body) {
+
+			    input.update(delta, mask);
+			    body.m_move_vector = input.getMoveVector();
  	        });
 	}
 
+	// void update(EntityManager & em, EventManager &evm, float delta ) {
+	// 	em.each<AIComponent, BodyComponent>([delta](Entity entity, PlayerState &state) {
+
+	// }
+
+private:
+
+	World & m_world;
 };

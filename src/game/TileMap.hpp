@@ -12,6 +12,12 @@ typedef std::shared_ptr<MapRegion> MapRegionPtr;
 
 class WorldProperties;
 
+
+struct CollisionData {
+
+	uint32_t m_entity_id;
+};
+
 struct TilePosition {
 	TilePosition() {};
 	TilePosition(int x, int y) : tilex(x), tiley(y) {}
@@ -22,6 +28,16 @@ struct TilePosition {
 class TileMap {
 public:
 
+	class CollisionMask {
+	public:
+		bool isColliding(int x, int y) {
+			if (m_mask(x,y) == 0) return false;
+			return true;
+		}
+
+		Eigen::Matrix<CollisionData, Eigen::Dynamic, Eigen::Dynamic> m_mask;
+	};
+
 	TileMap();
 	TileMap(std::string file);
 
@@ -30,14 +46,14 @@ public:
 	char getTileId(int x, int y);
 
 	void generate(const WorldProperties & properties);
-	
+
 	MapRegionPtr getMapRegionFromTile(const int x, const int y);
 	std::vector<uint32_t> getRegionTiles(MapRegionPtr);
 	int getRegionW() { return _regionW; }
 	int getRegionH() { return _regionH; }
-	
+
 	typedef std::shared_ptr<TileMap> Ptr;
-	
+
 private:
 	std::vector<MapRegionPtr> _regions;
 	int _regionW;
@@ -50,4 +66,6 @@ private:
 	//3 bits: 8 biomes
 	//3 bits: 8 within-biome types
  	uint32_t _tile_data[MAX_TILEMAP_SIZE_X][MAX_TILEMAP_SIZE_Y];
+
+	CollisionMask _collision_mask;
 };
