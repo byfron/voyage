@@ -15,12 +15,14 @@ find_package(Threads REQUIRED)
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-message(STATUS ${RAKNET_LIB})
-
 set(DB_NAME "test.db")
 set(DB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/datasets/")
 set(SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/scripts/")
 set(GRAPHICS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/graphics/")
+
+add_definitions(-DCONFIG_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/config/")
+add_definitions(-DTEXTURE_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/textures/")
+add_definitions(-DSHADER_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/shaders/")
 
 add_definitions(-DDB_DIR="${DB_DIR}")
 add_definitions(-DDB_NAME="${DB_NAME}")

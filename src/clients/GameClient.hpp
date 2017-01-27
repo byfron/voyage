@@ -43,17 +43,17 @@ public:
 	void createPlayer(Entity::Id id) {
 
 		_gameEngine.entityManager().assign<AnimationComponent>(id,
-								       "main_character_anim.cfg");
-	       
+			       std::string(CONFIG_FILE_PATH) + "main_character_anim.cfg");
+
 		//NOTE: same speed as camera. TODO: Load from config file!!!
 		_gameEngine.entityManager().assign<PlayerState>(id, 5.0f);
 	}
 
 	void createMap(Entity::Id id) {
-		_gameEngine.entityManager().assign<MapComponent>(id,
+		_gameEngine.entityManager().assign<MapComponent>(id, std::string(CONFIG_FILE_PATH) +
 								 "map.cfg");
 	}
-	
+
 	void init_engine() override {
 
 		_gameEngine.init() ; //ugly with a engine from pumpkin
@@ -63,7 +63,7 @@ public:
 
 		createPlayer(player1.id());
 		createMap(map.id());
-		
+
 		_gameEngine.add<StateSystem>(std::make_shared<StateSystem>());
 		_gameEngine.add<AnimationSystem>(std::make_shared<AnimationSystem>());
 		_gameEngine.add<MapSystem>(std::make_shared<MapSystem>());
