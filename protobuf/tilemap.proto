@@ -5,11 +5,12 @@ import "texture_atlas.proto";
 message TileMapCfg {
 	repeated TileMapLayerCfg layers=1;
 	required uint32 size_x=2;
-	required uint32 size_y=3;	
+	required uint32 size_y=3;
+	required string data_file=4;
+	required string mask_file=5;
 }
 
 message TileMapLayerCfg {
-	required string data_file=1;
-	required uint32 shader_id=2;
-	required uint32 atlas_id=3;	
+	required uint32 shader_id=1;
+	required uint32 atlas_id=2;	
 }
