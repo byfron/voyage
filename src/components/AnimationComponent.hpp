@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BodyCmp.hpp"
+#include "InputCmp.hpp"
 #include <entities/System.hpp>
 #include <graphics/Animation.hpp>
 #include <graphics/AnimationFactory.hpp>
@@ -15,8 +16,20 @@ public:
 	}
 
 	void retrieveAnimation(int32_t action) {
+
+		if (action &  (1 << (int)Action::FACING_LEFT)) {
+			m_animation.switchToAnim(3);
+		}
+		else if (action & (1 << (int)Action::FACING_RIGHT)) {
+			m_animation.switchToAnim(2);
+		}
 		
-		m_animation.switchToAnim(0);
+		if (action & (1 << (int)Action::FACING_UP)) {
+			m_animation.switchToAnim(1);
+		}
+		else if (action & (1 << (int)Action::FACING_DOWN)) {
+			m_animation.switchToAnim(0);
+		}
 	}
 	
 	void update(float delta ) {					       		
@@ -47,23 +60,11 @@ public:
 							     BodyCmp & body) {
 //			 if (state.isDirty()) {
 
-				// check in a table which animation shall we move to
-                                // given the actionState
-							    
-			        // tell pumpkin to go to that one
-
-				// set position of the graphical object
-							    
-							    
-//				 updateAnimation(anim, body);
-				 
-				     anim.retrieveAnimation(body.m_action_id);		 
-				     anim.getAnimation2D().setPosition(body.m_position);
-				     anim.update(delta);
+			     anim.retrieveAnimation(body.m_action_id);		 
+			     anim.getAnimation2D().setPosition(body.m_position);
+			     anim.update(delta);
 								 
 //			 }
-
-			 anim.update(delta);
 		 });	       
 	}
 

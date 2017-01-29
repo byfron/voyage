@@ -5,19 +5,23 @@
 #include <utils/Interval.hpp>
 #include <common/math.hpp>
 
-enum class PlayerAction {
-	Idle,
-	Walking,	
-	Rolling,
-	Shooting
-};
-
 enum class CardinalDirection {
 	East,
 	North,
 	West,
 	South,
 };
+
+enum class Action {
+	IDLE,
+	RUNNING,
+	FACING_UP,
+	FACING_DOWN,
+	FACING_LEFT,
+	FACING_RIGHT,
+	SHOOTING		
+};
+
 
 class InputCmp {
 
@@ -34,15 +38,23 @@ public:
 
 		if (pumpkin::InputManager::m_keys & KEY_MOVE_UP) {
 			direction += pumpkin::GraphicsEngine::camera().getForwardDir();
+			m_action |= (1 << (int)Action::FACING_UP);
 		}
 		if (pumpkin::InputManager::m_keys & KEY_MOVE_DOWN) {
 			direction += -pumpkin::GraphicsEngine::camera().getForwardDir();
+			m_action |= (1 << (int)Action::FACING_DOWN);
 		}
 		if (pumpkin::InputManager::m_keys & KEY_MOVE_RIGHT) {
 			direction += -pumpkin::GraphicsEngine::camera().getRightDir();
+			m_action |= (1 << (int)Action::FACING_RIGHT);
 		}
 		if (pumpkin::InputManager::m_keys & KEY_MOVE_LEFT) {
 			direction += pumpkin::GraphicsEngine::camera().getRightDir();
+			m_action |= (1 << (int)Action::FACING_LEFT);
+		}
+
+		if (direction.norm() > 0) {
+			m_action |= (1 << (int)Action::RUNNING);
 		}
 		
 		m_move_vector = direction;
@@ -56,7 +68,22 @@ public:
 			int idx = mint.indexContains(pumpkin::InputManager::m_mouse_angle);
 			m_lookat_direction = CardinalDirection(idx);
 
-			m_action |= (1 << (int)PlayerAction::Shooting);
+			switch(m_lookat_direction) {
+			case CardinalDirection::East:
+				m_action |= (1 << (int)Action::FACING_RIGHT);
+				break;
+			case CardinalDirection::West:
+				m_action |= (1 << (int)Action::FACING_LEFT);
+				break;
+			case CardinalDirection::North:
+				m_action |= (1 << (int)Action::FACING_UP);
+				break;
+			case CardinalDirection::South:
+				m_action |= (1 << (int)Action::FACING_DOWN);
+				break;				
+			}
+			
+			m_action |= (1 << (int)Action::SHOOTING);
 			
 //			m_lookat_vector = InputManager::bla bla
 		}

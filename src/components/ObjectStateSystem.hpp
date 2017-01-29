@@ -27,7 +27,6 @@ public:
 			// Updates inputs
 			input.update();
 
-
 			// Check collision
 			// in case of collision with map, project motion vector in tile
 		        Vec3f pos = body.m_position + input.m_move_vector *
@@ -40,8 +39,7 @@ public:
 				pumpkin::GraphicsEngine::camera().setSpeed(0.0);
 //				std::vector<Vec3f> edge = TileMapUtils::getClosestEdge(game_map, tile);
 //				TileMapUtils::getClosestEdgeVector(corners, 
-				
-				
+								
 			}else {
 				
 				pumpkin::GraphicsEngine::camera().setSpeed(body.m_moveSpeed);
@@ -49,12 +47,11 @@ public:
 				body.m_position += input.m_move_vector *
 					body.m_moveSpeed * delta;
 			}
-			
+
+
 			//body.m_tile_pos = TileMapUtils::computeTilePos(body.m_position);
 			body.m_action_id = input.m_action;
-
-
- 	        });
+					   });
 
 		// Update networking players
 
