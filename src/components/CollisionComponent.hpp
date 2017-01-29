@@ -7,6 +7,10 @@ public:
 	float radius;
 };
 
+// NOTE: We distinguish between characters and body
+// Characters have a position, tile, action state a direction of movemenet,
+// Objects have a position, tile, direction mov. 
+// FUCK could be the same?
 
 class CollisionSystem : public System<CollisionSystem> {
 
@@ -31,9 +35,10 @@ class CollisionSystem : public System<CollisionSystem> {
 		TileMap::CollisionMask collision_grid = *m_collision_mask;
 
 
-		em.each<CollisionComponent, Body>([delta](Entity entity,
-							  CollisionComponent & collision,
-							  Body & body) {
+		// solve candidates with characters
+		em.each<CollisionComponent, BodyCmp >([delta](Entity entity,
+							      CollisionComponent & collision,
+							      BodyCmp & body) {
 
 		  // check if entity is colliding with a map object
 		  // we shall do this here ONLY if walls are objects I guess
@@ -43,9 +48,8 @@ class CollisionSystem : public System<CollisionSystem> {
 			  std::cout << "isColliding!!!" << std::endl;
 //			  body.stepBack();
 		  }
-
-
-//			  = entity.getId();
+		  
+//		  = entity.getId();
 
 		  // add colliding tiles acoording to radius
 		  // std::vector<Vec2i> tiles =
@@ -61,6 +65,10 @@ class CollisionSystem : public System<CollisionSystem> {
 		  // }
 
 		  });
+
+		// solve candidates with other objects
+		em.each<CollisionComponent, ObjectCmp >([delta](Entity entity,
+
 
 		// send collision messages
 
