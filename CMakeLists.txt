@@ -23,6 +23,7 @@ set(GRAPHICS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/graphics/")
 add_definitions(-DCONFIG_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/config/")
 add_definitions(-DTEXTURE_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/textures/")
 add_definitions(-DSHADER_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/shaders/")
+add_definitions(-DSCRIPT_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/scripts/")
 
 add_definitions(-DDB_DIR="${DB_DIR}")
 add_definitions(-DDB_NAME="${DB_NAME}")
@@ -36,7 +37,7 @@ set(CMAKE_MODULE_PATH
   )
 
 SET(PYTHON_INCLUDE_PATH /usr/include/python2.7)
-SET(PYTHON_LIBRARIES /usr/lib/python2.7/config-x86_64-linux-gnu/libpython2.7.so)
+SET(PYTHON_LIBRARIES /usr/lib/x86_64-linux-gnu/libpython2.7.so)
 
 
 ######## GTest #########
@@ -87,14 +88,13 @@ include_directories(${PROTOBUF_GENEREATED_HEADERS})
 message(STATUS ${PROTOBUF_GENEREATED_HEADERS})
 
 
-FIND_PACKAGE(Boost 1.45.0)
-IF(Boost_FOUND)
-  INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}" "/usr/include/python2.6")
-  SET(Boost_USE_STATIC_LIBS OFF)
-  SET(Boost_USE_MULTITHREADED ON)
-  SET(Boost_USE_STATIC_RUNTIME OFF)
-  FIND_PACKAGE(Boost 1.45.0 COMPONENTS python)
-ENDIF()
+
+SET(Boost_USE_STATIC_LIBS OFF)
+SET(Boost_USE_MULTITHREADED ON)
+SET(Boost_USE_STATIC_RUNTIME OFF)
+SET(Boost_INCLUDE_DIRS "/usr/local/include/boost")
+SET(Boost_LIBRARIES "/usr/local/lib/libboost_python.so")
+INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}" "/usr/include/python2.6")
 
 find_package(SDL2)
 find_package(SDL2_image)
