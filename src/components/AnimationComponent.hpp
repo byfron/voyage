@@ -1,7 +1,10 @@
 #pragma once
 
+#include "BodyCmp.hpp"
+#include <entities/System.hpp>
 #include <graphics/Animation.hpp>
 #include <graphics/AnimationFactory.hpp>
+
 
 // shall the graphic elements be organized per texture?
 class AnimationComponent {
@@ -11,7 +14,12 @@ public:
 		m_animation.init();
 	}
 
-	void update(float delta ) {
+	void retrieveAnimation(int32_t action) {
+		
+		m_animation.switchToAnim(0);
+	}
+	
+	void update(float delta ) {					       		
 		m_animation.update(delta);
 	}
 
@@ -28,17 +36,35 @@ private:
 
 class AnimationSystem : public System<AnimationSystem> {
 public:
+
+	void updateAnimation(AnimationComponent &anim, BodyCmp & body) {
+
+	}
+	
 	void update(EntityManager & em, EventManager &evm, float delta ) {
-		em.each<AnimationComponent, PlayerState>([delta](Entity entity,
-								 AnimationComponent &anim,
-								 PlayerState & state) {
+		em.each<AnimationComponent, BodyCmp>([delta](Entity entity,
+							     AnimationComponent &anim,
+							     BodyCmp & body) {
 //			 if (state.isDirty()) {
-				 anim.getAnimation2D().setPosition(state.getPosition());
-				 anim.getAnimation2D().switchToAnim(state.getAnimationId());
+
+				// check in a table which animation shall we move to
+                                // given the actionState
+							    
+			        // tell pumpkin to go to that one
+
+				// set position of the graphical object
+							    
+							    
+//				 updateAnimation(anim, body);
+				 
+				     anim.retrieveAnimation(body.m_action_id);		 
+				     anim.getAnimation2D().setPosition(body.m_position);
+				     anim.update(delta);
+								 
 //			 }
 
 			 anim.update(delta);
-		 });
+		 });	       
 	}
 
 private:
