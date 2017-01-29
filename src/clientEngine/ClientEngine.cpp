@@ -32,6 +32,10 @@ void ClientEngine::init() {
 
 	_registerHandlers();
 
+	// create world
+	m_world = std::make_shared<World>();
+
+
 	//_graphicsEngine = std::make_shared<SDLGraphicsEngine>(ClientEngine::Ptr(this));
 	//_graphicsEngine->init();
 
@@ -56,9 +60,6 @@ void ClientEngine::requestQuit() {
 	_running = false;
 }
 
-void ClientEngine::initPlayer(PlayerData & playerData) {
-
-}
 
 void ClientEngine::processFrame() {
 

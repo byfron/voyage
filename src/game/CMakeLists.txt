@@ -1,8 +1,10 @@
 add_library(game
-  TileMap.hpp
-  TileMap.cpp
+  GameMap.hpp
+  GameMap.cpp
   World.hpp
   World.cpp
-  MapRegion.hpp
   WorldProperties.hpp
   )
+
+target_link_libraries(game
+  pumpkin_engine)

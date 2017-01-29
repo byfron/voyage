@@ -4,6 +4,5 @@
 World::World() {
 
 	std::cout << "initializing world" << std::endl;
-	_tilemap = std::make_shared<TileMap>();
+	_game_map = std::make_shared<GameMap>(std::string(CONFIG_FILE_PATH) + "map.cfg");
 }
-

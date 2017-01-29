@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TileMap.hpp"
+#include "GameMap.hpp"
 #include "WorldProperties.hpp"
 
 /**
@@ -14,10 +14,11 @@ public:
 
 	typedef std::shared_ptr<World> Ptr;
 
-	TileMap::Ptr getTileMap() { return _tilemap; }
+	GameMap::Ptr getGameMap() { return _game_map; }
+	GameMap::CollisionMask & getMapCollisionMask() { return _game_map->getCollisionMask(); }
 
 private:
 
-	TileMap::Ptr _tilemap;
+	GameMap::Ptr _game_map;
 	WorldProperties _properties;
 };

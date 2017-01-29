@@ -1,21 +1,28 @@
 #pragma once
 
-#include <components/PlayerComponent.hpp>
+#include <components/BodyCmp.hpp>
+#include <components/InputCmp.hpp>
 #include <components/AnimationComponent.hpp>
+#include <components/ObjectStateSystem.hpp>
+#include <components/ScriptSystem.hpp>
 #include <clientEngine/ClientEngine.hpp>
 #include <pumpkin.hpp>
 #include <Eigen/Dense>
+#include <tilemap.pb.h>
+#include <utils/Configuration.hpp>
+#include <graphics/TileMap.hpp>
 
 class MapComponent {
 public:
-	MapComponent(const std::string & conf_file) : m_tileMap(conf_file) {}
+	MapComponent(pumpkin::TileMap & tmap) : m_tileMap(tmap) {
+	}
 	void update(float delta ) {
 		m_tileMap.update(delta);
 	}
 
 private:
 
-	pumpkin::TileMap m_tileMap;
+	pumpkin::TileMap & m_tileMap;
 
 };
 
@@ -42,16 +49,22 @@ public:
 
 	void createPlayer(Entity::Id id) {
 
+
+		
 		_gameEngine.entityManager().assign<AnimationComponent>(id,
-			       std::string(CONFIG_FILE_PATH) + "main_character_anim.cfg");
+								       std::string(CONFIG_FILE_PATH) +
+								       "main_character_anim.cfg");
 
 		//NOTE: same speed as camera. TODO: Load from config file!!!
-		_gameEngine.entityManager().assign<PlayerState>(id, 5.0f);
+		_gameEngine.entityManager().assign<BodyCmp>(id, "cfg");
+		_gameEngine.entityManager().assign<InputCmp>(id, "cfg");
+		_gameEngine.entityManager().assign<ScriptCmp>(id, "test.py");
+				
 	}
 
 	void createMap(Entity::Id id) {
-		_gameEngine.entityManager().assign<MapComponent>(id, std::string(CONFIG_FILE_PATH) +
-								 "map.cfg");
+		_gameEngine.entityManager().assign<MapComponent>(id,
+		 _gameEngine.getWorld()->getGameMap()->getTileMap());
 	}
 
 	void init_engine() override {
@@ -64,9 +77,12 @@ public:
 		createPlayer(player1.id());
 		createMap(map.id());
 
-		_gameEngine.add<StateSystem>(std::make_shared<StateSystem>());
+		_gameEngine.add<ObjectStateSystem>(std::make_shared<ObjectStateSystem>
+						   (_gameEngine.getWorld()));
 		_gameEngine.add<AnimationSystem>(std::make_shared<AnimationSystem>());
 		_gameEngine.add<MapSystem>(std::make_shared<MapSystem>());
+		
+		_gameEngine.add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
 
 	}
 

@@ -3,7 +3,7 @@
 #include <networking/ClientNetworkManager.hpp>
 #include <entities/Entity.hpp>
 #include <entities/System.hpp>
-#include "PlayerData.hpp"
+#include <game/World.hpp>
 
 class ClientEngine {
 public:
@@ -13,7 +13,7 @@ public:
 	void clientLoop();
 	void requestQuit();
 	void processFrame();
-	void initPlayer(PlayerData & playerData);
+//	void initPlayer(PlayerData & playerData);
 
 	void run_frame(float dt) {
 		_systemManager->update_all(dt);
@@ -26,6 +26,8 @@ public:
 	void add(std::shared_ptr<S> system) {
 		_systemManager->add<S>(system);
 	}
+
+	World::Ptr getWorld() { return m_world; }
 
 //	ClientTileMap::Ptr getTileMap() { return _tileMap; };
 	ClientNetworkManager::Ptr getNetworkManager() { return _netManager; }
@@ -45,5 +47,5 @@ private:
 
 	bool _running;
 
-
+	World::Ptr m_world;
 };
