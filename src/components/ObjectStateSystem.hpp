@@ -3,6 +3,7 @@
 #include <entities/System.hpp>
 #include <game/World.hpp>
 #include "InputCmp.hpp"
+#include "BulletCmp.hpp"
 #include "BodyCmp.hpp"
 #include <pumpkin.hpp>
 
@@ -20,9 +21,9 @@ public:
 		GameMap::Ptr game_map = m_world->getGameMap();
 		
 		// Update all player states
-		em.each<InputCmp, BodyCmp>([delta, game_map, mask](Entity entity,
-								   InputCmp &input,
-								   BodyCmp &body) {
+		em.each<InputCmp, BodyCmp>([&em, delta, game_map, mask](Entity entity,
+								       InputCmp &input,
+								       BodyCmp &body) {
 
 			// Updates inputs
 			input.update();
@@ -51,7 +52,18 @@ public:
 
 			//body.m_tile_pos = TileMapUtils::computeTilePos(body.m_position);
 			body.m_action_id = input.m_action;
-					   });
+
+			if (body.m_action_id & (1 << (int)Action::SHOOTING)) {
+				
+				//Create a bullet
+				Entity bullet = em.create();
+				em.assign<GraphicsCmp>(bullet.id(), Configuration<>());
+				em.assign<BodyCmp>(bullet.id());
+				em.assign<BulletCmp>(bullet.id());
+				
+			}
+			
+		   });
 
 		// Update networking players
 

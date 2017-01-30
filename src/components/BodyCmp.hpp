@@ -3,8 +3,14 @@
 #include <common/math.hpp>
 
 class BodyCmp {
+	
 public:
-	BodyCmp() {
+	BodyCmp(float speed = 0.0f,
+		Vec3f pos = Vec3f::Zero(),
+		Vec2i tile = Vec2i::Zero() ) : m_moveSpeed(speed),
+							m_position(pos),
+							m_tile_pos(tile)
+	{
 	}
 	
 	BodyCmp(const std::string & cfg/*config*/) {
@@ -12,7 +18,8 @@ public:
 		m_position = Vec3f(0.0f, 1.5f, 0.0f);
 		m_tile_pos = Vec2i(0,0);
 		m_action_id = 0;
-	} 
+	}
+	
 public:
 
 	float m_moveSpeed;
