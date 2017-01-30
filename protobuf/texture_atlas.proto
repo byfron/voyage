@@ -1,10 +1,14 @@
 package voyage;
 
+message AtlasListCfg {
+	repeated AtlasCfg texture = 1;
+}
+
 message AtlasCfg {
 	required uint32 resource_id = 1;
 	required string atlas_file = 2;
 	required uint32 sprite_height = 3;
-	required uint32 sprite_width = 4;	
+	required uint32 sprite_width = 4;
 	required uint32 grid_height = 5;
 	required uint32 grid_width = 6;
 }

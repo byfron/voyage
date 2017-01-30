@@ -1,5 +1,9 @@
 package voyage;
 
+message ShaderListCfg {
+	repeated ShaderCfg shader = 1;
+}
+
 message ShaderCfg {
 	required uint32 resource_id = 1;
 	required string fragment_shader = 2;
