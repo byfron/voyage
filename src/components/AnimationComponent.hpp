@@ -15,24 +15,25 @@ public:
 		m_animation.init();
 	}
 
+	// TODO: this should not be here
 	void retrieveAnimation(int32_t action) {
 
-		if (action &  (1 << (int)Action::FACING_LEFT)) {
+		if (action & (1 << (int)Action::FACING_LEFT)) {
 			m_animation.switchToAnim(3);
 		}
 		else if (action & (1 << (int)Action::FACING_RIGHT)) {
 			m_animation.switchToAnim(2);
 		}
-		
-		if (action & (1 << (int)Action::FACING_UP)) {
+		else if (action & (1 << (int)Action::FACING_UP)) {
 			m_animation.switchToAnim(1);
 		}
 		else if (action & (1 << (int)Action::FACING_DOWN)) {
 			m_animation.switchToAnim(0);
 		}
+		else m_animation.stop();
 	}
-	
-	void update(float delta ) {					       		
+
+	void update(float delta ) {
 		m_animation.update(delta);
 	}
 
@@ -53,19 +54,19 @@ public:
 	void updateAnimation(AnimationComponent &anim, BodyCmp & body) {
 
 	}
-	
+
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 		em.each<AnimationComponent, BodyCmp>([delta](Entity entity,
 							     AnimationComponent &anim,
 							     BodyCmp & body) {
 //			 if (state.isDirty()) {
 
-			     anim.retrieveAnimation(body.m_action_id);		 
+			     anim.retrieveAnimation(body.m_action_id);
 			     anim.getAnimation2D().setPosition(body.m_position);
 			     anim.update(delta);
-								 
+
 //			 }
-		 });	       
+		 });
 	}
 
 private:

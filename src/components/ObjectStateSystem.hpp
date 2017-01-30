@@ -2,6 +2,7 @@
 
 #include <entities/System.hpp>
 #include <game/World.hpp>
+#include "GraphicsCmp.hpp"
 #include "InputCmp.hpp"
 #include "BulletCmp.hpp"
 #include "BodyCmp.hpp"
@@ -16,10 +17,10 @@ public:
 	}
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
-	       
+
 		GameMap::CollisionMask mask = m_world->getMapCollisionMask();
 		GameMap::Ptr game_map = m_world->getGameMap();
-		
+
 		// Update all player states
 		em.each<InputCmp, BodyCmp>([&em, delta, game_map, mask](Entity entity,
 								       InputCmp &input,
@@ -39,10 +40,10 @@ public:
 
 				pumpkin::GraphicsEngine::camera().setSpeed(0.0);
 //				std::vector<Vec3f> edge = TileMapUtils::getClosestEdge(game_map, tile);
-//				TileMapUtils::getClosestEdgeVector(corners, 
-								
+//				TileMapUtils::getClosestEdgeVector(corners,
+
 			}else {
-				
+
 				pumpkin::GraphicsEngine::camera().setSpeed(body.m_moveSpeed);
 				// Updates character state
 				body.m_position += input.m_move_vector *
@@ -54,24 +55,24 @@ public:
 			body.m_action_id = input.m_action;
 
 			if (body.m_action_id & (1 << (int)Action::SHOOTING)) {
-				
-				//Create a bullet
-				Entity bullet = em.create();
-				em.assign<GraphicsCmp>(bullet.id(), Configuration<>());
-				em.assign<BodyCmp>(bullet.id());
-				em.assign<BulletCmp>(bullet.id());
-				
+
+				// //Create a bullet
+				// Entity bullet = em.create();
+				// em.assign<GraphicsCmp>(bullet.id(), Configuration<>());
+				// em.assign<BodyCmp>(bullet.id());
+				// em.assign<BulletCmp>(bullet.id());
+
 			}
-			
+
 		   });
 
 		// Update networking players
 
-		
+
 		// Update networking objects
 
 
-	       
+
 	}
 
 	// In server:
