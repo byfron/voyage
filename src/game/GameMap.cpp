@@ -47,15 +47,12 @@ bool GameMap::loadTileMap(const pumpkin::Configuration<voyage::TileMapCfg> & con
 
 void GameMap::generateLayer(pumpkin::TileMapLayer::Ptr layer) {
 
-	float height = 0.5;
+	float height = 0.5;	
+	
 	for (int i = 0; i < m_size_x; i++) {
 		for (int j = 0; j < m_size_y; j++) {
-
-			// TODO: here we need a proper table of objects
-			if (m_tilemap_data(i,j).type == 0)
-				layer->addTile(i, j, m_tile_size);
-			else
-				layer->addWall(i, j, m_tile_size, height);
+			layer->addMeshObject(i, j, m_tilemap_data(i,j).type,
+					     m_tile_size, height);			
 		}
 	}
 
