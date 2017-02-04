@@ -6,9 +6,14 @@
 #include "InputCmp.hpp"
 #include "BulletCmp.hpp"
 #include "BodyCmp.hpp"
+#include "CollisionComponent.hpp"
 #include <pumpkin.hpp>
 
-class World;
+struct Quad {
+	Vec2f vertex[4];
+	int num_vertices = 4;
+};
+
 
 class ObjectStateSystem : public System<ObjectStateSystem> {
 public:
@@ -22,36 +27,77 @@ public:
 		GameMap::Ptr game_map = m_world->getGameMap();
 
 		// Update all player states
-		em.each<InputCmp, BodyCmp>([&em, delta, game_map, mask](Entity entity,
-								       InputCmp &input,
-								       BodyCmp &body) {
+		em.each<InputCmp, CollisionComponent, BodyCmp>
+			([&em, delta, game_map, mask](Entity entity,
+						      InputCmp &input,
+						      CollisionComponent &col,
+						      BodyCmp &body) {	      
 
 			// Updates inputs
 			input.update();
 
 			// Check collision
-			// in case of collision with map, project motion vector in tile
-		        Vec3f pos = body.m_position + input.m_move_vector *
+			Vec3f move_vec = input.m_move_vector *
 				body.m_moveSpeed * delta;
+		        Vec3f pos = body.m_position + move_vec;
 
-			Vec2i tile = game_map->getTileCoords(pos);
-			if (mask.isColliding(tile)) {
-				//project vector in
+			Vec2i tile = game_map->getTileCoords(body.m_position);
 
-				pumpkin::GraphicsEngine::camera().setSpeed(0.0);
-//				std::vector<Vec3f> edge = TileMapUtils::getClosestEdge(game_map, tile);
-//				TileMapUtils::getClosestEdgeVector(corners,
+			// Potential collision tiles
+			std::vector<Vec2i> collision_candidates;
+			collision_candidates.push_back(Vec2i(tile(0), tile(1)));
+			collision_candidates.push_back(Vec2i(tile(0)+1, tile(1)));
+			collision_candidates.push_back(Vec2i(tile(0)+1, tile(1)+1));
+			collision_candidates.push_back(Vec2i(tile(0), tile(1)+1));
+			collision_candidates.push_back(Vec2i(tile(0)-1, tile(1)));
+			collision_candidates.push_back(Vec2i(tile(0)-1, tile(1)-1));
+			collision_candidates.push_back(Vec2i(tile(0), tile(1)-1));
+			collision_candidates.push_back(Vec2i(tile(0)+1, tile(1)-1));
+			collision_candidates.push_back(Vec2i(tile(0)-1, tile(1)+1));
 
-			}else {
+			GeometryUtils::Polygon player = body.getPolygon();
 
-				pumpkin::GraphicsEngine::camera().setSpeed(body.m_moveSpeed);
-				// Updates character state
-				body.m_position += input.m_move_vector *
-					body.m_moveSpeed * delta;
+			// Check that all points lie in walkable tiles
+			Vec2f accum_mtd = Vec2f::Zero();
+
+			for (auto candidate: collision_candidates) {
+
+				//TODO move to debug
+				//game_map->getTileMap().highlightTile(candidate);
+
+				GeometryUtils::Polygon cand;
+				Vec2i tilec = candidate;
+				cand.vertex[0] = Vec2f(tilec(0)*0.5, tilec(1)*0.5);
+				cand.vertex[1] = Vec2f(tilec(0)*0.5, (tilec(1)+1)*0.5);
+				cand.vertex[2] = Vec2f((tilec(0)+1)*0.5, (tilec(1)+1)*0.5);
+				cand.vertex[3] = Vec2f((tilec(0)+1)*0.5, tilec(1)*0.5);
+
+				if (not mask.isWalkable(candidate)) {
+					Vec2f MTD = Vec2f::Zero();
+					if (GeometryUtils::IntersectMTD(player, cand, MTD)) {
+						accum_mtd += MTD;
+						player.vertex[0] -= MTD;
+						player.vertex[1] -= MTD;
+						player.vertex[2] -= MTD;
+						player.vertex[3] -= MTD;
+					}
+				}
 			}
 
+			// Move player
+			move_vec = input.m_move_vector *
+				body.m_moveSpeed * delta - Vec3f(accum_mtd(0), accum_mtd(1), 0.0f);
 
-			//body.m_tile_pos = TileMapUtils::computeTilePos(body.m_position);
+			body.m_position += move_vec;
+
+			// Move camera
+			pumpkin::GraphicsEngine::camera().moveAlong(move_vec);
+
+			// Make character face the camera
+			Eigen::MatrixXf rot = pumpkin::GraphicsEngine::camera().
+				getTowardsCameraRotation(body.m_position);
+			body.m_rotation = rot;
+			
 			body.m_action_id = input.m_action;
 
 			if (body.m_action_id & (1 << (int)Action::SHOOTING)) {

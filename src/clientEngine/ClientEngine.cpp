@@ -4,7 +4,7 @@
 #include <signal.h>
 #include <common/GameMessages.hpp>
 #include "handlers/ClientLoginHandler.hpp"
-#include "handlers/ClientMapHandler.hpp"
+//#include "handlers/ClientMapHandler.hpp"
 #include "voyage.pb.h"
 #include <iostream>
 
@@ -52,8 +52,8 @@ void ClientEngine::_registerHandlers() {
 	_netManager->registerHandler(std::make_shared<ClientLoginHandler>(ClientEngine::Ptr(this)),
 				     {ID_SC_LOGIN_ACCEPTED});
 
-	_netManager->registerHandler(std::make_shared<ClientMapHandler>(ClientEngine::Ptr(this)),
-				     {ID_SC_REGION_DATA});
+//	_netManager->registerHandler(std::make_shared<ClientMapHandler>(ClientEngine::Ptr(this)),
+//				     {ID_SC_REGION_DATA});
 }
 
 void ClientEngine::requestQuit() {
