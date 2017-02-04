@@ -58,7 +58,9 @@ public:
 		//NOTE: same speed as camera. TODO: Load from config file!!!
 		_gameEngine.entityManager().assign<BodyCmp>(id, "cfg");
 		_gameEngine.entityManager().assign<InputCmp>(id, "cfg");
-		_gameEngine.entityManager().assign<ScriptCmp>(id, "test.py");
+//		_gameEngine.entityManager().assign<ScriptCmp>(id, "test.py");
+		_gameEngine.entityManager().assign<CollisionComponent>(id);
+		_gameEngine.entityManager().assign<DebugGraphicsCmp>(id);
 				
 	}
 
@@ -77,12 +79,14 @@ public:
 		createPlayer(player1.id());
 		createMap(map.id());
 
+		_gameEngine.add<CollisionSystem>(std::make_shared<CollisionSystem>());
+
 		_gameEngine.add<ObjectStateSystem>(std::make_shared<ObjectStateSystem>
 						   (_gameEngine.getWorld()));
 		_gameEngine.add<AnimationSystem>(std::make_shared<AnimationSystem>());
-		_gameEngine.add<MapSystem>(std::make_shared<MapSystem>());
-		
+		_gameEngine.add<MapSystem>(std::make_shared<MapSystem>());		
 		_gameEngine.add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
+//		_gameEngine.add<DebugGraphicsSystem>(std::make_shared<DebugGraphicsSystem>());
 
 	}
 

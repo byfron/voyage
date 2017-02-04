@@ -14,6 +14,7 @@ target_link_libraries(client
   clientEngine
   EntitiesCore
   proto
+  utils
   pumpkin_engine
   dl
   scriptSystem
@@ -41,4 +42,6 @@ add_subdirectory(clientEngine)
 add_subdirectory(serverEngine)
 add_subdirectory(game)
 add_subdirectory(database)
+add_subdirectory(utils)
+
 #add_subdirectory(scripts)
