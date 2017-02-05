@@ -1,6 +1,6 @@
 package voyage;
 
-message GraphicsObjectCfg {
+message SpriteObjectCfg {
 	required uint32 atlas_id = 1;
 	required uint32 shader_id = 2;
 	required float width = 3;

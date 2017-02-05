@@ -102,10 +102,10 @@ public:
 
 			if (body.m_action_id & (1 << (int)Action::SHOOTING)) {
 
+				//TODO: this should be done acoording to the weapon!
 				// //Create a bullet
 				// Entity bullet = em.create();
-				// em.assign<GraphicsCmp>(bullet.id(), Configuration<>());
-				// em.assign<BodyCmp>(bullet.id());
+				// em.assign<BodyCmp>(bullet.id(), speed_vec);
 				// em.assign<BulletCmp>(bullet.id());
 
 			}

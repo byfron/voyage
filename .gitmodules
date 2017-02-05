@@ -4,3 +4,6 @@
 [submodule "pumpkin"]
 	path = pumpkin
 	url = git@github.com:byfron/pumpkin.git
+[submodule "byfron-utils"]
+	path = byfron-utils
+	url = git@github.com:byfron/byfron-utils.git

@@ -43,7 +43,6 @@ public:
 
 private:
 
-	uint32_t m_resource_id;
 	pumpkin::Animation m_animation;
 };
 
@@ -64,6 +63,9 @@ public:
 			     anim.retrieveAnimation(body.m_action_id);
 			     anim.getAnimation2D().setPosition(body.m_position);
 			     anim.getAnimation2D().setRotation(body.m_rotation);
+
+
+			     //batch 
 			     anim.update(delta);
 
 //			 }
