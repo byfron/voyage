@@ -20,7 +20,7 @@ public:
 
 	GraphicsCmp() {}
 
-	pumpkin::GraphicsObject m_graphics;
+	pumpkin::GraphicsObject<> m_graphics;
 };
 	
 class SpriteCmp {
