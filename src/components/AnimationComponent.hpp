@@ -61,8 +61,9 @@ public:
 //			 if (state.isDirty()) {
 
 			     anim.retrieveAnimation(body.m_action_id);
-			     anim.getAnimation2D().setPosition(body.m_position);
-			     anim.getAnimation2D().setRotation(body.m_rotation);
+			     anim.getAnimation2D().setTransform(body.getTransform());
+//			     anim.getAnimation2D().setPosition(body.m_position);
+//			     anim.getAnimation2D().setRotation(body.m_rotation);
 
 
 			     //batch 

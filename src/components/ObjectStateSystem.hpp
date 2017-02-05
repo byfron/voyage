@@ -104,9 +104,10 @@ public:
 
 				//TODO: this should be done acoording to the weapon!
 				// //Create a bullet
-				// Entity bullet = em.create();
-				// em.assign<BodyCmp>(bullet.id(), speed_vec);
-				// em.assign<BulletCmp>(bullet.id());
+				Entity bullet = em.create();
+				em.assign<BodyCmp>(bullet.id(), speed_vec);
+				em.assign<GraphicsCmp>(bullet.id(), "pistol_bullet.cfg");
+				em.assign<BulletCmp>(bullet.id());
 
 			}
 

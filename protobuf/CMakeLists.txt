@@ -1,5 +1,6 @@
 SET(PROTO_FILES
   texture_atlas.proto
+  mesh.proto
   shader.proto
   animation.proto
   graphics.proto

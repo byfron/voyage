@@ -11,6 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC -pthread -march=native"
 set(RAKNET_ROOT "${CMAKE_SOURCE_DIR}/RakNet")
 find_library(RAKNET_LIB RakNetLibStatic PATHS ${RAKNET_ROOT}/Lib/LibStatic)
 include_directories(${RAKNET_ROOT}/include/raknet)
+include_directories(${RAKNET_ROOT}/include/raknet)
 find_package(Threads REQUIRED)
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -75,6 +76,7 @@ endif()
 
 #######################
 include_directories(src)
+include_directories(byfron-utils/src)
 include_directories(pumpkin/src)
 include_directories(pumpkin/bx/include)
 include_directories(pumpkin/bgfx/include)
