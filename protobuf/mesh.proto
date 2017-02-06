@@ -7,7 +7,7 @@ message MeshListCfg {
 message MeshCfg {
 	required uint32 resource_id = 1;
 	repeated Vertex vertices = 2;
-	repeated int indices = 3;
+	repeated uint32 indices = 3;
 	repeated TexCoord texcoords = 4;
 	repeated Vertex normals = 5;
 }

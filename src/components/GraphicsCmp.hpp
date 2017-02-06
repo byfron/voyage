@@ -18,7 +18,9 @@ public:
 class GraphicsCmp {
 public:
 
-	GraphicsCmp() {}
+	GraphicsCmp() {
+		m_graphics.init();
+	}
 
 	pumpkin::GraphicsObject<> m_graphics;
 };
@@ -31,6 +33,24 @@ public:
 	SpriteCmp() {}
 
 	pumpkin::SpriteObject m_graphics;
+};
+
+class GraphicsSystem : public System<GraphicsSystem> {
+public:
+	GraphicsSystem() {};
+
+	void update(EntityManager & em, EventManager &evm, float delta ) {
+
+		em.each<GraphicsCmp, BodyCmp>(
+			[delta](Entity entity,
+				GraphicsCmp &go,
+				BodyCmp &body) {
+
+				go.m_graphics.setTransform(body.getTransform());
+				go.m_graphics.update(delta);
+		});
+	}
+			
 };
 
 

@@ -2,20 +2,28 @@
 #include <string>
 #include <common/math.hpp>
 #include <utils/GeometryUtils.hpp>
+#include <entities/System.hpp>
 
 class BodyCmp {
 	
 public:
 	BodyCmp(float speed = 0.0f,
+		Vec3f motion = Vec3f::Zero(),
 		Vec3f pos = Vec3f::Zero(),
 		Vec2i tile = Vec2i::Zero() ) : m_moveSpeed(speed),
+					       m_moveVec(motion),
 					       m_position(pos),
+					       m_rotation(Eigen::MatrixXf::Identity(4,4)),	
 					       m_tile_pos(tile)					       
 	{
+		m_action_id = 0;
+		m_aabb.m_min = Vec3f(-0.5, -0.25,  -0.01);
+		m_aabb.m_max = Vec3f(0.0,  0.25,  0.01);
 	}
 	
 	BodyCmp(const std::string & cfg/*config*/) {
 		m_moveSpeed = 5.0; //same speed as the camera now
+		m_moveVec = Vec3f::Zero(),
 		m_position = Vec3f(0.0f, 1.5f, 0.0f);
 		m_rotation = Eigen::MatrixXf::Identity(4,4);
 		m_tile_pos = Vec2i(0,0);
@@ -74,6 +82,7 @@ public:
 
 	GeometryUtils::AABB m_aabb;
 	float m_moveSpeed;
+	Vec3f m_moveVec;
 	Vec3f m_position;
 	Eigen::MatrixXf m_rotation;
 	Vec2i m_tile_pos;
@@ -82,4 +91,15 @@ public:
 	// to ease communication with animation or other system
 	// An alternative to this would be to dispatch an event
 	int32_t m_action_id;
+};
+
+class BodySystem : public System<BodySystem> {
+
+	void update(EntityManager & em, EventManager &evm, float delta ) {
+
+		em.each<BodyCmp>([delta](Entity entity, BodyCmp & body) {
+			body.m_position += body.m_moveVec; 		      
+		});
+	}
+		
 };
