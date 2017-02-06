@@ -31,7 +31,7 @@ public:
 			([&em, delta, game_map, mask](Entity entity,
 						      InputCmp &input,
 						      CollisionComponent &col,
-						      BodyCmp &body) {	      
+						      BodyCmp &body) {
 
 			// Updates inputs
 			input.update();
@@ -97,22 +97,36 @@ public:
 			// Make character face the camera
 			Eigen::MatrixXf rot = pumpkin::GraphicsEngine::camera().
 				getTowardsCameraRotation(body.m_position);
-			
+
 			body.m_rotation = rot;
-			
+
 			body.m_action_id = input.m_action;
 
 			if (body.m_action_id & (1 << (int)Action::SHOOTING)) {
 
-				// //TODO: this should be done acoording to the weapon!
+				// //TODO: this should be done acoordaing to the weapon!
 				// //Create a bullet
-				Vec3f motion_vec = Vec3f(1.0, 0.0, 0.0);
-				float speed = 5.0 * delta;
+				Vec3f motion_vec = input.m_lookat_vector;
+				Vec3f hand_pos = Vec3f(body.m_position(0), body.m_position(1), -0.5);
 				Entity bullet = em.create();
-				em.assign<BodyCmp>(bullet.id(), speed, motion_vec, body.m_position);
+				float speed = 10.0;
+
+				//rotate the bullet to face lookatvec
+				Eigen::AngleAxis<float> aa(pumpkin::InputManager::m_mouse_angle
+							   + M_PI/4, Vec3f(0.0,0.0,1.0));
+
+				Eigen::MatrixXf rot = Eigen::MatrixXf::Identity(4,4);
+				rot.block(0,0,3,3) = aa.matrix();
+
+				em.assign<BodyCmp>(bullet.id(),
+						   speed,
+						   motion_vec*speed*delta,
+						   hand_pos,
+						   rot);
+
 				em.assign<GraphicsCmp>(bullet.id());
 //				em.assign<BulletCmp>(bullet.id());
-				
+
 			}
 
 		   });

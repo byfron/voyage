@@ -4,13 +4,15 @@
 #include "CollisionComponent.hpp"
 #include <entities/System.hpp>
 
+class pumpkin::PosColorVertex;
+
 class DebugGraphicsCmp {
 
 public:
 	void update(float delta) {
 		m_debug.update(delta);
 	}
-	
+
 	pumpkin::DebugGraphicsObject m_debug;
 
 };
@@ -22,9 +24,9 @@ public:
 		m_graphics.init();
 	}
 
-	pumpkin::GraphicsObject<> m_graphics;
+	pumpkin::GraphicsObject<pumpkin::PosColorVertex> m_graphics;
 };
-	
+
 class SpriteCmp {
 
 public:
@@ -50,7 +52,7 @@ public:
 				go.m_graphics.update(delta);
 		});
 	}
-			
+
 };
 
 
@@ -67,7 +69,7 @@ public:
 				CollisionComponent &col,
 				BodyCmp &body) {
 
-			
+
 			debug.update(delta);
 
 			});

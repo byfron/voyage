@@ -19,7 +19,7 @@ enum class Action {
 	FACING_DOWN,
 	FACING_LEFT,
 	FACING_RIGHT,
-	SHOOTING		
+	SHOOTING
 };
 
 
@@ -56,7 +56,7 @@ public:
 		if (direction.norm() > 0) {
 			m_action |= (1 << (int)Action::RUNNING);
 		}
-		
+
 		m_move_vector = direction;
 	}
 
@@ -65,6 +65,7 @@ public:
 		if (pumpkin::InputManager::isLeftMouseButtonPressed())
 		{
 			MultiInterval<float> mint(Interval<float>(-M_PI, M_PI), 4);
+
 			int idx = mint.indexContains(pumpkin::InputManager::m_mouse_angle);
 			m_lookat_direction = CardinalDirection(idx);
 
@@ -80,33 +81,40 @@ public:
 				break;
 			case CardinalDirection::South:
 				m_action |= (1 << (int)Action::FACING_DOWN);
-				break;				
+				break;
 			}
-			
-			m_action |= (1 << (int)Action::SHOOTING);
-			
-//			m_lookat_vector = InputManager::bla bla
+			// Rotations are expressed wrt North-west
+			static Vec3f zero_angle_vec = Vec3f(-1.0,1.0,0.0);
+			zero_angle_vec.normalize();
+			Eigen::AngleAxis<float> aa(pumpkin::InputManager::m_mouse_angle,
+						   Vec3f(0.0,0.0,1.0));
+			m_lookat_vector = aa.matrix() * zero_angle_vec;
 		}
+
+		if (pumpkin::InputManager::isLeftMouseButtonJustPressed()) {
+			m_action |= (1 << (int)Action::SHOOTING);
+		}
+
+
+
 	}
 
-	void reset() {		
+	void reset() {
 		m_action = 0;
 		m_move_vector = Vec3f::Zero();
 	}
-	
+
 	void update() {
 
 		reset();
 		updateMovementVector();
 		updateLookatVector();
-	}       
+	}
 
-	
+
 	Vec3f m_move_vector;
 	Vec3f m_lookat_vector;
 	CardinalDirection m_lookat_direction;
 	int32_t m_action;
 
 };
-
-
