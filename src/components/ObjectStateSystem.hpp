@@ -88,7 +88,8 @@ public:
 			move_vec = input.m_move_vector *
 				body.m_moveSpeed * delta - Vec3f(accum_mtd(0), accum_mtd(1), 0.0f);
 
-			body.m_position += move_vec;
+
+			body.m_moveVec = move_vec;
 
 			// Move camera
 			pumpkin::GraphicsEngine::camera().moveAlong(move_vec);
@@ -96,19 +97,22 @@ public:
 			// Make character face the camera
 			Eigen::MatrixXf rot = pumpkin::GraphicsEngine::camera().
 				getTowardsCameraRotation(body.m_position);
+			
 			body.m_rotation = rot;
 			
 			body.m_action_id = input.m_action;
 
 			if (body.m_action_id & (1 << (int)Action::SHOOTING)) {
 
-				//TODO: this should be done acoording to the weapon!
+				// //TODO: this should be done acoording to the weapon!
 				// //Create a bullet
+				Vec3f motion_vec = Vec3f(1.0, 0.0, 0.0);
+				float speed = 5.0 * delta;
 				Entity bullet = em.create();
-				em.assign<BodyCmp>(bullet.id(), speed_vec);
-				em.assign<GraphicsCmp>(bullet.id(), "pistol_bullet.cfg");
-				em.assign<BulletCmp>(bullet.id());
-
+				em.assign<BodyCmp>(bullet.id(), speed, motion_vec, body.m_position);
+				em.assign<GraphicsCmp>(bullet.id());
+//				em.assign<BulletCmp>(bullet.id());
+				
 			}
 
 		   });
