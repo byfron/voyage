@@ -59,7 +59,8 @@ public:
 							     AnimationComponent &anim,
 							     BodyCmp & body) {
 //			 if (state.isDirty()) {
-			     anim.retrieveAnimation(body.m_action_id);
+
+							     //   anim.retrieveAnimation(body.m_action_id);
 			     anim.getAnimation2D().setTransform(body.getTransform());
 			     anim.update(delta);
 //			 }

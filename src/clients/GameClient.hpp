@@ -49,10 +49,10 @@ public:
 	~GameClient() {}
 
 	void createPlayer(Entity::Id id) {
-		
+
 		_gameEngine.entityManager().assign<AnimationComponent>(id,
 					       std::string(CONFIG_FILE_PATH) +
-					       "main_character_anim.cfg");
+					       "main_character_anim2.cfg");
 
 		//NOTE: same speed as camera. TODO: Load from config file!!!
 		_gameEngine.entityManager().assign<BodyCmp>(id, "cfg");
@@ -62,7 +62,7 @@ public:
 //		_gameEngine.entityManager().assign<ScriptCmp>(id, "test.py");
 		_gameEngine.entityManager().assign<CollisionComponent>(id);
 		_gameEngine.entityManager().assign<DebugGraphicsCmp>(id);
-				
+
 	}
 
 	void createMap(Entity::Id id) {
@@ -80,7 +80,7 @@ public:
 		createPlayer(player1.id());
 		createMap(map.id());
 
-		
+
 		_gameEngine.add<ObjectStateSystem>(std::make_shared<ObjectStateSystem>
 						   (_gameEngine.getWorld()));
 		_gameEngine.add<BodySystem>(std::make_shared<BodySystem>());
@@ -89,14 +89,14 @@ public:
 		// graphics stuff
 
 		// TODO: Refactor graphics engine into RenderSystem.
-		
+
 		_gameEngine.add<AnimationSystem>(std::make_shared<AnimationSystem>());
 		_gameEngine.add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
 		_gameEngine.add<MapSystem>(std::make_shared<MapSystem>());
-		
-		////////////////// 
 
-		
+		//////////////////
+
+
 		_gameEngine.add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
 //		_gameEngine.add<DebugGraphicsSystem>(std::make_shared<DebugGraphicsSystem>());
 
