@@ -1,9 +1,15 @@
 #pragma once
 
 #include <entities/System.hpp>
+#include <game/World.hpp>
 #include <common/math.hpp>
 #include "BodyCmp.hpp"
 #include <utils/GeometryUtils.hpp>
+
+struct CollisionEvent {
+	Entity left;
+	Entity right;
+};
 
 class CollisionComponent {
 
@@ -28,6 +34,7 @@ public:
 
 class CollisionSystem : public System<CollisionSystem> {
 
+public:
 
 // 	struct CollisionCandidate {
 // 		Vec2i m_pos;
@@ -37,7 +44,7 @@ class CollisionSystem : public System<CollisionSystem> {
 
 // 	// get collision mask from tilemap
 // 	// alternative option. make each wall also a CollisionComponent/WallComponent
-// 	CollisionSystem() {}
+ 	CollisionSystem(World::Ptr world) : m_world(world) {}
 
 // 	void init(TileMap::CollisionMask * cm) {
 // 		collision_mask = cm;
@@ -46,17 +53,30 @@ class CollisionSystem : public System<CollisionSystem> {
  	void update(EntityManager & em, EventManager & evm, float delta) {
 
 // 		// copy current state of collision mask
-// 		TileMap::CollisionMask collision_grid = *m_collision_mask;
+		GameMap::CollisionMask mask = m_world->getMapCollisionMask();
+		GameMap::Ptr game_map = m_world->getGameMap();
 
 
 // 		// solve candidates with characters
- 		em.each<CollisionComponent, BodyCmp >([delta](Entity entity,
- 							      CollisionComponent & collision,
- 							      BodyCmp & body) {
+ 		em.each<CollisionComponent, BodyCmp >
+			([delta, game_map, mask](Entity entity,
+						 CollisionComponent & collision,
+						 BodyCmp & body) {
 
 
 		      // Update collision geometry
 		      collision.update(body.m_aabb, body.getTransform());
+
+		      Vec2i tile = game_map->getTileCoords(body.m_position);
+		      
+		      // Check if entity collides with map
+		      if (not mask.isWalkable(tile)) {
+
+			      // send message
+//			      evm.emit<CollideEvent>(entity, other_entity);
+			       
+			      std::cout << "isColliding!!!" << std::endl;
+ 		  }		  		      
 
 	      });
 	}
@@ -94,6 +114,10 @@ class CollisionSystem : public System<CollisionSystem> {
 // 		// send collision messages
 
 // 	  }
+
+private:
+
+	World::Ptr m_world;
 
 // 	TileMap::CollisionMask * m_collision_mask;
 };

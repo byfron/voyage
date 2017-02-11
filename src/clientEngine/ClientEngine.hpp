@@ -1,36 +1,29 @@
 #pragma once
 
 #include <networking/ClientNetworkManager.hpp>
-#include <entities/Entity.hpp>
-#include <entities/System.hpp>
-#include <game/World.hpp>
+#include <game/GameEngine.hpp>
 
-class ClientEngine {
+class ClientEngine : public GameEngine {
 public:
 	~ClientEngine() {}
 	void init();
 	void start() {};
 	void clientLoop();
 	void requestQuit();
-	void processFrame();
-//	void initPlayer(PlayerData & playerData);
-
-	void run_frame(float dt) {
-		_systemManager->update_all(dt);
-	}
-
-	EntityManager & entityManager() { return _entityManager; }
+	
+       	EntityManager & entityManager() { return _entityManager; }
 	EventManager & eventManager() { return _eventManager; }
 
-	template <typename S>
-	void add(std::shared_ptr<S> system) {
-		_systemManager->add<S>(system);
-	}
+	World::Ptr getWorld() { return _world; }
 
-	World::Ptr getWorld() { return m_world; }
-
+	void createSubsystems();
+	void createWorld();
+	void createPlayer();	
+		
 //	ClientTileMap::Ptr getTileMap() { return _tileMap; };
-	ClientNetworkManager::Ptr getNetworkManager() { return _netManager; }
+	ClientNetworkManager::Ptr networkManager() {
+		return std::static_pointer_cast<ClientNetworkManager>(_netManager);
+	}
 	typedef std::shared_ptr<ClientEngine> Ptr;
 
 
@@ -38,14 +31,4 @@ private:
 
 	void _registerHandlers();
 
-	EntityManager _entityManager;
-	EventManager _eventManager;
-
-//	ClientTileMap::Ptr _tileMap;
-	SystemManager::Ptr _systemManager;
-	ClientNetworkManager::Ptr _netManager;
-
-	bool _running;
-
-	World::Ptr m_world;
 };

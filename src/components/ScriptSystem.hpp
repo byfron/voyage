@@ -14,9 +14,6 @@ BOOST_PYTHON_MODULE(Context)
 
     class_<EventManager>("EventManager");
     
-    class_<BodyCmp>("BodyCmp")
-	    .def_readwrite("m_moveSpeed", &BodyCmp::m_moveSpeed);
-
     
 };
 

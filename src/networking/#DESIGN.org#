@@ -7,9 +7,9 @@
 * We can have a generic Event class for every message that can happen (Raknet::Packet?)
 * To send back a message it's done through the PlayerSession
   
-  
-  //too much shit here
-  
+
+//too much shit here
+
 * EventDispatcher: associated with a player session is able to send the messages to the 
 * different handlers. We may have only one. (SessionHandler that takes messages from client)
   

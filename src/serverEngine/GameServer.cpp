@@ -15,51 +15,20 @@ void break_loop(int s) {
 	finished_sig = true;
 }
 
-GameServer::GameServer(int portNum, int poolSize) :
-	_dbPoolPtr(std::make_shared<DatabaseConnectionPool>(poolSize)) {
-	_datasetName = DB_DIR DB_NAME;
-	_init(portNum);
-}
-
-void GameServer::_init(int port) {
-
-	//initialize server
-	_netManagerPtr = std::make_shared<ServerNetworkManager>();
-	_netManagerPtr->start(port);
-	_finished = false;
-
-	//initialize database pool
-	_dbPoolPtr->fillPool(_datasetName);
-
-	//initialize scripting engine
-	_scriptEnginePtr = std::make_shared<ScriptEngine>();
-	_scriptEnginePtr->init(_dbPoolPtr);
+GameServer::GameServer(int portNum) {
 	
-	//register managers
-	_netManagerPtr->registerHandler(std::make_shared<ServerLoginHandler>(GameServer::Ptr(this)),
-				    {ID_CS_LOGIN_REQUEST});
-
-	_netManagerPtr->registerHandler(std::make_shared<ServerMapHandler>(GameServer::Ptr(this)),
-				    {ID_CS_REGION_REQUEST});
+	_gameEngine.init(portNum);	
+	_gameEngine.networkManager()->registerHandler(std::make_shared<ServerLoginHandler>
+						      (this), {ID_CS_LOGIN_REQUEST});
 
 
-	//initialize event manager
-
-
-	//initialize entity manager
+	
 	
 
-	//initialize world
-	_world = std::make_shared<World>();
-	
 }
 
 void GameServer::stop() {
-	_dbPoolPtr->drainPool();
-	_scriptEnginePtr->finalize();
-
 	google::protobuf::ShutdownProtobufLibrary();
-
 }
 
 PlayerSession::Ptr GameServer::createPlayerSession(RakNet::SystemAddress addr) {
@@ -85,21 +54,10 @@ void GameServer::start() {
 
 	spd::get("Server")->info("Starting game server");
 	signal(SIGINT, break_loop);
-	      	
+	
 	while (!finished_sig && !_finished) {
-
-		//check for client commands
-		_netManagerPtr->receiveData();
-
-		// Update systems
-
-		// run AI
-
-		// move all entities
-
-		// send updates about the game to the clients		
+		_gameEngine.processFrame();
 	}
 
-	stop();
-	
+	stop();       
 }

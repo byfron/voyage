@@ -6,11 +6,12 @@
 //#include "PacketHandler.hpp"
 #include <map>
 #include "ServerNetworkManager.hpp"
+#include "NetworkManager.hpp"
 
 using namespace RakNet;
 
 
-class ClientNetworkManager
+class ClientNetworkManager  : public NetworkManager
 {
 public:
 	ClientNetworkManager();
@@ -18,8 +19,6 @@ public:
 	void start(const char *address, const int port);
 	void connect();
 	void disconnect();
-	void registerHandler(PacketHandler::Ptr h, const std::list<int> & list);
-	void receiveData();
 
 	template<typename T>
 	void sendData(RakNet::MessageID id, const T & content) {
@@ -36,11 +35,6 @@ public:
 
 private:
 
-	bool _isConnected;
-	RakPeerInterface *_peer;
-	std::map<int, int> _msgHandlersMap;	
-	std::map<int, PacketHandler::Ptr> _handlers;
-	int _port;
 	const char *_remoteIPAddress;
 };
 

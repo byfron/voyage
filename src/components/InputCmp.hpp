@@ -19,6 +19,10 @@ enum class Action {
 	FACING_DOWN,
 	FACING_LEFT,
 	FACING_RIGHT,
+	FACING_UP_LEFT,
+	FACING_UP_RIGHT,
+	FACING_DOWN_LEFT,
+	FACING_DOWN_RIGHT,
 	SHOOTING
 };
 
@@ -38,17 +42,38 @@ public:
 
 		if (pumpkin::InputManager::m_keys & KEY_MOVE_UP) {
 			direction += pumpkin::GraphicsEngine::camera().getForwardDir();
-			m_action |= (1 << (int)Action::FACING_UP);
+
+			if (pumpkin::InputManager::m_keys & KEY_MOVE_RIGHT) {
+				direction += -pumpkin::GraphicsEngine::camera().getRightDir();
+				m_action |= (1 << (int)Action::FACING_UP_RIGHT);
+			}
+			else if (pumpkin::InputManager::m_keys & KEY_MOVE_LEFT) {
+				direction += pumpkin::GraphicsEngine::camera().getRightDir();
+				m_action |= (1 << (int)Action::FACING_UP_LEFT);
+			}
+			else {
+				m_action |= (1 << (int)Action::FACING_UP);
+			}
 		}
-		if (pumpkin::InputManager::m_keys & KEY_MOVE_DOWN) {
+		else if (pumpkin::InputManager::m_keys & KEY_MOVE_DOWN) {
 			direction += -pumpkin::GraphicsEngine::camera().getForwardDir();
-			m_action |= (1 << (int)Action::FACING_DOWN);
+			if (pumpkin::InputManager::m_keys & KEY_MOVE_RIGHT) {
+				direction += -pumpkin::GraphicsEngine::camera().getRightDir();
+				m_action |= (1 << (int)Action::FACING_DOWN_RIGHT);
+			}
+			else if (pumpkin::InputManager::m_keys & KEY_MOVE_LEFT) {
+				direction += pumpkin::GraphicsEngine::camera().getRightDir();
+				m_action |= (1 << (int)Action::FACING_DOWN_LEFT);
+			}
+			else {
+				m_action |= (1 << (int)Action::FACING_DOWN);
+			}
 		}
-		if (pumpkin::InputManager::m_keys & KEY_MOVE_RIGHT) {
+		else if (pumpkin::InputManager::m_keys & KEY_MOVE_RIGHT) {
 			direction += -pumpkin::GraphicsEngine::camera().getRightDir();
 			m_action |= (1 << (int)Action::FACING_RIGHT);
 		}
-		if (pumpkin::InputManager::m_keys & KEY_MOVE_LEFT) {
+		else if (pumpkin::InputManager::m_keys & KEY_MOVE_LEFT) {
 			direction += pumpkin::GraphicsEngine::camera().getRightDir();
 			m_action |= (1 << (int)Action::FACING_LEFT);
 		}

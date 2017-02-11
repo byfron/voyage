@@ -6,27 +6,24 @@
 #include <list>
 #include "PacketHandler.hpp"
 #include "Session.hpp"
+#include "NetworkManager.hpp"
 
 #define SERVER_PORT 1234
 
-class ServerNetworkManager
+class ServerNetworkManager : public NetworkManager
 {
 public:
 	ServerNetworkManager();
 	~ServerNetworkManager();	
 	void start(const int port);
 	void stop();
-	void receiveData();
-	void registerHandler(PacketHandler::Ptr, const std::list<int> & list);
+
 	unsigned connectionCount(void) const;
 
 	RakNet::RakPeerInterface *getPeer() { return _peer; }
 	typedef std::shared_ptr<ServerNetworkManager> Ptr;
 	
 private:
-	RakNet::RakPeerInterface *_peer;
-	std::map<RakNet::MessageID, int> _msgHandlersMap;
-	std::map<RakNet::MessageID, PacketHandler::Ptr> _handlers;
 	bool _server_running;
 };
 

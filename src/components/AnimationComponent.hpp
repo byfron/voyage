@@ -19,17 +19,32 @@ public:
 	void retrieveAnimation(int32_t action) {
 
 		if (action & (1 << (int)Action::FACING_LEFT)) {
-			m_animation.switchToAnim(3);
+			m_animation.switchToAnim(6);
 		}
 		else if (action & (1 << (int)Action::FACING_RIGHT)) {
 			m_animation.switchToAnim(2);
 		}
 		else if (action & (1 << (int)Action::FACING_UP)) {
-			m_animation.switchToAnim(1);
-		}
-		else if (action & (1 << (int)Action::FACING_DOWN)) {
 			m_animation.switchToAnim(0);
 		}
+		else if (action & (1 << (int)Action::FACING_DOWN)) {
+			m_animation.switchToAnim(4);
+		}
+		else if (action & (1 << (int)Action::FACING_DOWN_LEFT)) {
+			m_animation.switchToAnim(7);
+		}
+		else if (action & (1 << (int)Action::FACING_DOWN_RIGHT)) {
+			m_animation.switchToAnim(3);
+		}
+		else if (action & (1 << (int)Action::FACING_UP_LEFT)) {
+			m_animation.switchToAnim(5);
+		}
+		else if (action & (1 << (int)Action::FACING_UP_RIGHT)) {
+			m_animation.switchToAnim(1);
+		}
+
+
+		
 		else m_animation.stop();
 	}
 
@@ -60,7 +75,7 @@ public:
 							     BodyCmp & body) {
 //			 if (state.isDirty()) {
 
-							     //   anim.retrieveAnimation(body.m_action_id);
+			     //   anim.retrieveAnimation(body.m_action_id);
 			     anim.getAnimation2D().setTransform(body.getTransform());
 			     anim.update(delta);
 //			 }

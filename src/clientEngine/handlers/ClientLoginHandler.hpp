@@ -29,7 +29,7 @@ public:
 		msgRegReq.set_x(25);
 		msgRegReq.set_y(25);
 		//msg.set_timestamp(); of the last seen region!!
-		_client->getNetworkManager()->sendData<voyage::cs_regionDataRequest>(ID_CS_REGION_REQUEST, msgRegReq);
+		_client->networkManager()->sendData<voyage::cs_regionDataRequest>(ID_CS_REGION_REQUEST, msgRegReq);
 		
 	}
 

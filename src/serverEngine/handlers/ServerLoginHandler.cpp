@@ -9,7 +9,7 @@
 namespace spd = spdlog;
 using namespace voyage;
 
-ServerLoginHandler::ServerLoginHandler(GameServer::Ptr gs) {
+ServerLoginHandler::ServerLoginHandler(GameServer *gs) {
 	_handlerId = SERVER_LOGIN_REQ_HANDLER;
 	_gameServer = gs;
 }
@@ -28,11 +28,11 @@ void ServerLoginHandler::onMessage(RakNet::Packet *p) {
 		
 		//send relevant data to the client
 		sc_loginAccepted content;
-		sc_entityPosition *entityPosition = new sc_entityPosition();
-		entityPosition->set_entityid(1);
-		entityPosition->set_x(25);
-		entityPosition->set_y(25);		
-		content.set_allocated_playerpos(entityPosition);
+//		sc_entityPosition *entityPosition = new sc_entityPosition();
+//		entityPosition->set_entityid(1);
+//		entityPosition->set_x(25);
+//		entityPosition->set_y(25);		
+//		content.set_allocated_playerpos(entityPosition);
 		
 		Message<sc_loginAccepted>::Ptr msg = std::make_shared<Message<sc_loginAccepted> >(ID_SC_LOGIN_ACCEPTED, content);		
 		session->sendMessage<sc_loginAccepted>(msg);

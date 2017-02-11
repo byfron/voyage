@@ -11,11 +11,6 @@ add_library(serverEngine
 
 target_link_libraries(serverEngine
   networking
-  database
-  scriptEngine
-  proto
-  game
-  pumpkin_engine
-  ${PYTHON_LIBRARIES})
+  proto)
 
 target_include_directories(serverEngine PUBLIC ${PYTHON_INCLUDE_PATH} ${CMAKE_BINARY_DIR}/src/protobuf)

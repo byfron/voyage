@@ -74,6 +74,16 @@ function(cxx_test name sources)
 endfunction()
 endif()
 
+
+
+SET(Boost_USE_STATIC_LIBS OFF)
+SET(Boost_USE_MULTITHREADED ON)
+SET(Boost_USE_STATIC_RUNTIME OFF)
+SET(Boost_INCLUDE_DIRS "/usr/local/include/boost")
+SET(Boost_LIBRARIES "/usr/local/lib/libboost_python.so")
+INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}" "/usr/include/python2.6")
+include_directories(${PYTHON_INCLUDE_PATH})
+
 #######################
 include_directories(src)
 include_directories(byfron-utils/src)
@@ -88,15 +98,6 @@ include_directories(pumpkin/bgfx/examples/)
 set(PROTOBUF_GENEREATED_HEADERS ${CMAKE_BINARY_DIR}/protobuf)
 include_directories(${PROTOBUF_GENEREATED_HEADERS})
 message(STATUS ${PROTOBUF_GENEREATED_HEADERS})
-
-
-
-SET(Boost_USE_STATIC_LIBS OFF)
-SET(Boost_USE_MULTITHREADED ON)
-SET(Boost_USE_STATIC_RUNTIME OFF)
-SET(Boost_INCLUDE_DIRS "/usr/local/include/boost")
-SET(Boost_LIBRARIES "/usr/local/lib/libboost_python.so")
-INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}" "/usr/include/python2.6")
 
 find_package(SDL2)
 find_package(SDL2_image)

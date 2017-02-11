@@ -14,17 +14,6 @@ ClientNetworkManager::~ClientNetworkManager()
 	RakNet::RakPeerInterface::DestroyInstance(_peer);
 }
 
-void ClientNetworkManager::registerHandler(PacketHandler::Ptr h, const std::list<int> & list) {
-
-	h->isRegistered = true;
-
-	for (auto m : list) {
-		_msgHandlersMap[m] = h->getId();
-	}
-	
-	_handlers[h->getId()] = h;	
-}
-
 void ClientNetworkManager::start(const char *address, const int port)
 {
 	_remoteIPAddress = address;
@@ -74,14 +63,3 @@ void ClientNetworkManager::disconnect(void)
 // */	
 
 // }
-
-void ClientNetworkManager::receiveData()
-{
-	Packet *p;
-	for (p=_peer->Receive(); p; _peer->DeallocatePacket(p), p=_peer->Receive())
-	{
-		int id = p->data[0];
-		if (_msgHandlersMap.count(id))
-			_handlers[_msgHandlersMap[id]]->onMessage(p);
-	}
-}

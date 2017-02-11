@@ -24,6 +24,14 @@ target_link_libraries(client
   )
 
 
+add_executable(server main_server.cpp)
+target_link_libraries(server
+  serverEngine
+  EntitiesCore
+  proto
+  utils
+  ${Boost_LIBRARIES}
+  )
 
 target_include_directories(client PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}

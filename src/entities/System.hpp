@@ -11,6 +11,8 @@ public:
 	typedef size_t Family;
 	virtual ~BaseSystem();
 
+	virtual void configure(EventManager &events) {}
+
 	virtual void update(EntityManager & em, EventManager &evm, float delta ) = 0;
 	static Family _family_counter;
 };
@@ -41,7 +43,7 @@ public:
 		std::cout << "systems size:" << _systems.size() << std::endl;
 
 	}
-
+	
 	template <typename S>
 	std::shared_ptr<S> system() {
 		auto it = _systems.find(S::family());

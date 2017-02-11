@@ -3,6 +3,7 @@
 #include <common/math.hpp>
 #include <utils/GeometryUtils.hpp>
 #include <entities/System.hpp>
+#include <voyage.pb.h>
 
 class BodyCmp {
 
@@ -15,22 +16,23 @@ public:
 						       m_moveVec(motion),
 						       m_position(pos),
 						       m_rotation(rot),
-						       m_tile_pos(tile)
+						       m_rotAngle(0.0f)
 	{
-		m_action_id = 0;
 		m_aabb.m_min = Vec3f(-0.5, -0.25,  -0.01);
 		m_aabb.m_max = Vec3f(0.0,  0.25,  0.01);
 	}
 
 	BodyCmp(const std::string & cfg/*config*/) {
-		m_moveSpeed = 5.0; //same speed as the camera now
+		
+		m_moveSpeed = 2.0; //same speed as the camera now
+		m_rotAngle = 0.0;
 		m_moveVec = Vec3f::Zero(),
-		m_position = Vec3f(0.0f, 1.5f, 0.0f);
+		m_position = Vec3f(0.0f, 0.0f, -0.1f);
 		m_rotation = Eigen::MatrixXf::Identity(4,4);
-		m_tile_pos = Vec2i(0,0);
-		m_action_id = 0;
-		m_aabb.m_min = Vec3f(-0.5, -0.25,  -0.01);
-		m_aabb.m_max = Vec3f(0.0,  0.25,  0.01);
+
+		// TODO set this to the real thing! now is the sprite size!
+		m_aabb.m_min = Vec3f(-0.25, -0.25,  -0.01);
+		m_aabb.m_max = Vec3f(0.25,  0.25,  0.01);
 	}
 
 
@@ -71,6 +73,22 @@ public:
 		return p;
 	}
 
+
+	void sync_with_server() {
+
+
+		// try  to converge current state towards authoritative
+
+
+
+		// For the time being, just correct it
+		m_position = m_auth_position;
+		m_rotAngle = m_auth_rotAngle;
+		
+		
+
+	}
+	
 	Eigen::MatrixXf getTransform() {
 		//NOTE: this could be pre-computed and updated only if dirty
 
@@ -82,24 +100,39 @@ public:
 public:
 
 	GeometryUtils::AABB m_aabb;
+
 	float m_moveSpeed;
 	Vec3f m_moveVec;
 	Vec3f m_position;
+	
 	Eigen::MatrixXf m_rotation;
-	Vec2i m_tile_pos;
+	float m_rotAngle;
+
+	// Values requested by the server
+	Vec3f m_auth_position;
+	float m_auth_rotAngle;       
 
 	// This is used as an internal (user-data) state
 	// to ease communication with animation or other system
 	// An alternative to this would be to dispatch an event
-	int32_t m_action_id;
+	// int32_t m_action_id;
 };
 
 class BodySystem : public System<BodySystem> {
-
+	
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
 		em.each<BodyCmp>([delta](Entity entity, BodyCmp & body) {
-			body.m_position +=  body.m_moveVec;
+				
+			body.m_position += body.m_moveVec;
+			
+			Eigen::AngleAxis<float> aa(body.m_rotAngle, Vec3f(0.0,0.0,1.0));
+			Eigen::MatrixXf rot = Eigen::MatrixXf::Identity(4,4);
+			rot.block(0,0,3,3) = aa.matrix();
+			
+			body.m_rotation = rot;
+			
+			//	body.sync_with_server();
 		});
 	}
 
