@@ -27,6 +27,7 @@ public:
 		for (p=_peer->Receive(); p; _peer->DeallocatePacket(p), p=_peer->Receive())
 		{
 			int id = p->data[0];
+
 			if (_msgHandlersMap.count(id))
 				_handlers[_msgHandlersMap[id]]->onMessage(p);
 		}

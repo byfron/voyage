@@ -6,6 +6,12 @@ message sc_entityUpdate {
 	required uint32 y = 3;
 }
 
+message cs_userMovement {
+	required uint32 entityId = 1;
+	required float x = 2;
+	required float y = 3;	
+}
+
 message sc_playerInfo {
 	required uint32 entityId = 1;
 	optional string name = 2;

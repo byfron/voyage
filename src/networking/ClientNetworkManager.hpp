@@ -29,7 +29,6 @@ public:
 		_peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
 		
 	}
-//	void sendData(RakNet::MessageID id);
 
 	typedef std::shared_ptr<ClientNetworkManager> Ptr;
 

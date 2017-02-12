@@ -5,6 +5,8 @@ add_library(serverEngine
   PlayerSession.cpp
   handlers/ServerLoginHandler.hpp
   handlers/ServerLoginHandler.cpp
+  handlers/ServerDataHandler.hpp
+  handlers/ServerDataHandler.cpp
   handlers/ServerMapHandler.hpp
   handlers/ServerMapHandler.cpp
   )

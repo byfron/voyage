@@ -2,6 +2,8 @@
 #include <spdlog/spdlog.h>
 #include "handlers/ServerLoginHandler.hpp"
 #include "handlers/ServerMapHandler.hpp"
+#include "handlers/ServerDataHandler.hpp"
+
 #include <signal.h>
 #include <common/GameMessages.hpp>
 #include "PlayerSession.hpp"
@@ -21,7 +23,8 @@ GameServer::GameServer(int portNum) {
 	_gameEngine.networkManager()->registerHandler(std::make_shared<ServerLoginHandler>
 						      (this), {ID_CS_LOGIN_REQUEST});
 
-
+	_gameEngine.networkManager()->registerHandler(std::make_shared<ServerDataHandler>
+						      (this), {ID_CS_USER_MOVEMENT});
 	
 	
 

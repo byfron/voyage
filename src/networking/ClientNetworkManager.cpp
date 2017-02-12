@@ -50,16 +50,20 @@ void ClientNetworkManager::disconnect(void)
 
 // 	Message<T>::Ptr m = std::make_shared<T>(id, content);
 // 	_peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
-// /*	
+	
 // 	switch(id) {
 
-// 		case ID_CS_LOGIN_REQUEST:			
-// 			Message<voyage::cs_LoginRequest>::Ptr m =
-// 				std::make_shared< Message<voyage::cs_LoginRequest> >(id);
-// 			m->toBitStream(bsOut);
-// 			break;
+// 	case ID_CS_LOGIN_REQUEST:			
+// 		Message<voyage::cs_LoginRequest>::Ptr m =
+// 			std::make_shared< Message<voyage::cs_LoginRequest> >(id);
+// 		m->toBitStream(bsOut);
+// 		break;
+			
+// 	case ID_CS_USER_MOVEMENT:
+// 		Message<voyage::cs_userMovement>::Ptr m =
+// 			std::make_shared< Message<voyage::cs_userMovement> >(id);
+// 		m->toBitStream(bsOut);
+// 		break;
 
-// 	};		
-// */	
-
+// 	};			
 // }

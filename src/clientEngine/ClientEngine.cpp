@@ -48,8 +48,8 @@ void ClientEngine::createSubsystems() {
 	// TODO: this goes up to the server as well
 
 	// NOTE: Order matters
-	add<EntityInputSystem>(std::make_shared<EntityInputSystem>(_world));
-	add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());	
+	add<EntityInputSystem>(std::make_shared<EntityInputSystem>(_world, networkManager()));
+	add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
 	add<CollisionSystem>(std::make_shared<CollisionSystem>(_world));
 	add<AnimationSystem>(std::make_shared<AnimationSystem>());
 	add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
@@ -87,11 +87,11 @@ void ClientEngine::createPlayer() {
 
 void ClientEngine::_registerHandlers() {
 
-	_netManager->registerHandler(std::make_shared<ClientLoginHandler>(ClientEngine::Ptr(this)),
-				     {ID_SC_LOGIN_ACCEPTED});
+	_netManager->registerHandler(std::make_shared<ClientLoginHandler>
+				     (ClientEngine::Ptr(this)), {ID_SC_LOGIN_ACCEPTED});
 
-	_netManager->registerHandler(std::make_shared<ClientEntityUpdateHandler>(&_eventManager),
-				     {ID_SC_ENTITY_UPDATE});
+	_netManager->registerHandler(std::make_shared<ClientEntityUpdateHandler>
+				     (&_eventManager), {ID_SC_ENTITY_UPDATE});
 	
 //	_netManager->registerHandler(std::make_shared<ClientMapHandler>(ClientEngine::Ptr(this)),
 //				     {ID_SC_REGION_DATA});
