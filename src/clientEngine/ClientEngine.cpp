@@ -6,9 +6,9 @@
 #include "handlers/ClientLoginHandler.hpp"
 #include "handlers/ClientEntityUpdateHandler.hpp"
 
-
 #include <components/BodyCmp.hpp>
 #include <components/EntityInputSystem.hpp>
+#include <components/EntityNetworkSystem.hpp>
 #include <components/AnimationComponent.hpp>
 #include <components/CollisionComponent.hpp>
 #include <components/MapCmp.hpp>
@@ -49,6 +49,7 @@ void ClientEngine::createSubsystems() {
 
 	// NOTE: Order matters
 	add<EntityInputSystem>(std::make_shared<EntityInputSystem>(_world, networkManager()));
+	add<EntityNetworkSystem>(std::make_shared<EntityNetworkSystem>(_world, networkManager()));
 	add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
 	add<CollisionSystem>(std::make_shared<CollisionSystem>(_world));
 	add<AnimationSystem>(std::make_shared<AnimationSystem>());
@@ -82,6 +83,12 @@ void ClientEngine::createPlayer() {
 	// Client-side components
 	_entityManager.assign<InputCmp>(player1.id(), "cfg");
 	_entityManager.assign<DebugGraphicsCmp>(player1.id());
+
+
+	
+	Entity player2 = _entityManager.create();
+	_entityManager.assign<BodyCmp>(player2.id(), "cfg");
+	_entityManager.assign<NetworkCmp>(player2.id());
 }
 
 

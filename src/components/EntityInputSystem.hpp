@@ -23,25 +23,25 @@ UPDATE:
 - Sync current pos with server data
 */
 
-class EntityInputSystem : public System<EntityInputSystem>, public Receiver<voyage::sc_entityUpdate> {
+class EntityInputSystem : public System<EntityInputSystem>,
+			  public Receiver<voyage::sc_entityUpdate> {
 public:
 
 	EntityInputSystem(World::Ptr world,
 			  ClientNetworkManager::Ptr net) : m_world(world),
 							   m_network_manager(net) {
-
 	}
-
 	
 	// Receives an entity update message from server
 	void receive(const voyage::sc_entityUpdate &entity_update) {
 
-		std::cout << "Received entity update!" << std::endl;//entity_update.entityId() << std::endl;
-		std::cout << "pos:" << entity_update.x() << "," << entity_update.y() << std::endl;
+		std::cout << "Received entity update!" << std::endl;
+		std::cout << "pos:" << entity_update.x() << ","
+			  << entity_update.y() << std::endl;
 
 		// keep a map of received states from server
 		
-	}
+	}	
 	
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
@@ -55,7 +55,6 @@ public:
 					  CollisionComponent &col,
 					  BodyCmp &body) {
 
-
 			// make this bodycmp
 			// with if(client)
 
@@ -67,13 +66,12 @@ public:
 			// TODO
 			
 			 
-			// Inmediatelly send movement vector
+			// Inmediatelly send movement vector (if it has changed)
 			voyage::cs_userMovement movement;
 			movement.set_entityid(entity.id().id);
 			movement.set_x(input.m_move_vector(0));
 			movement.set_y(input.m_move_vector(1));				
 			this->m_network_manager->sendData<voyage::cs_userMovement>(ID_CS_USER_MOVEMENT, movement);
-
 
 			// TODO: the polygon should come from the collision?
 			// Solve collisions

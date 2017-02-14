@@ -110,7 +110,10 @@ public:
 
 	// Values requested by the server
 	Vec3f m_auth_position;
-	float m_auth_rotAngle;       
+	float m_auth_rotAngle;
+
+
+	std::queue<BodyState> m_state_queue;
 
 	// This is used as an internal (user-data) state
 	// to ease communication with animation or other system
@@ -119,7 +122,8 @@ public:
 };
 
 class BodySystem : public System<BodySystem> {
-	
+
+
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
 		em.each<BodyCmp>([delta](Entity entity, BodyCmp & body) {
@@ -132,7 +136,6 @@ class BodySystem : public System<BodySystem> {
 			
 			body.m_rotation = rot;
 			
-			//	body.sync_with_server();
 		});
 	}
 

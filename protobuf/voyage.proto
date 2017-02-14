@@ -6,6 +6,14 @@ message sc_entityUpdate {
 	required uint32 y = 3;
 }
 
+message sc_playerState {
+	required uint32 entityId = 1;
+	required uint32 actionSeq = 2;
+	optional float pos_x = 3;
+	optional float pos_y = 4;
+	optional float angle = 5;
+}
+
 message cs_userMovement {
 	required uint32 entityId = 1;
 	required float x = 2;
@@ -71,8 +79,9 @@ message cs_userMoves {
 }
 
 message cs_userAction {
-	required uint32 action_id = 1;
-	optional uint32 instance1_id = 2;
-	optional uint32 instance2_id = 3;	
-	optional string action_content = 4;
+	required uint32 seq_num = 1;
+	optional float motion_x = 2;
+	optional float motion_y = 3;
+	optional float angle = 4;
+	optional action_code = 5;
 }
