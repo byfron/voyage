@@ -2,6 +2,8 @@
 
 BaseSystem::Family BaseSystem::_family_counter;
 uint32_t EntityManager::entity_count = 0;
+uint32_t EntityManager::entity_local_count = 0;
+uint32_t EntityManager::entity_networked_count = 0;
 PoolIndex BaseComponent::pool_index_counter = 0;
 
 BaseSystem::~BaseSystem() {

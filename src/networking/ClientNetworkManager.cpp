@@ -34,6 +34,60 @@ void ClientNetworkManager::connect()
 		printf("Client connect call failed!\n");
 	}
 
+	return;
+
+	// TODO: handle all this in the loginHandler
+
+	printf("CONNECTING..\n");
+	
+	Packet *p = _peer->Receive();
+	while (p)
+	{
+		switch (p->data[0])
+		{
+		case ID_CONNECTION_REQUEST_ACCEPTED:
+			printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
+
+			sendCustomLoginRequest();
+			
+			_isConnected=true;
+			break;
+		case ID_CONNECTION_ATTEMPT_FAILED:
+			printf("Client Error: ID_CONNECTION_ATTEMPT_FAILED\n");
+			_isConnected=false;
+			break;
+		case ID_ALREADY_CONNECTED:
+			printf("Client Error: ID_ALREADY_CONNECTED\n");
+			break;
+		case ID_CONNECTION_BANNED:
+			printf("Client Error: ID_CONNECTION_BANNED\n");
+			break;
+		case ID_INVALID_PASSWORD:
+			printf("Client Error: ID_INVALID_PASSWORD\n");
+			break;
+		case ID_INCOMPATIBLE_PROTOCOL_VERSION:
+			printf("Client Error: ID_INCOMPATIBLE_PROTOCOL_VERSION\n");
+			break;
+		case ID_NO_FREE_INCOMING_CONNECTIONS:
+			printf("Client Error: ID_NO_FREE_INCOMING_CONNECTIONS\n");
+			_isConnected=false;
+			break;
+		case ID_DISCONNECTION_NOTIFICATION:
+			//printf("ID_DISCONNECTION_NOTIFICATION\n");
+			_isConnected=false;
+			break;
+		case ID_CONNECTION_LOST:
+			printf("Client Error: ID_CONNECTION_LOST\n");
+			_isConnected=false;
+			break;
+		}
+		_peer->DeallocatePacket(p);
+		p = _peer->Receive();
+			
+	}
+
+	printf("DONE\n");
+		
 	_isConnected = true;
 		
 }
@@ -67,3 +121,13 @@ void ClientNetworkManager::disconnect(void)
 
 // 	};			
 // }
+
+
+void ClientNetworkManager::sendCustomLoginRequest() {
+	// send login message
+	voyage::cs_loginRequest logreq;
+	logreq.set_username("byfron");
+	logreq.set_password("1234");
+	sendData<voyage::cs_loginRequest>(ID_CS_LOGIN_REQUEST, logreq);
+
+}

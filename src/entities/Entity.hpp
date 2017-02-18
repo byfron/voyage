@@ -97,49 +97,97 @@ public:
 	typedef std::bitset<MAX_COMPONENTS> ComponentMask;
 
 	static uint32_t entity_count;
+	static uint32_t entity_networked_count;
+	static uint32_t entity_local_count;
+
+	uint32_t generateNetworkedId() {
+		uint32_t id = EntityManager::entity_networked_count++;
+		assert(id < 0x00ff);		
+		return (id << 16);
+	}
+
+	uint32_t generateLocalId() {
+		uint32_t id = EntityManager::entity_local_count++;
+		assert(id < 0x00ff);
+		return id;
+	}
 
 	// TODO put this in namespace/class
-	Entity::Id generateNewId() {
+	Entity::Id generateNewId(bool networked) {
+
 		Entity::Id id;
-		id.id = EntityManager::entity_count++;
+		if (networked) {
+			id.id = generateNetworkedId();		
+		}
+		else {
+			id.id = generateLocalId();			
+		}			     
+
+		EntityManager::entity_count++;
 		id.valid = true;
 		return id.index();
 	}
 	
-	Entity::Id getFreeId() {
-		assert(not _freeIdList.empty());
-		uint32_t index = _freeIdList.back();
-		_freeIdList.pop_back();
+	Entity::Id getFreeId(bool networked) {
+
+		uint32_t index;
+		if (networked) {			
+			assert(not _freeNetworkedIdList.empty());
+			index = _freeNetworkedIdList.back();
+			_freeNetworkedIdList.pop_back();
+		}
+		else {
+			assert(not _freeLocalIdList.empty());
+			index = _freeLocalIdList.back();
+			_freeLocalIdList.pop_back();
+		}
 		return Entity::Id(index);
 	}
 
 	void releaseId(uint32_t id) {
-		_freeIdList.push_back(id);
+		if (id & 0x00ff) {
+			_freeLocalIdList.push_back(id);
+		}
+		else {
+			_freeNetworkedIdList.push_back(id);
+		}
 	}
 	
 public:
 
 	EntityManager()  {};
 
-	Entity create() {
 
-		Entity::Id id;
-		
-		if (_freeIdList.empty()) {
-			id = generateNewId();
-		}
-		else {		    
-			id = getFreeId();
-		}
-		
-		Entity entity(this, id);		
-		reserveEntityData(id.index());
-		_valid_entities[id.index()] = true;
-		
-		//event_manager.broadcast<EntityCreatedEvent>(entity);
-		return entity;
+	//TODO: generate networked entities
+	// or local entities separately
+	// same but ids in different ranges
+
+
+	// Server ONLY generates global ids
+
+	// Client ONLY generates local ids
+
+	// So all non networked entities will have the upper bits to zero
+	// Networked entities will have to upper
+
+	// When client requests for an id, it can either get
+	// the upper bits or the lower bits depending on which type
+
+	Entity createNetworked() {
+		return create(true);
 	}
 
+	Entity createLocal() {
+		return create(false);
+	}       	
+
+	bool isIdListEmpty(bool networked) {
+		if (networked)
+			return _freeNetworkedIdList.size() == 0;
+		else 
+			return _freeLocalIdList.size() == 0;
+	}
+	
 	bool valid(Entity::Id id) {
 		return _valid_entities[id.id];
 	}
@@ -230,6 +278,25 @@ public:
 	
 protected:
 
+	Entity create(bool networked = false) {
+
+		Entity::Id id;
+
+		if (isIdListEmpty(networked)) {
+			id = generateNewId(networked);
+		}
+		else {		    
+			id = getFreeId(networked);
+		}
+		
+		Entity entity(this, id);		
+		reserveEntityData(id.index());
+		_valid_entities[id.index()] = true;
+		
+		//event_manager.broadcast<EntityCreatedEvent>(entity);
+		return entity;
+	}
+	
 	template <typename ... Components>
 	class ComponentsView {
 
@@ -328,7 +395,8 @@ protected:
 	std::vector<BasePool*> _component_pools;
 	std::vector<ComponentMask> _entity_component_mask;
 	std::vector<bool> _valid_entities;
-        std::vector<uint32_t> _freeIdList;
+        std::vector<uint32_t> _freeNetworkedIdList;
+	std::vector<uint32_t> _freeLocalIdList;
 
 };
 

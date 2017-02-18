@@ -4,11 +4,10 @@
 #include <signal.h>
 #include <common/GameMessages.hpp>
 #include "handlers/ClientLoginHandler.hpp"
-#include "handlers/ClientEntityUpdateHandler.hpp"
+#include "handlers/ClientCustomHandler.hpp"
 
 #include <components/BodyCmp.hpp>
-#include <components/EntityInputSystem.hpp>
-#include <components/EntityNetworkSystem.hpp>
+#include <components/ClientPlayerSystem.hpp>
 #include <components/AnimationComponent.hpp>
 #include <components/CollisionComponent.hpp>
 #include <components/MapCmp.hpp>
@@ -26,10 +25,9 @@ void ClientEngine::init() {
 	std::cout << "Initializing ClientEngine";
 
 	GameEngine::init();
-	
-	_netManager = std::make_shared<ClientNetworkManager>();
-	networkManager()->start("127.0.0.1", 1234);
-	networkManager()->connect();
+		
+	_netManager.start("127.0.0.1", 1234);
+	_netManager.connect();
 	_running = true;
 
 	_registerHandlers();
@@ -48,13 +46,18 @@ void ClientEngine::createSubsystems() {
 	// TODO: this goes up to the server as well
 
 	// NOTE: Order matters
-	add<EntityInputSystem>(std::make_shared<EntityInputSystem>(_world, networkManager()));
-	add<EntityNetworkSystem>(std::make_shared<EntityNetworkSystem>(_world, networkManager()));
+
+	// Player system
+	std::shared_ptr<ClientPlayerSystem> ps =
+		std::make_shared<ClientPlayerSystem>(_world, _netManager);
+	ps->configure(_eventManager);
+	add<ClientPlayerSystem>(ps);
+
 	add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
 	add<CollisionSystem>(std::make_shared<CollisionSystem>(_world));
 	add<AnimationSystem>(std::make_shared<AnimationSystem>());
 	add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
-	add<MapSystem>(std::make_shared<MapSystem>());
+	add<MapDrawSystem>(std::make_shared<MapDrawSystem>(_world));
 	
 }
 
@@ -62,46 +65,51 @@ void ClientEngine::createWorld() {
 
 	_world = std::make_shared<World>();
 
-	Entity map = _entityManager.create();
+	// Entity map = _entityManager.createLocal();
 		
-	_entityManager.assign<MapComponent>(map.id(),
-					    _world->getGameMap()->getTileMap());
+	// _entityManager.assign<MapComponent>(map.id(),
+	// 				    _world->getGameMap()->getTileMap());
 }
 
 void ClientEngine::createPlayer() {
 
-	Entity player1 = _entityManager.create();
+	Entity player1 = _entityManager.createLocal();
 
 	_entityManager.assign<AnimationComponent>(player1.id(),
 						  std::string(CONFIG_FILE_PATH) +
 						  "main_character_anim3.cfg");
 	
 	//TODO: This should be a response from a server createEntity message
-	_entityManager.assign<BodyCmp>(player1.id(), "cfg");
+	_entityManager.assign<PlayerCmp>(player1.id(), GameEngine::m_playerId);
+	_entityManager.assign<BodyCmp>(player1.id(), "cfg");	
+	_entityManager.assign<NetworkCmp>(player1.id());		
 	_entityManager.assign<CollisionComponent>(player1.id());
 
 	// Client-side components
-	_entityManager.assign<InputCmp>(player1.id(), "cfg");
 	_entityManager.assign<DebugGraphicsCmp>(player1.id());
 
+	GameEngine::m_playerId = player1.id().id;
 
 	
-	Entity player2 = _entityManager.create();
-	_entityManager.assign<BodyCmp>(player2.id(), "cfg");
-	_entityManager.assign<NetworkCmp>(player2.id());
+// 	Entity player2 = _entityManager.create();
+// 	_entityManager.assign<PlayerCmp>(player2.id());
+// 	_entityManager.assign<CollisionComponent>(player2.id());
+// 	_entityManager.assign<NetworkCmp>(player2.id());
+// 	_entityManager.assign<BodyCmp>(player2.id(), "cfg");	
+// 	_entityManager.assign<AnimationComponent>(player2.id(),
+// 						  std::string(CONFIG_FILE_PATH) +
+// 						  "main_character_anim3.cfg");
 }
 
 
 void ClientEngine::_registerHandlers() {
 
-	_netManager->registerHandler(std::make_shared<ClientLoginHandler>
-				     (ClientEngine::Ptr(this)), {ID_SC_LOGIN_ACCEPTED});
+	_netManager.registerHandler(std::make_shared<ClientLoginHandler>
+				    (ClientEngine::Ptr(this)), {ID_SC_LOGIN_ACCEPTED, ID_CONNECTION_REQUEST_ACCEPTED});
 
-	_netManager->registerHandler(std::make_shared<ClientEntityUpdateHandler>
-				     (&_eventManager), {ID_SC_ENTITY_UPDATE});
+	_netManager.registerHandler(std::make_shared<ClientCustomHandler<voyage::sc_worldState> >
+				     (&_eventManager), {ID_SC_WORLD_STATE});
 	
-//	_netManager->registerHandler(std::make_shared<ClientMapHandler>(ClientEngine::Ptr(this)),
-//				     {ID_SC_REGION_DATA});
 }
 
 void ClientEngine::requestQuit() {

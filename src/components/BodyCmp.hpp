@@ -4,6 +4,11 @@
 #include <utils/GeometryUtils.hpp>
 #include <entities/System.hpp>
 #include <voyage.pb.h>
+#include <queue>
+
+struct BodyState {
+
+};
 
 class BodyCmp {
 
@@ -33,6 +38,15 @@ public:
 		// TODO set this to the real thing! now is the sprite size!
 		m_aabb.m_min = Vec3f(-0.25, -0.25,  -0.01);
 		m_aabb.m_max = Vec3f(0.25,  0.25,  0.01);
+	}
+
+	void updateRotation() {
+
+		Eigen::AngleAxis<float> aa(m_rotAngle, Vec3f(0.0,0.0,1.0));
+		Eigen::MatrixXf rot = Eigen::MatrixXf::Identity(4,4);
+		rot.block(0,0,3,3) = aa.matrix();
+			
+		m_rotation = rot;
 	}
 
 
@@ -123,20 +137,5 @@ public:
 
 class BodySystem : public System<BodySystem> {
 
-
-	void update(EntityManager & em, EventManager &evm, float delta ) {
-
-		em.each<BodyCmp>([delta](Entity entity, BodyCmp & body) {
-				
-			body.m_position += body.m_moveVec;
-			
-			Eigen::AngleAxis<float> aa(body.m_rotAngle, Vec3f(0.0,0.0,1.0));
-			Eigen::MatrixXf rot = Eigen::MatrixXf::Identity(4,4);
-			rot.block(0,0,3,3) = aa.matrix();
-			
-			body.m_rotation = rot;
-			
-		});
-	}
-
+	void update(EntityManager & em, EventManager &evm, float delta );
 };

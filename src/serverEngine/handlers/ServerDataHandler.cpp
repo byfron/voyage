@@ -21,14 +21,26 @@ void ServerDataHandler::onMessage(RakNet::Packet * p) {
 	
 	switch(p->data[0]) {
 
-	case ID_CS_USER_MOVEMENT: {
-		Message<voyage::cs_userMovement>::Ptr m =
-			std::make_shared< Message<voyage::cs_userMovement> >(p);
+// 	case ID_CS_USER_MOVEMENT: {
+// 		Message<voyage::cs_userMovement>::Ptr m =
+// 			std::make_shared< Message<voyage::cs_userMovement> >(p);
 
-//		_gameServer->
-		// push this in body system
-		break;
+// //		_gameServer->
+// 		// push this in body system
+// 		break;
+
+	case ID_CS_USER_ACTION: {
+		Message<voyage::cs_userAction>::Ptr m =
+ 			std::make_shared< Message<voyage::cs_userAction> >(p);
+
+		//	PlayerSessionPtr player_session = _gameServer->getPlayerSession(RakNet::SystemAddress("127.0.0.1"));
+
+
+		PlayerSessionPtr player_session = _gameServer->getPlayerSession(p->guid);
 		
+		if (player_session) {
+			_gameServer->engine().dispatchMessage(UserAction(player_session->getPlayerId(), m->getContent()));
+		}
 	}
 		
 	}

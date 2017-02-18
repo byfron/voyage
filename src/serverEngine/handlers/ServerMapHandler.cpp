@@ -21,7 +21,7 @@ void ServerMapHandler::onMessage(RakNet::Packet *p) {
 		Message<cs_regionDataRequest>::Ptr m =
 			std::make_shared< Message<cs_regionDataRequest> >(p);
 
-		PlayerSession::Ptr pSession = _gameServer->getPlayerSession(m->getAddr());
+		PlayerSession::Ptr pSession = _gameServer->getPlayerSession(p->guid);
 		handleRegionDataRequest(pSession, m->getContent());
 		
 		break;

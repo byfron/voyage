@@ -1,7 +1,6 @@
 #pragma once
 
 #include <components/BodyCmp.hpp>
-#include <components/InputCmp.hpp>
 #include <components/AnimationComponent.hpp>
 #include <clientEngine/ClientEngine.hpp>
 #include <pumpkin.hpp>
@@ -23,7 +22,9 @@ public:
 	}
 
 	void frame(const float dt) override {
+		_gameEngine.receiveData();
 		_gameEngine.run_frame(dt);
+
 	}
 
 private:

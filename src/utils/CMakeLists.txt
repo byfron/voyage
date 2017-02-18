@@ -1,3 +1,5 @@
 add_library(utils
-	GeometryUtils.hpp
-	GeometryUtils.cpp)
+  PlayerInput.hpp
+  PlayerInput.cpp
+  GeometryUtils.hpp
+  GeometryUtils.cpp)

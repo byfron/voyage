@@ -1,5 +1,4 @@
-#ifndef __VOYAGE_CLIENT_HPP__
-#define __VOYAGE_CLIENT_HPP__
+#pragma once
 
 //Tiny client
 #include <RakPeerInterface.h>
@@ -20,6 +19,8 @@ public:
 	void connect();
 	void disconnect();
 
+	void sendCustomLoginRequest();
+
 	template<typename T>
 	void sendData(RakNet::MessageID id, const T & content) {
 		
@@ -37,4 +38,3 @@ private:
 	const char *_remoteIPAddress;
 };
 
-#endif

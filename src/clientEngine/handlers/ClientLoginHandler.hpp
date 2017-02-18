@@ -16,21 +16,32 @@ public:
 	}
 	
 	void onMessage(RakNet::Packet *p) {
-		
-		std::cout << "login successful"  << std::endl;
-		Message<voyage::sc_loginAccepted> msg(p);
-		
-		//get the player info
-		//_client->initPlayer();
 
-		//DEBUG: ask server for map data
-		//TODO: _client->requestMapRegion();
-		voyage::cs_regionDataRequest msgRegReq;
-		msgRegReq.set_x(25);
-		msgRegReq.set_y(25);
-		//msg.set_timestamp(); of the last seen region!!
-		_client->networkManager()->sendData<voyage::cs_regionDataRequest>(ID_CS_REGION_REQUEST, msgRegReq);
-		
+		switch (p->data[0])
+		{
+		case ID_CONNECTION_REQUEST_ACCEPTED: {
+			printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
+
+			// send custon login message. This may not be needed. 
+			voyage::cs_loginRequest logreq;
+			logreq.set_username("byfron");
+			logreq.set_password("1234");
+			_client->getNetManager().sendData<voyage::cs_loginRequest>(ID_CS_LOGIN_REQUEST, logreq);
+
+			
+			break;
+		}
+		case ID_SC_LOGIN_ACCEPTED: {
+			Message<voyage::sc_loginAccepted> msg(p);
+			
+			voyage::sc_loginAccepted data = msg.getContent();
+			
+			std::cout << "Login accepted. Player id " << data.playerid() << std::endl;
+			
+			GameEngine::m_playerId = data.playerid();
+			break;
+		}
+		};
 	}
 
 private:

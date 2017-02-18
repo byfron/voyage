@@ -1,5 +1,11 @@
 package voyage;
 
+message sc_spawnPlayer {
+	required uint32 entity_id = 1;
+	required uint32 x = 2;
+	required uint32 y = 3;	
+}
+
 message sc_entityUpdate {
 	required uint32 entityId = 1;
 	required uint32 x = 2;
@@ -7,11 +13,15 @@ message sc_entityUpdate {
 }
 
 message sc_playerState {
-	required uint32 entityId = 1;
 	required uint32 actionSeq = 2;
 	optional float pos_x = 3;
 	optional float pos_y = 4;
 	optional float angle = 5;
+}
+
+message sc_worldState {
+	optional sc_playerState player = 1;
+	repeated sc_entityUpdate entity = 2;
 }
 
 message cs_userMovement {
@@ -21,8 +31,7 @@ message cs_userMovement {
 }
 
 message sc_playerInfo {
-	required uint32 entityId = 1;
-	optional string name = 2;
+	required string name = 2;	
 }
 
 message sc_regionData {
@@ -38,7 +47,7 @@ message sc_initDatabase {
 }
 
 message sc_loginAccepted {
-	optional sc_entityUpdate playerPos = 1;
+	required uint32 playerId = 1;
 	optional sc_playerInfo playerInfo = 2;		
 }
 
@@ -83,5 +92,6 @@ message cs_userAction {
 	optional float motion_x = 2;
 	optional float motion_y = 3;
 	optional float angle = 4;
-	optional action_code = 5;
+	optional uint32 action_code = 5;
+	required uint32 timestamp = 6;	    
 }

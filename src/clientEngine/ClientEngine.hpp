@@ -19,16 +19,19 @@ public:
 	void createSubsystems();
 	void createWorld();
 	void createPlayer();	
-		
+
+	void receiveData()  { _netManager.receiveData(); }
+	
 //	ClientTileMap::Ptr getTileMap() { return _tileMap; };
-	ClientNetworkManager::Ptr networkManager() {
-		return std::static_pointer_cast<ClientNetworkManager>(_netManager);
-	}
+
+	ClientNetworkManager & getNetManager() { return _netManager; }
+
 	typedef std::shared_ptr<ClientEngine> Ptr;
 
 
 private:
 
 	void _registerHandlers();
+	ClientNetworkManager  _netManager;
 
 };

@@ -6,11 +6,12 @@
 // Class Exposure
 using namespace boost::python;
 
+
 			
 BOOST_PYTHON_MODULE(Context)
 {
     class_<EntityManager>("EntityManager")
-	    .def("create", &EntityManager::create);
+	    .def("create", &EntityManager::createLocal);
 
     class_<EventManager>("EventManager");
     

@@ -50,37 +50,8 @@ public:
 // 		collision_mask = cm;
 // 	}
 
- 	void update(EntityManager & em, EventManager & evm, float delta) {
-
-// 		// copy current state of collision mask
-		GameMap::CollisionMask mask = m_world->getMapCollisionMask();
-		GameMap::Ptr game_map = m_world->getGameMap();
-
-
-// 		// solve candidates with characters
- 		em.each<CollisionComponent, BodyCmp >
-			([delta, game_map, mask](Entity entity,
-						 CollisionComponent & collision,
-						 BodyCmp & body) {
-
-
-		      // Update collision geometry
-		      collision.update(body.m_aabb, body.getTransform());
-
-		      Vec2i tile = game_map->getTileCoords(body.m_position);
-		      
-		      // Check if entity collides with map
-		      if (not mask.isWalkable(tile)) {
-
-			      // send message
-//			      evm.emit<CollideEvent>(entity, other_entity);
-			       
-			      std::cout << "isColliding!!!" << std::endl;
- 		  }		  		      
-
-	      });
-	}
-							      
+ 	void update(EntityManager & em, EventManager & evm, float delta);
+	
 // 		  // check if entity is colliding with a map object
 // 		  // we shall do this here ONLY if walls are objects I guess
 // 		  if (collision_grid.isColliding(body.m_tile_position.x,

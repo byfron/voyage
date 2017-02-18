@@ -4,7 +4,6 @@
 #include <game/World.hpp>
 #include <game/CollisionManager.hpp>
 #include "GraphicsCmp.hpp"
-#include "InputCmp.hpp"
 #include "BulletCmp.hpp"
 #include "BodyCmp.hpp"
 #include "CollisionComponent.hpp"

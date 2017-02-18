@@ -3,6 +3,7 @@
 #include <pumpkin.hpp>
 #include "CollisionComponent.hpp"
 #include <entities/System.hpp>
+#include "PlayerSystem.hpp"
 
 class pumpkin::PosColorVertex;
 

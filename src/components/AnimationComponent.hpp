@@ -1,11 +1,12 @@
 #pragma once
 
 #include "BodyCmp.hpp"
-#include "InputCmp.hpp"
+#include "PlayerInput.hpp"
 #include <entities/System.hpp>
 #include <graphics/Animation.hpp>
 #include <graphics/AnimationFactory.hpp>
 
+using namespace PlayerInput;
 
 // shall the graphic elements be organized per texture?
 class AnimationComponent {

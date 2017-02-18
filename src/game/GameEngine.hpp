@@ -4,7 +4,7 @@
 #include <entities/Entity.hpp>
 #include <entities/System.hpp>
 #include <networking/NetworkManager.hpp>
-#include <components/BodyCmp.hpp>
+
 
 class GameEngine {
 public:
@@ -17,20 +17,21 @@ public:
 
 	void run_frame(float dt) {
 
-		_netManager->receiveData();
+		//	_netManager->receiveData();
 		_systemManager->update_all(dt);
 	}
 	
-	virtual void init() {
+	virtual void init();
 
-		// create system manager
-		_systemManager = std::make_shared<SystemManager>(_entityManager,
-								 _eventManager);
-
-		// Create subsystems. Systems defined here will be present
-		// in both server and client side
-		add<BodySystem>(std::make_shared<BodySystem>());
+	template <typename E>
+	void dispatchMessage(const E & msg) {
+		_eventManager.emit(msg);
 	}
+
+	EntityManager & entity_manager() { return _entityManager; }
+
+	static bool isClient;
+	static uint32_t m_playerId;
 
 protected:
 
@@ -41,5 +42,6 @@ protected:
 	EventManager _eventManager;
 	SystemManager::Ptr _systemManager;
 	World::Ptr _world;
-	std::shared_ptr<NetworkManager> _netManager;
+//	std::shared_ptr<NetworkManager> _netManager;
+
 };

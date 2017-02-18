@@ -3,6 +3,8 @@ add_library(serverEngine
   GameServer.cpp
   PlayerSession.hpp
   PlayerSession.cpp
+  ServerEngine.hpp
+  ServerEngine.cpp
   handlers/ServerLoginHandler.hpp
   handlers/ServerLoginHandler.cpp
   handlers/ServerDataHandler.hpp

@@ -18,14 +18,17 @@ void break_loop(int s) {
 }
 
 GameServer::GameServer(int portNum) {
-	
-	_gameEngine.init(portNum);	
-	_gameEngine.networkManager()->registerHandler(std::make_shared<ServerLoginHandler>
+       
+	_gameEngine.init(portNum);
+
+
+	//TODO refactor to registerNetworkHandlers!!
+	_gameEngine.getNetManager().registerHandler(std::make_shared<ServerLoginHandler>
 						      (this), {ID_CS_LOGIN_REQUEST});
 
-	_gameEngine.networkManager()->registerHandler(std::make_shared<ServerDataHandler>
-						      (this), {ID_CS_USER_MOVEMENT});
-	
+	_gameEngine.getNetManager().registerHandler(std::make_shared<ServerDataHandler>
+						      (this), {ID_CS_USER_ACTION});
+ 		
 	
 
 }
@@ -34,23 +37,43 @@ void GameServer::stop() {
 	google::protobuf::ShutdownProtobufLibrary();
 }
 
-PlayerSession::Ptr GameServer::createPlayerSession(RakNet::SystemAddress addr) {
+PlayerSession::Ptr GameServer::createPlayerSession(RakNet::RakNetGUID guid) {
 
 	//make sure the address is not in the map yet
-	assert(_playerSessionAddrMap.count(addr) == 0);
+	assert(_playerSessionAddrMap.count(guid) == 0);
 
 	//assign a new id
-	int id = _playerSessions.size()+1;
+	int id = _playerSessions.size();
 
 	PlayerSession::Ptr psPtr = PlayerSession::Ptr(
-		new PlayerSession(id, addr, GameServer::Ptr(this)));
+		new PlayerSession(id, guid, *this));
 
 	_playerSessions.push_back(psPtr);
-	_playerSessionAddrMap[addr] = psPtr;
+	_playerSessionAddrMap[guid] = psPtr;
 
-	spd::get("Server")->info() << "Player Session " << id << " successfully created";
+	spd::get("Server")->info() << "Player Session " << id << " with address:" << guid.ToString() << " successfully created";
 
 	return psPtr;
+}
+
+void GameServer::broadcastWorldState() {
+
+	for (auto session : _playerSessions) {
+
+		//TODO: check if something has changed around the player area
+
+		voyage::sc_worldState worldState = _gameEngine.computeWorldState(/*player_area*/);
+			
+		if (_gameEngine.getNetManager().hasWaitingMsg(session->getPlayerId())) {
+			worldState.mutable_player()->CopyFrom(_gameEngine.getNetManager().
+							      getPlayerStateMsg(session->getPlayerId()));
+		}
+		
+		session->sendMessage(std::make_shared<Message<voyage::sc_worldState> >
+				     (ID_SC_WORLD_STATE, worldState));
+
+	}	
+
 }
 
 void GameServer::start() {
@@ -59,7 +82,12 @@ void GameServer::start() {
 	signal(SIGINT, break_loop);
 	
 	while (!finished_sig && !_finished) {
+
+		// wait a bit? which frequency?		
 		_gameEngine.processFrame();
+
+		// send data to clients
+		broadcastWorldState();
 	}
 
 	stop();       

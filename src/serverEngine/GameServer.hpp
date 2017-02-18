@@ -2,6 +2,7 @@
 
 #include <RakPeerInterface.h>
 #include "ServerEngine.hpp"
+#include <spdlog/spdlog.h>
 
 class PlayerSession;
 typedef std::shared_ptr<PlayerSession> PlayerSessionPtr;
@@ -12,22 +13,29 @@ public:
 
 	void start();
 	void stop();
-	PlayerSessionPtr createPlayerSession(RakNet::SystemAddress);
-	
+	PlayerSessionPtr createPlayerSession(RakNet::RakNetGUID guid);
+	void broadcastWorldState();
 
-	PlayerSessionPtr getPlayerSession(RakNet::SystemAddress addr) {
-		return _playerSessionAddrMap[addr];
+	PlayerSessionPtr getPlayerSession(RakNet::RakNetGUID guid) {
+		if (_playerSessionAddrMap.count(guid) == 0) {
+			spd::get("Server")->warn() <<
+				"Player session does not exist in addr:" << guid.ToString();
+			return nullptr;
+		}
+		return _playerSessionAddrMap[guid];
 	}
-	
-	RakNet::RakPeerInterface *getRakNetPeer() { _gameEngine.networkManager()->getPeer(); }
+
+	RakNet::RakPeerInterface *getRakNetPeer() { _gameEngine.getNetManager().getPeer(); }
+
+	ServerEngine & engine() { return _gameEngine; }
 	
 	typedef std::shared_ptr<GameServer> Ptr;
 	
 private:
 	std::vector<PlayerSessionPtr> _playerSessions;
-	std::map<RakNet::SystemAddress, PlayerSessionPtr> _playerSessionAddrMap; 
+	std::map<RakNet::RakNetGUID, PlayerSessionPtr> _playerSessionAddrMap; 
 	
-	bool _finished;
+	bool _finished = false;
 	ServerEngine _gameEngine;
 	
 

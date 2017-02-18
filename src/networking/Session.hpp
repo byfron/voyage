@@ -10,24 +10,28 @@ class Session {
 public:
 
 	typedef std::shared_ptr<Session> Ptr;
+
+	Session(RakNet::RakNetGUID guid, uint16_t player_id) : _guid(guid), _playerId(player_id) { }
+
+	unsigned int getPlayerId() { return _playerId; }
+	
 	template <typename T>
 	void sendRakNetMessage(RakNet::RakPeerInterface *peer, std::shared_ptr< Message<T> >  m) {
 		RakNet::BitStream bsOut;
 		m->toBitStream(bsOut);
 
-		std::cout << "sending:" << *m << std::endl;
-		
+		if (peer)
 		peer->Send(&bsOut, HIGH_PRIORITY,
 			   RELIABLE_ORDERED, 0,
-			   _address, true);
+			   _guid, false);
 	};
 	
-private:
+protected:
 	
 	std::string _name;
 	std::string _playerLogin;
 	std::string _playerPwd;
-	RakNet::AddressOrGUID _address;
+	RakNet::RakNetGUID _guid;
 	unsigned int _playerId;
 	RakNet::Time _creationTime;
 	
