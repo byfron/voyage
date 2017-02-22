@@ -90,25 +90,33 @@ protected:
 // Entity Manager
 //
 
+
+// So we have a bunch of "networked" ids that are pre-allocated and waiting to be
+// used (1000). This can only be used-freed by networked entities. The rest are
+// local
+
+
 class EntityManager {
 
 public:
 
 	typedef std::bitset<MAX_COMPONENTS> ComponentMask;
 
+	static uint32_t max_networked_ids;
 	static uint32_t entity_count;
 	static uint32_t entity_networked_count;
 	static uint32_t entity_local_count;
 
-	uint32_t generateNetworkedId() {
+	uint32_t generateNetworkedId() {		
 		uint32_t id = EntityManager::entity_networked_count++;
-		assert(id < 0x00ff);		
-		return (id << 16);
+		
+		assert(id < EntityManager::max_networked_ids);		
+		return id;
 	}
 
 	uint32_t generateLocalId() {
 		uint32_t id = EntityManager::entity_local_count++;
-		assert(id < 0x00ff);
+		assert(id > EntityManager::max_networked_ids);
 		return id;
 	}
 
@@ -123,7 +131,6 @@ public:
 			id.id = generateLocalId();			
 		}			     
 
-		EntityManager::entity_count++;
 		id.valid = true;
 		return id.index();
 	}
@@ -145,7 +152,7 @@ public:
 	}
 
 	void releaseId(uint32_t id) {
-		if (id & 0x00ff) {
+		if (id < EntityManager::max_networked_ids) {
 			_freeLocalIdList.push_back(id);
 		}
 		else {
@@ -155,7 +162,14 @@ public:
 	
 public:
 
-	EntityManager()  {};
+	EntityManager()  {
+
+
+		_valid_entities.resize(EntityManager::max_networked_ids);
+		_entity_component_mask.resize(EntityManager::max_networked_ids);
+		for (BasePool *pool : _component_pools)
+			if (pool) pool->expand(EntityManager::max_networked_ids);
+	};
 
 
 	//TODO: generate networked entities
@@ -173,6 +187,18 @@ public:
 	// When client requests for an id, it can either get
 	// the upper bits or the lower bits depending on which type
 
+	Entity createFromId(int index) {
+
+		std::cout << index << std::endl;
+		assert(index < EntityManager::max_networked_ids);
+		
+		Entity::Id id(index);
+		Entity entity(this, id);
+		_valid_entities[id.index()] = true;
+		EntityManager::entity_count++;
+		return entity;
+	}
+	
 	Entity createNetworked() {
 		return create(true);
 	}
@@ -278,6 +304,7 @@ public:
 	
 protected:
 
+	
 	Entity create(bool networked = false) {
 
 		Entity::Id id;
@@ -386,7 +413,8 @@ protected:
 		
 		if (not _component_pools[poolIndex]) {
 			_component_pools[poolIndex] = new Pool<C>();
-			_component_pools[poolIndex]->expand(EntityManager::entity_count);
+			_component_pools[poolIndex]->expand(EntityManager::max_networked_ids +
+							    EntityManager::entity_local_count);
 		}
 
 		return static_cast<Pool<C>*>(_component_pools[poolIndex]);

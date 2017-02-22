@@ -65,8 +65,8 @@ void GameServer::broadcastWorldState() {
 		voyage::sc_worldState worldState = _gameEngine.computeWorldState(/*player_area*/);
 			
 		if (_gameEngine.getNetManager().hasWaitingMsg(session->getPlayerId())) {
-			worldState.mutable_player()->CopyFrom(_gameEngine.getNetManager().
-							      getPlayerStateMsg(session->getPlayerId()));
+			worldState.mutable_player_update()->CopyFrom(_gameEngine.getNetManager().
+								     getPlayerStateMsg(session->getPlayerId()));
 		}
 		
 		session->sendMessage(std::make_shared<Message<voyage::sc_worldState> >

@@ -53,8 +53,7 @@ public:
 	int player_id;
 };
 
-class PlayerSystem : public System<PlayerSystem>,
-		     public Receiver<PlayerSystem> {
+class PlayerSystem : public System<PlayerSystem> {
 public:
 
 	PlayerSystem(World::Ptr world) : m_world(world) {}	

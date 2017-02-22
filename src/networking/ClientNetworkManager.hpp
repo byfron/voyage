@@ -4,6 +4,7 @@
 #include <RakPeerInterface.h>
 //#include "PacketHandler.hpp"
 #include <map>
+#include <queue>
 #include "ServerNetworkManager.hpp"
 #include "NetworkManager.hpp"
 
@@ -30,7 +31,7 @@ public:
 		_peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED,0,RakNet::UNASSIGNED_SYSTEM_ADDRESS,true);
 		
 	}
-
+	
 	typedef std::shared_ptr<ClientNetworkManager> Ptr;
 
 private:

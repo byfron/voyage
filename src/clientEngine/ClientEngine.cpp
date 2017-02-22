@@ -33,7 +33,7 @@ void ClientEngine::init() {
 	_registerHandlers();
 
 	createWorld();
-	createPlayer();
+	//createPlayer();
 
 	// Create client subsystems
 	// Subsystems should be created at the end!
@@ -49,14 +49,14 @@ void ClientEngine::createSubsystems() {
 
 	// Player system
 	std::shared_ptr<ClientPlayerSystem> ps =
-		std::make_shared<ClientPlayerSystem>(_world, _netManager);
+		std::make_shared<ClientPlayerSystem>(_world, _netMsgPool, _netManager);
 	ps->configure(_eventManager);
 	add<ClientPlayerSystem>(ps);
 
 	add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
 	add<CollisionSystem>(std::make_shared<CollisionSystem>(_world));
-	add<AnimationSystem>(std::make_shared<AnimationSystem>());
 	add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
+	add<AnimationSystem>(std::make_shared<AnimationSystem>());
 	add<MapDrawSystem>(std::make_shared<MapDrawSystem>(_world));
 	
 }
@@ -71,9 +71,16 @@ void ClientEngine::createWorld() {
 	// 				    _world->getGameMap()->getTileMap());
 }
 
-void ClientEngine::createPlayer() {
+void ClientEngine::createPlayer(uint32_t entity_id, int x, int y) {
 
-	Entity player1 = _entityManager.createLocal();
+	// NO! This id isNetweorked. will be assigned by the server
+	//Entity player1 = _entityManager.createNetworked(id);
+		
+	Entity player1 = _entityManager.createFromId(entity_id);
+
+	std::cout << player1.id().id << "=" << entity_id << std::endl;
+
+	// TODO server spawn msg returns config file and initial params
 
 	_entityManager.assign<AnimationComponent>(player1.id(),
 						  std::string(CONFIG_FILE_PATH) +
@@ -88,7 +95,6 @@ void ClientEngine::createPlayer() {
 	// Client-side components
 	_entityManager.assign<DebugGraphicsCmp>(player1.id());
 
-	GameEngine::m_playerId = player1.id().id;
 
 	
 // 	Entity player2 = _entityManager.create();
@@ -101,12 +107,16 @@ void ClientEngine::createPlayer() {
 // 						  "main_character_anim3.cfg");
 }
 
-
 void ClientEngine::_registerHandlers() {
 
 	_netManager.registerHandler(std::make_shared<ClientLoginHandler>
-				    (ClientEngine::Ptr(this)), {ID_SC_LOGIN_ACCEPTED, ID_CONNECTION_REQUEST_ACCEPTED});
-
+				    (ClientEngine::Ptr(this)),
+				    {
+					    ID_SC_LOGIN_ACCEPTED,
+					    ID_CONNECTION_REQUEST_ACCEPTED,
+					    ID_SC_SPAWN_PLAYER,
+				    });
+	
 	_netManager.registerHandler(std::make_shared<ClientCustomHandler<voyage::sc_worldState> >
 				     (&_eventManager), {ID_SC_WORLD_STATE});
 	

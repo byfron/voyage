@@ -37,7 +37,5 @@ private:
 	
 	bool _finished = false;
 	ServerEngine _gameEngine;
-	
-
 };
 

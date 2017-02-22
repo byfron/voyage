@@ -42,6 +42,10 @@ protected:
 	EventManager _eventManager;
 	SystemManager::Ptr _systemManager;
 	World::Ptr _world;
+
+
+	
+	
 //	std::shared_ptr<NetworkManager> _netManager;
 
 };

@@ -26,21 +26,25 @@ public:
 			voyage::cs_loginRequest logreq;
 			logreq.set_username("byfron");
 			logreq.set_password("1234");
-			_client->getNetManager().sendData<voyage::cs_loginRequest>(ID_CS_LOGIN_REQUEST, logreq);
-
-			
+			_client->getNetManager().sendData<voyage::cs_loginRequest>(ID_CS_LOGIN_REQUEST, logreq);			
 			break;
 		}
 		case ID_SC_LOGIN_ACCEPTED: {
-			Message<voyage::sc_loginAccepted> msg(p);
-			
-			voyage::sc_loginAccepted data = msg.getContent();
-			
+			Message<voyage::sc_loginAccepted> msg(p);			
+			voyage::sc_loginAccepted data = msg.getContent();			
 			std::cout << "Login accepted. Player id " << data.playerid() << std::endl;
-			
 			GameEngine::m_playerId = data.playerid();
 			break;
 		}
+
+		case ID_SC_SPAWN_PLAYER: {
+			Message<voyage::sc_playerSpawn> msg(p);
+			voyage::sc_playerSpawn data = msg.getContent();
+			std::cout << "spawning player in " << data.x() << "," << data.y() << std::endl;
+			_client->createPlayer(data.entityid(), data.x(), data.y());
+			break;
+		}
+			
 		};
 	}
 
