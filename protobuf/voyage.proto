@@ -3,14 +3,14 @@ package voyage;
 message sc_playerSpawn {
 	required uint32 entityId = 1;
 //      required string conf_file = 2	
-	required uint32 x = 2;
-	required uint32 y = 3;	
+	required float x = 2;
+	required float y = 3;	
 }
 
 message sc_entitySpawn {
 	required uint32 entityId = 1;
-	required uint32 x = 2;
-	required uint32 y = 3;	
+	required float x = 2;
+	required float y = 3;	
 }
 
 message sc_entityDestroy {
