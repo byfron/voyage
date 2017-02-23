@@ -73,30 +73,32 @@ void ClientEngine::createWorld() {
 	// 				    _world->getGameMap()->getTileMap());
 }
 
-void ClientEngine::createPlayer(uint32_t entity_id, int x, int y) {
+void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 
 	// NO! This id isNetweorked. will be assigned by the server
 	//Entity player1 = _entityManager.createNetworked(id);
 		
-	Entity player1 = _entityManager.createFromId(entity_id);
-
-	std::cout << player1.id().id << "=" << entity_id << std::endl;
+	Entity player = _entityManager.createFromId(entity_id);
 
 	// TODO server spawn msg returns config file and initial params
 
-	_entityManager.assign<AnimationComponent>(player1.id(),
+	_entityManager.assign<AnimationComponent>(player.id(),
 						  std::string(CONFIG_FILE_PATH) +
 						  "main_character_anim3.cfg");
 	
 	//TODO: This should be a response from a server createEntity message
-	_entityManager.assign<PlayerCmp>(player1.id(), GameEngine::m_playerId);
-	_entityManager.assign<BodyCmp>(player1.id(), "cfg");	
-	_entityManager.assign<NetworkCmp>(player1.id());		
-	_entityManager.assign<CollisionComponent>(player1.id());
+	_entityManager.assign<PlayerCmp>(player.id(), GameEngine::m_playerId);
+	_entityManager.assign<BodyCmp>(player.id(), "cfg");	
+	_entityManager.assign<NetworkCmp>(player.id());		
+	_entityManager.assign<CollisionComponent>(player.id());
 
 	// Client-side components
-	_entityManager.assign<DebugGraphicsCmp>(player1.id());
+	_entityManager.assign<DebugGraphicsCmp>(player.id());
 
+
+	BodyCmp *body = _entityManager.getComponentPtr<BodyCmp>(player.id());
+	body->m_position(0) = x;
+	body->m_position(1) = y;
 
 	
 // 	Entity player2 = _entityManager.create();

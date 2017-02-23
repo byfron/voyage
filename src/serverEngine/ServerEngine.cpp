@@ -79,6 +79,13 @@ Entity ServerEngine::createPlayerEntity(int player_id) {
 	_entityManager.assign<NetworkCmp>(entity.id());		
 	_entityManager.assign<CollisionComponent>(entity.id());
 
+
+	// initial position of player?
+	BodyCmp *body = _entityManager.getComponentPtr<BodyCmp>(entity.id());
+	body->m_position(0) = 0.8;
+	body->m_position(1) = 0.8;
+								
+	
 	return entity;
 }
 

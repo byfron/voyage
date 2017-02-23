@@ -49,7 +49,7 @@ void ServerLoginHandler::onMessage(RakNet::Packet *p) {
 
 		Message<sc_entitySpawn>::Ptr spawn_msg =
 		MessageFactory::createSpawnPlayerMsg(pe.id().id, *body);
-			       
+		
 		// send its spawn to all the other sessions
 		_gameServer->broadcastMessageToAll(spawn_msg);
 

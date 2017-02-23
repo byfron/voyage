@@ -19,7 +19,7 @@ public:
 
 	void createSubsystems();
 	void createWorld();
-	void createPlayer(uint32_t index, int x, int y);	
+	void createPlayer(uint32_t index, float x, float y);	
 
 	void receiveData()  { _netManager.receiveData(); }
 	
