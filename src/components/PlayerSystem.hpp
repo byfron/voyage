@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BulletCmp.hpp"
-#include "BodyCmp.hpp"
 #include "CollisionComponent.hpp"
 #include <entities/System.hpp>
 #include <common/GameMessages.hpp>
@@ -59,20 +58,8 @@ class PlayerSystem : public System<PlayerSystem>,
 		     public Receiver<PlayerSystem> {
 public:
 
-	PlayerSystem(World::Ptr world) : m_world(world) {}	
-	
-	void update(EntityManager & em, EventManager &evm, float delta ) {
-
-		em.each<NetworkCmp, PlayerCmp, BodyCmp>
-			([&em, delta, this](Entity entity,
-					    NetworkCmp &netdata,
-					    PlayerCmp &player,
-					    BodyCmp & body) {
-
-//			updateSystem();
-
-		   });
-	}
+	PlayerSystem(World::Ptr world) : m_world(world) {}		
+	void update(EntityManager & em, EventManager &evm, float delta );
 
 protected:
 
