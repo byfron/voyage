@@ -16,7 +16,7 @@ ServerDataHandler::ServerDataHandler(GameServer* gs) {
 
 void ServerDataHandler::onMessage(RakNet::Packet * p) {
 
-	spd::get("Server")->info() << "Received data:" << p->data[0];
+
 	PlayerSession::Ptr ps;
 	
 	switch(p->data[0]) {

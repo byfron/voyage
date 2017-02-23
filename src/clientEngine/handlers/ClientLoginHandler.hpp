@@ -37,14 +37,6 @@ public:
 			break;
 		}
 
-		case ID_SC_SPAWN_PLAYER: {
-			Message<voyage::sc_playerSpawn> msg(p);
-			voyage::sc_playerSpawn data = msg.getContent();
-			std::cout << "spawning player in " << data.x() << "," << data.y() << std::endl;
-			_client->createPlayer(data.entityid(), data.x(), data.y());
-			break;
-		}
-			
 		};
 	}
 

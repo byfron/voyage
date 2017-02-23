@@ -5,6 +5,7 @@
 enum Handlers {
 	SERVER_LOGIN_REQ_HANDLER,
 	CLIENT_LOGIN_HANDLER, // handles login/logou
+	CLIENT_ENTITY_SPAWN_HANDLER,
 	SERVER_USER_ACTION_HANDLER, 
 	CLIENT_UPDATE_HANDLER, //this handles several msgs: chat, content, move, ...
 	CLIENT_MAP_HANDLER,

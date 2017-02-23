@@ -29,7 +29,7 @@ public:
 	void receiveData()
 	{
 		Packet *p;
-		int max_msgs_per_frame = 8;
+		int max_msgs_per_frame = 100;
 		int count = 0;
 		for (p=_peer->Receive(); p && count < max_msgs_per_frame ; _peer->DeallocatePacket(p), p=_peer->Receive())
 		{

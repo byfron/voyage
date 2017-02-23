@@ -23,7 +23,8 @@ struct UserAction {
 		motion_vec(0) = ua.motion_x();
 		motion_vec(1) = ua.motion_y();
 		angle = ua.angle();
-		action_code = ua.action_code();		
+		action_code = ua.action_code();
+		delta = ua.delta();
 	}
 	
 	int player_id = -1;
@@ -31,6 +32,7 @@ struct UserAction {
 	float angle = 0;
 	uint32_t action_code = 0;
 	uint32_t seq_num;
+	float delta;
 
 	bool operator !=(const UserAction &a) {
 		return (a.motion_vec != motion_vec ||
@@ -53,7 +55,8 @@ public:
 	int player_id;
 };
 
-class PlayerSystem : public System<PlayerSystem> {
+class PlayerSystem : public System<PlayerSystem>,
+		     public Receiver<PlayerSystem> {
 public:
 
 	PlayerSystem(World::Ptr world) : m_world(world) {}	

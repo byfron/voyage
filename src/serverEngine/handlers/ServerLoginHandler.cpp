@@ -5,6 +5,7 @@
 #include <common/GameMessages.hpp>
 #include "voyage.pb.h"
 #include "../PlayerSession.hpp"
+#include <serverEngine/GameServer.hpp>
 
 namespace spd = spdlog;
 using namespace voyage;
@@ -40,21 +41,31 @@ void ServerLoginHandler::onMessage(RakNet::Packet *p) {
 		// - player name/data/etc...
 
 		Entity pe = _gameServer->engine().createPlayerEntity(session->getPlayerId());
+		session->setPlayerEntityId(pe.id().id);
 		sc_loginAccepted login_ack;
 		login_ack.set_playerid(pe.id().id);
 		Message<sc_loginAccepted>::Ptr msg = std::make_shared<Message<sc_loginAccepted> >(ID_SC_LOGIN_ACCEPTED, login_ack);
-		session->sendMessage(msg);		
+		session->sendMessage(msg);	
 
 		// Create player entity and send spawn message to client
 		BodyCmp *body = _gameServer->engine().entity_manager().
 			getComponentPtr<BodyCmp>(pe.id());
-			
-		sc_playerSpawn spawn_player;
+		
+		sc_entitySpawn spawn_player;
 		spawn_player.set_entityid(pe.id().id);
 		spawn_player.set_x(body->m_position(0));
 		spawn_player.set_y(body->m_position(1));
-		Message<sc_playerSpawn>::Ptr spawn_msg = std::make_shared<Message<sc_playerSpawn> >(ID_SC_SPAWN_PLAYER, spawn_player);
-		session->sendMessage(spawn_msg);
+		Message<sc_entitySpawn>::Ptr spawn_msg = std::make_shared<Message<sc_entitySpawn> >(ID_SC_SPAWN_PLAYER, spawn_player);
+
+		// send it to all sessions!
+		_gameServer->broadcastMessage(spawn_msg);		
+		std::cout << "Broadcasting spawn NOW!!!!!!!!!!!!!" << std::endl;
+
+		// send creation of entities in current state!
+
+		
+		
+//		session->sendMessage(spawn_msg);
 
 		// 
 

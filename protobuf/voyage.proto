@@ -32,7 +32,6 @@ message sc_playerState {
 }
 
 message sc_worldState {
-
 	optional sc_playerState player_update = 1;	      
 	repeated sc_entitySpawn entity_spawn = 2;
 	repeated sc_entityDestroy entity_destroy = 3;
@@ -108,5 +107,6 @@ message cs_userAction {
 	optional float motion_y = 3;
 	optional float angle = 4;
 	optional uint32 action_code = 5;
-	required uint32 timestamp = 6;	    
+	required uint32 timestamp = 6;
+	required float delta = 7;	
 }

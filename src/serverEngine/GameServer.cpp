@@ -46,7 +46,7 @@ PlayerSession::Ptr GameServer::createPlayerSession(RakNet::RakNetGUID guid) {
 	int id = _playerSessions.size();
 
 	PlayerSession::Ptr psPtr = PlayerSession::Ptr(
-		new PlayerSession(id, guid, *this));
+		new PlayerSession(id, guid, getRakNetPeer()));
 
 	_playerSessions.push_back(psPtr);
 	_playerSessionAddrMap[guid] = psPtr;
@@ -56,22 +56,27 @@ PlayerSession::Ptr GameServer::createPlayerSession(RakNet::RakNetGUID guid) {
 	return psPtr;
 }
 
+
 void GameServer::broadcastWorldState() {
 
 	for (auto session : _playerSessions) {
 
-		//TODO: check if something has changed around the player area
-
-		voyage::sc_worldState worldState = _gameEngine.computeWorldState(/*player_area*/);
+		voyage::sc_worldState playerWorldState =
+			_gameEngine.computeWorldState(session->getPlayerEntityId()/*player_area*/);
 			
 		if (_gameEngine.getNetManager().hasWaitingMsg(session->getPlayerId())) {
-			worldState.mutable_player_update()->CopyFrom(_gameEngine.getNetManager().
+			playerWorldState.mutable_player_update()->CopyFrom(_gameEngine.getNetManager().
 								     getPlayerStateMsg(session->getPlayerId()));
 		}
-		
-		session->sendMessage(std::make_shared<Message<voyage::sc_worldState> >
-				     (ID_SC_WORLD_STATE, worldState));
 
+
+		// send if we have something ready
+		if (playerWorldState.entity_update().size() > 0 ||
+		    playerWorldState.has_player_update() ) {
+
+			session->sendMessage(std::make_shared<Message<voyage::sc_worldState> >
+					     (ID_SC_WORLD_STATE, playerWorldState));
+		}
 	}	
 
 }
@@ -88,6 +93,9 @@ void GameServer::start() {
 
 		// send data to clients
 		broadcastWorldState();
+
+		//sleep
+		//sleep(1.0f/60.0f);
 	}
 
 	stop();       

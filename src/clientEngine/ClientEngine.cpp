@@ -5,6 +5,8 @@
 #include <common/GameMessages.hpp>
 #include "handlers/ClientLoginHandler.hpp"
 #include "handlers/ClientCustomHandler.hpp"
+#include "handlers/ClientEntitySpawnHandler.hpp"
+#include "handlers/ClientWorldStateHandler.hpp"
 
 #include <components/BodyCmp.hpp>
 #include <components/ClientPlayerSystem.hpp>
@@ -113,12 +115,23 @@ void ClientEngine::_registerHandlers() {
 				    (ClientEngine::Ptr(this)),
 				    {
 					    ID_SC_LOGIN_ACCEPTED,
-					    ID_CONNECTION_REQUEST_ACCEPTED,
-					    ID_SC_SPAWN_PLAYER,
+					    ID_CONNECTION_REQUEST_ACCEPTED
 				    });
 	
-	_netManager.registerHandler(std::make_shared<ClientCustomHandler<voyage::sc_worldState> >
-				     (&_eventManager), {ID_SC_WORLD_STATE});
+//	_netManager.registerHandler(std::make_shared<ClientCustomHandler<voyage::sc_worldState> >
+//				     (&_eventManager), {ID_SC_WORLD_STATE});
+
+	_netManager.registerHandler(std::make_shared<ClientWorldStateHandler>
+				    (ClientEngine::Ptr(this)), {ID_SC_WORLD_STATE});
+
+	_netManager.registerHandler(std::make_shared<ClientEntitySpawnHandler>
+				    (ClientEngine::Ptr(this)),
+				    {
+					    ID_SC_SPAWN_PLAYER,
+					    ID_SC_SPAWN_ENTITY,
+					    ID_SC_DESTROY_ENTITY,	    
+				    });
+
 	
 }
 

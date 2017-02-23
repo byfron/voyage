@@ -22,7 +22,7 @@ public:
 	Entity createPlayerEntity(int);
 	void createSubsystems();
 
-	voyage::sc_worldState computeWorldState();
+	voyage::sc_worldState computeWorldState(uint32_t player_ent_id);
 
 	ServerNetworkManager & getNetManager() { return _netManager; }
 	

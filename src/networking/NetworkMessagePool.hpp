@@ -12,6 +12,10 @@ public:
 
 	void pushEntityUpdateMsg(const voyage::sc_entityState & msg) {
 		m_entity_update_queue[msg.entityid()].push(msg);
+
+		if (m_entity_update_queue[msg.entityid()].size() > 3) {
+			m_entity_update_queue[msg.entityid()].pop();
+		}
 	}
 
 	voyage::sc_entityState popEntityUpdateMsg(uint32_t id) {
