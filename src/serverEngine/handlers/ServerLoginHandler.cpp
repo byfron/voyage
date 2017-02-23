@@ -6,6 +6,7 @@
 #include "voyage.pb.h"
 #include "../PlayerSession.hpp"
 #include <serverEngine/GameServer.hpp>
+#include <serverEngine/MessageFactory.hpp>
 
 namespace spd = spdlog;
 using namespace voyage;
@@ -50,21 +51,21 @@ void ServerLoginHandler::onMessage(RakNet::Packet *p) {
 		// Create player entity and send spawn message to client
 		BodyCmp *body = _gameServer->engine().entity_manager().
 			getComponentPtr<BodyCmp>(pe.id());
-		
-		sc_entitySpawn spawn_player;
-		spawn_player.set_entityid(pe.id().id);
-		spawn_player.set_x(body->m_position(0));
-		spawn_player.set_y(body->m_position(1));
-		Message<sc_entitySpawn>::Ptr spawn_msg = std::make_shared<Message<sc_entitySpawn> >(ID_SC_SPAWN_PLAYER, spawn_player);
 
-		// send it to all sessions!
-		_gameServer->broadcastMessage(spawn_msg);		
-		std::cout << "Broadcasting spawn NOW!!!!!!!!!!!!!" << std::endl;
 
-		// send creation of entities in current state!
 
+		Message<sc_entitySpawn>::Ptr spawn_msg =
+		MessageFactory::createSpawnPlayerMsg(pe.id().id, body);
+			       
+
+		// send its spawn to all the other sessions
+		_gameServer->broadcastMessageToAllButThis(session->getPlayerId(), spawn_msg);
+
+		// send spawn to every other player
 		
+		session->sendMessage(spawn_msg);
 		
+		// spawn every networked entity
 //		session->sendMessage(spawn_msg);
 
 		// 

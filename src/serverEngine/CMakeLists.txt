@@ -5,6 +5,7 @@ add_library(serverEngine
   PlayerSession.cpp
   ServerEngine.hpp
   ServerEngine.cpp
+  MessageFactory.hpp
   handlers/ServerLoginHandler.hpp
   handlers/ServerLoginHandler.cpp
   handlers/ServerDataHandler.hpp

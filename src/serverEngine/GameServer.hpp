@@ -17,6 +17,14 @@ public:
 	void broadcastWorldState();
 
 	template <typename T>
+	void broadcastMessageToAllButThis(uint32_t player_id, std::shared_ptr< Message<T> > m) {
+		for (auto session : _playerSessions) {
+			if (session.getPlayerId() != player_id)
+				session->sendMessage(m);
+		}			
+	}
+
+	template <typename T>
 	void broadcastMessage(std::shared_ptr< Message<T> > m) {
 		for (auto session : _playerSessions) {
 			session->sendMessage(m);
