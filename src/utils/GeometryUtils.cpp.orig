@@ -1,0 +1,238 @@
+#include "GeometryUtils.hpp"
+
+namespace GeometryUtils {
+<<<<<<< HEAD
+
+
+
+	/*
+
+	  ---------------
+	  | 0,0 | 0,1 |
+	  ---------------
+	  | 1,0 | 1,1 |
+	  ---------------
+	  | 2,0 | 2,1 | 
+
+	 */
+	
+	Vec3f getCorrectionVector(Vec3f int_point,
+				  AABB tile_box,
+				  Vec3f motion_vec) {
+
+		/*
+		//NOTE: the tilebox will always be aligned with the canonical 
+                // axis so we dont have to rotate it, and probably this can 
+                //be much more efficient
+
+		  A min(0),min(1)--- B min(0),max(1)
+		  |                  |
+		  |                  |
+		  C max(0),min(1)--- D max(0),max(1)
+
+		  ====================================
+		  A------------
+		  |
+		  o---x  // intersecting point
+		  |  /
+		  | /
+		  |/
+		  /
+		 /|
+		/ | 
+	       x  | <- edge of box2d
+                  C------------
+		*/
+
+		// check which side of box2d intersects with [last_point intersecting_point]
+		// compute orthogonal vector from x to the side
+		// return
+
+		
+
+		// 1. Check in which quadrant the origin point is up,down,left,right
+
+
+//		GeomtryUtils::getSide(tile_box, op);
+//		GeomtryUtils::getSide(tile_box, ip);
+
+		Vec2f op = Vec2f(int_point(0) - motion_vec(0), int_point(1) - motion_vec(1));
+		Vec2f ip = Vec2f(int_point(0), int_point(1));
+		
+		Vec2f A = TO_2DVEC(tile_box.m_min);
+		Vec2f D = TO_2DVEC(tile_box.m_max);
+		Vec2f C (tile_box.m_max(0), tile_box.m_min(1));
+		Vec2f B (tile_box.m_min(0), tile_box.m_max(1));
+				
+		Vec2f AB = B - A;
+		Vec2f BD = D - B;
+		Vec2f BA = -AB;
+		Vec2f DB = -BD;
+		Vec2f AC = C - A;
+		Vec2f CA = -AC;
+
+		Vec2f v;
+
+		if (AB.dot(op - A) < 0) { //AC side 
+
+			// compute vector form ip to AC
+			v =  -AB * AB.dot(ip - A);
+			
+
+		}else if (AB.dot(op - A) < AB.norm()) { //AB,CD 
+
+			if (BD.dot(op - B) < 0) { //AB side
+
+				v = -AC * AC.dot(ip - A);
+
+			}else if (BD.dot(op - B) < BD.norm()) { // inside
+				//	assert(false);
+
+			}
+			else { //CD side
+				v =  -CA * CA.dot(ip - C);
+			}
+			
+		}
+		else { //BD side
+			v = -BA * BA.dot(ip - B);
+		}
+
+		return Vec3f(v(0), v(1), 0.0f);
+=======
+	
+	void CalculateInterval(Vec2f Axis, GeometryUtils::Polygon P, float& min, float& max)
+	{
+		float d = Axis.dot(P.vertex[0]);
+		min = max = d;
+		for(int I = 0; I < P.num_vertices; I ++)
+		{
+			float d = P.vertex[I].dot(Axis);
+			if (d < min)
+				min = d;
+			else
+				if(d > max)
+					max = d;
+		}
+	}
+
+	bool AxisSeparatePolygons(Vec2f& Axis, GeometryUtils::Polygon A, GeometryUtils::Polygon B)
+	{
+		float mina, maxa;
+		float minb, maxb;
+
+		CalculateInterval(Axis, A, mina, maxa);
+		CalculateInterval(Axis, B, minb, maxb);
+
+		if (mina > maxb || minb > maxa)
+			return true;
+
+		// find the interval overlap
+		float d0 = maxa - minb;
+		float d1 = maxb - mina;
+		float depth = (d0 < d1)? d0 : d1;
+
+		// convert the separation axis into a push vector (re-normalise
+		// the axis and multiply by interval overlap)
+		float axis_length_squared = Axis.dot(Axis);
+
+		Axis *= depth / axis_length_squared;
+		return false;
+	}
+
+
+	bool Intersect(GeometryUtils::Polygon A, GeometryUtils::Polygon B)
+	{
+		int I = 0;
+		for(int J = A.num_vertices-1; I < A.num_vertices; J = I, I++)
+		{
+			Vec2f E = A.vertex[I] - A.vertex[J];
+			Vec2f N = Vec2f(-E(1), E(0));
+
+			if (AxisSeparatePolygons(N, A, B))
+				return false;
+		}
+
+		I = 0;
+		for(int J = B.num_vertices-1; I < B.num_vertices; J = I, I ++)
+		{
+			Vec2f E = B.vertex[I] - B.vertex[J];
+			Vec2f N = Vec2f(-E(1), E(0));
+
+			if (AxisSeparatePolygons(N, A, B))
+				return false;
+		}
+	}
+
+
+	Vec2f FindMTD(Vec2f* PushVector, int iNumVectors)
+	{
+		Vec2f MTD = PushVector[0];
+		float mind2 = PushVector[0].dot(PushVector[0]);
+		for(int I = 1; I < iNumVectors; I++)
+		{
+			float d2 = PushVector[I].dot(PushVector[I]);
+			if (d2 < mind2)
+			{
+				mind2 = d2;
+				MTD = PushVector[I];
+			}
+		}
+		return MTD;
+	}
+
+	bool IntersectMTD(GeometryUtils::Polygon A, GeometryUtils::Polygon B, Vec2f& MTD)
+	{
+		// potential separation axes. they get converted into push
+		Vec2f Axis[32];
+		// max of 16 vertices per polygon
+		int iNumAxis = 0;
+		int J,I;
+		for(J = A.num_vertices-1, I = 0; I < A.num_vertices; J = I, I ++)
+		{
+			Vec2f E = A.vertex[I] - A.vertex[J];
+			Axis[iNumAxis++] = Vec2f(-E(1), E(0));
+
+			if (AxisSeparatePolygons(Axis[iNumAxis-1], A, B))
+				return false;
+		}
+		for(J = B.num_vertices-1, I = 0; I < B.num_vertices; J = I, I ++)
+		{
+			Vec2f E = B.vertex[I] - B.vertex[J];
+			Axis[iNumAxis++] = Vec2f(-E(1), E(0));
+
+			if (AxisSeparatePolygons (Axis[iNumAxis-1], A, B))
+				return false;
+		}
+
+		// find the MTD among all the separation vectors
+		MTD = FindMTD(Axis, iNumAxis);
+
+		// makes sure the push vector is pushing A away from B
+		Vec2f D = A.centroid() - B.centroid();
+		if (D.dot(MTD) > 0.0f)
+			MTD = -MTD;
+
+		return true;
+	}
+
+	bool linePlaneIntersection(Vec3f ray, Vec3f rayOrigin, Vec3f normal,
+				   Vec3f planePoint, Vec3f & contact) {
+
+		ray.normalize();
+		float d = normal.dot(planePoint);
+
+		if (normal.dot(ray) == 0) {
+			return false; // No intersection, the line is parallel to the plane
+		}
+
+		// Compute the X value for the directed line ray intersecting the plane
+		float x = (d - normal.dot(rayOrigin)) / normal.dot(ray);
+
+		// output contact point
+		contact = rayOrigin + ray*x; //Make sure your ray vector is normalized
+		return true;
+>>>>>>> origin/master
+	}
+
+}
