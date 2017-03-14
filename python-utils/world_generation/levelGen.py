@@ -1,4 +1,4 @@
-from __future__ import division 
+from __future__ import division
 import random
 import numpy as np
 import pdb
@@ -6,8 +6,8 @@ from PIL import Image, ImageDraw
 import FbxCommon
 from fbx import *
 from collections import OrderedDict
-    
- 
+
+
 def saveScene(pFilename, pFbxManager, pFbxScene, pAsASCII=False ):
     ''' Save the scene using the Python FBX API '''
     exporter = FbxExporter.Create( pFbxManager, '' )
@@ -25,7 +25,7 @@ def saveScene(pFilename, pFbxManager, pFbxScene, pAsASCII=False ):
     exporter.Export( pFbxScene )
 
     exporter.Destroy()
-    
+
 def find_intersection( p0, p1, p2, p3 ) :
 
     s10_x = p1[0] - p0[0]
@@ -67,7 +67,7 @@ def find_intersection( p0, p1, p2, p3 ) :
 def findAdjacentRegions(graph, reg):
 
     reg_vertices = graph.voronoi_regions[reg]
-            
+
     neighbors = []
 
     #find regions with shared vertices that are NOT at the border
@@ -84,7 +84,7 @@ def findRidgeLength(graph, r1, r2):
 
     vidx1 = graph.polygons[r1];
     vidx2 = graph.polygons[r2];
-    
+
     intersect = np.intersect1d(vidx1, vidx2)
     return np.linalg.norm(graph.vertices[intersect[0],:] - graph.vertices[intersect[1],:])
 
@@ -99,7 +99,7 @@ class TriangleMesh:
         self.indices = []
         self.normals = []
         self.texuv = []
-        
+
 class Region:
     def __init__(self, polygon):
         self.moist = []
@@ -116,7 +116,7 @@ class Region:
 class Corridor:
 
     def __init__(self, points, width):
-        self.points = points;         
+        self.points = points;
         self.width = width;
 
 class Room:
@@ -125,7 +125,10 @@ class Room:
         self.centroid = []
         self.regions = regions;
         self.walls = walls; #pairs of vertices for each wall
-        
+        self.floor_vertices = [];
+        self.floor_indices = [];
+        self.uv_coords = []
+
 class GameLevel:
 
     def __init__(self, graph):
@@ -138,15 +141,15 @@ class GameLevel:
         self.create();
 
     def create(self):
-        
+
         #choose the starting region randomly
 
         starting_region_idx = 20;
 
         #choose it somehwre in the center
-        
+
         for i in range(self.graph.N):
-                reg = Region(self.graph.polygons[i])                
+                reg = Region(self.graph.polygons[i])
                 reg.adjacent_regions = findAdjacentRegions(self.graph, i)
                 self.regions.append(reg)
 
@@ -157,18 +160,18 @@ class GameLevel:
 
         self.valid_regions = []
         idx = 0
-        for reg in self.regions:            
+        for reg in self.regions:
             reg.isEdgeRegion = np.any(self.reg_vertex_counter[reg.polygon] == 1);
             if (not reg.isEdgeRegion):
                 self.valid_regions.append(idx)
             idx = idx + 1
 
-        
+
         starting_region_idx = self.valid_regions[random.randint(0, len(self.valid_regions)-1)]
         room = self.createRoom(starting_region_idx);
-        corridor = self.createCorridor(room)        
+        corridor = self.createCorridor(room)
 
-                
+
     def createCorridor(self, room):
         corridor_w = self.getRandomCorridorWidth();
 
@@ -181,7 +184,7 @@ class GameLevel:
             if length > corridor_w:
                 candidate_walls.append(wall)
 
-                
+
         #choose wall randomly
         wall = candidate_walls[random.randint(0, len(candidate_walls)-1)]
 
@@ -207,25 +210,25 @@ class GameLevel:
 
         room_centroid = np.mean(roomv, axis=0)
         room.centroid = np.array((room_centroid[0], room_centroid[1], 0))
-        
+
         #make sure that the direction is "outwards"
         if np.linalg.norm(middle_point + corridor_dir - room_centroid) < np.linalg.norm(middle_point - corridor_dir - room_centroid):
             corridor_dir = corridor_dir * -1;
-    
-        
+
+
         room_neighbors = []
-        
+
         #Find all neighbor regions of the room
         for reg in room.regions:
             adj_reg = findAdjacentRegions(self.graph, reg)
             #remove regions in the room
             adj_reg_clean = [x for x in adj_reg if (x not in room.regions and not self.regions[x].isEdgeRegion)]
-            
+
             room_neighbors = room_neighbors + adj_reg_clean
 
         # for reg in room_neighbors:
         #     self.regions[reg].color = 'yellow'
-            
+
         #Find intersecting points between corridor and neighbor regions
         corridor_points = []
         corridor_points.append(middle_point);
@@ -234,26 +237,26 @@ class GameLevel:
 
 
         self.corridors.append( Corridor(corridor_points, 2.0))
-        
+
         #randomly generate a small room here
-        
+
 
         #if we are at the edge of the world, make small prefab room and stop here
-        
+
 
         #decide of we keep with the corridor or we go back to room
 
-        
 
 
 
-            
-        
-        
+
+
+
+
     def computeCorridorSegment(self, middle_point, corridor_dir, room_neighbors, roomv):
 
         #CAST ONLY ONE RAY WHILE COMPUTING THE CORRIDOR
-        
+
         l1a = middle_point
         l1b = (middle_point + corridor_dir).tolist();
         R1l = []
@@ -262,7 +265,7 @@ class GameLevel:
             for idx in range(vv.shape[0]-1):
 
                 #TODO: if corridor intersects with the same room cancel it
-                
+
                 # skip walls that belong to the room itself
                 if not np.any(np.where((roomv == vv[idx+1,:]).all(axis=1))[0]):
                     l2a = vv[idx,:].tolist()
@@ -280,26 +283,26 @@ class GameLevel:
                 bestr1 = r1;
 
         return bestr1
-                               
+
 
     def getRandomCorridorWidth(self):
         return 0.025;
-        
+
     def getRandomRoomSize(self):
         return 3;
-    
+
 
     def createPrefabRoom(self):
         pass
-    
+
     def createRoom(self, region_idx):
 
         room_size = self.getRandomRoomSize();
         room_polygon = self.graph.polygons[region_idx];
 
         lengths = []
-        adjacent_regions = self.regions[region_idx].adjacent_regions        
-        
+        adjacent_regions = self.regions[region_idx].adjacent_regions
+
         for adj in adjacent_regions:
             length = findRidgeLength(self.graph, adj, region_idx)
             lengths.append(length)
@@ -308,14 +311,14 @@ class GameLevel:
         idx_largest_edges = np.argsort(lengths)[-room_size:]
 
 
-        room_regions = [adjacent_regions[i] for i in idx_largest_edges if not self.regions[adjacent_regions[i]].isEdgeRegion]        
+        room_regions = [adjacent_regions[i] for i in idx_largest_edges if not self.regions[adjacent_regions[i]].isEdgeRegion]
         room_regions.append(region_idx)
 
         for idx in room_regions:
             self.regions[idx].color = 'blue'
 
         vertices3d = np.hstack((self.graph.vertices, np.zeros((self.graph.vertices.shape[0],1))))
-            
+
         # find walls of the room. Every ridge between room regions
         # and non-room regions
         self.walls = []
@@ -327,43 +330,43 @@ class GameLevel:
             for adj_reg in adjacent_regions:
                 if (adj_reg not in room_regions):
                     vadj_reg = self.graph.polygons[adj_reg]
-                    cva = np.mean(self.graph.vertices[vadj_reg], axis=0);                    
-                    intersect = np.intersect1d(vreg, vadj_reg)                                      
+                    cva = np.mean(self.graph.vertices[vadj_reg], axis=0);
+                    intersect = np.intersect1d(vreg, vadj_reg)
                     if intersect.size:
                         iv0 = vertices3d[intersect[0]]
                         iv1 = vertices3d[intersect[1]]
                         #check if we have the region to the left or to the right
                         #to oder the wall indices properly
                         vdir = iv1 - iv0
-                        vcenter = cv - cva                        
+                        vcenter = cv - cva
                         if np.cross(vdir, vcenter)[2] > 0:
                             self.walls.append(intersect)
                         else:
                             self.walls.append(np.array([intersect[1], intersect[0]]))
-                            
+
         room = Room(room_regions, self.walls)
 
         # create doors in random walls
-        num_doors = 1
-        door_wall_idx = random.randint(0, len(room.walls)-1)
-        door_wall = room.walls[door_wall_idx]
+        # num_doors = 1
+        # door_wall_idx = random.randint(0, len(room.walls)-1)
+        # door_wall = room.walls[door_wall_idx]
 
-        dv1 = vertices3d[door_wall[0]]
-        dv2 = vertices3d[door_wall[1]]
-        doorv = dv2-dv1
-        middle_door = (dv1 + dv2)/2
-        door_width = 0.25
-        door_edge1 = middle_door - doorv*door_width/2
-        door_edge2 = middle_door + doorv*door_width/2
-        exit_vector = np.array([door_edge1[1], -door_edge1[0]])
-        
-        idx_new_vertex = self.graph.vertices.shape[0]
-        self.graph.vertices = np.vstack([self.graph.vertices, door_edge1[0:2]])
-        self.graph.vertices = np.vstack([self.graph.vertices, door_edge2[0:2]])
+        # dv1 = vertices3d[door_wall[0]]
+        # dv2 = vertices3d[door_wall[1]]
+        # doorv = dv2-dv1
+        # middle_door = (dv1 + dv2)/2
+        # door_width = 0.25
+        # door_edge1 = middle_door - doorv*door_width/2
+        # door_edge2 = middle_door + doorv*door_width/2
+        # exit_vector = np.array([door_edge1[1], -door_edge1[0]])
 
-        room.walls.pop(door_wall_idx)
-        room.walls.append((door_wall[0], idx_new_vertex))
-        room.walls.append((idx_new_vertex+1, door_wall[1]))
+        # idx_new_vertex = self.graph.vertices.shape[0]
+        # self.graph.vertices = np.vstack([self.graph.vertices, door_edge1[0:2]])
+        # self.graph.vertices = np.vstack([self.graph.vertices, door_edge2[0:2]])
+
+        # room.walls.pop(door_wall_idx)
+        # room.walls.append((door_wall[0], idx_new_vertex))
+        # room.walls.append((idx_new_vertex+1, door_wall[1]))
 
         self.rooms.append(room)
         return room;
@@ -375,7 +378,7 @@ class GameLevel:
 
         lResult = FbxCommon.SaveScene(lSdkManager, lScene, 'test2')
 #        saveScene('test', lSdkManager, lScene)
-    
+
         lSdkManager.Destroy()
 
     def createFbxScene(self, pSdkManager, pScene):
@@ -387,58 +390,182 @@ class GameLevel:
         lSceneInfo.mKeywords = "deformed cylinder"
         lSceneInfo.mComment = "no particular comments required."
         pScene.SetSceneInfo(lSceneInfo)
-        
+
         sceneControlPoints = []
 
         # add the polygon at the bottom. Each voronoi region is convex so is very easy to create
         # a triangle mesh
-        
+
         # walls are created with two triangles per wall and two more triangles for top
         for room in self.rooms:
             tMesh = self.convertRoomToTriangleMesh(room);
             roomMesh = FbxMesh.Create( pSdkManager, 'Room')
 
-            # Set the normals on Layer 0.
-            # lLayer = roomMesh.GetLayer(0)
-            # if lLayer == None:
-            #     roomMesh.CreateLayer()
-            #     lLayer = roomMesh.GetLayer(0)
-                
-            # lLayerNormal= FbxLayerElementNormal.Create(roomMesh, "")
-            # lLayerNormal.SetMappingMode(FbxLayerElement.eByControlPoint)
-            # lLayerNormal.SetReferenceMode(FbxLayerElement.eDirect)
+            #Set the normals on Layer 0.
+            lLayer = roomMesh.GetLayer(0)
+            if lLayer == None:
+                roomMesh.CreateLayer()
+                lLayer = roomMesh.GetLayer(0)
+
+            lLayerNormal= FbxLayerElementNormal.Create(roomMesh, "")
+            lLayerNormal.SetMappingMode(FbxLayerElement.eByControlPoint)
+            lLayerNormal.SetReferenceMode(FbxLayerElement.eDirect)
 
             N = len(tMesh.vertices)
-            
+
             roomMesh.InitControlPoints(N)
 
+            #center the room at the mean. Remove this later
+            av = np.mean(tMesh.vertices, axis=0)
+            tMesh.vertices = tMesh.vertices - av
+
             for i in range(N):
-                fbxv = FbxVector4(int(tMesh.vertices[i][0]*100),
-                                  int(tMesh.vertices[i][1]*100),
-                                  int(tMesh.vertices[i][2]*100))
-                
+                fbxv = FbxVector4(tMesh.vertices[i][0]*10,
+                                  tMesh.vertices[i][1]*10,
+                                  tMesh.vertices[i][2]*10)
+
+                lLayerNormal.GetDirectArray().Add(FbxVector4(0.0, 0.0, 1.0))
                 roomMesh.SetControlPointAt(fbxv, i)
 
-            # for idx_triangle in tMesh.indices:
-            #     for vtri in range(3):         
-            #         lLayerNormal.GetDirectArray().Add(FbxVector4(0.0, 0.0, 1.0))
-                    
-            for idx_triangle in tMesh.indices:                
+            lLayer.SetNormals(lLayerNormal)
+
+            UVLayer = self.createFloorTextureLayer(room, roomMesh)
+            UVLayer.GetIndexArray().SetCount(len(tMesh.indices)*3) #as many UV coordinate as vertices
+
+            #add floor polygon
+            idx_vertex = 0
+            for idx_triangle in tMesh.indices:
                 roomMesh.BeginPolygon()
                 for vtri in range(3):
                     roomMesh.AddPolygon(idx_triangle[vtri])
+                    UVLayer.GetIndexArray().SetAt(idx_vertex, idx_triangle[vtri])
+                    idx_vertex = idx_vertex + 1
+
                 roomMesh.EndPolygon();
-                
-            #lLayer.SetNormals(lLayerNormal)            
-                
+
+
             roomNode = FbxNode.Create(pSdkManager, "Room")
             roomNode.SetNodeAttribute(roomMesh);
             roomNode.LclScaling.Set(FbxDouble3(1.0, 1.0, 1.0))
             roomNode.LclTranslation.Set(FbxDouble3(0.0, 0.0, 0.0))
             roomNode.LclRotation.Set(FbxDouble3(0.0, 0.0, 0.0))
+            roomNode.SetShadingMode(FbxNode.eTextureShading)
+
+            self.createFloorMaterial(pSdkManager, roomMesh)
 
         pScene.GetRootNode().AddChild(roomNode)
 
+    def createFloorMaterial(self, pSdkManager, roomMesh):
+
+        lLayer = roomMesh.GetLayer(0)
+        if lLayer == None:
+            roomMesh.CreateLayer()
+        lLayer = roomMesh.GetLayer(0)
+
+        lMaterial = None
+
+        # get the node of mesh, add material for it.
+        lNode = roomMesh.GetNode()
+        if lNode:
+            lMaterial = lNode.GetSrcObject(FbxCriteria.ObjectType(FbxSurfacePhong.ClassId), 0)
+            pdb.set_trace()
+            if not lMaterial:
+                lMaterialName = "toto"
+                lShadingName  = "Phong"
+                lBlack = FbxDouble3(0.0, 0.0, 0.0)
+                lRed = FbxDouble3(1.0, 0.0, 0.0)
+                lDiffuseColor = FbxDouble3(0.75, 0.75, 0.0)
+                lMaterial = FbxSurfacePhong.Create(pSdkManager, lMaterialName)
+
+                # Generate primary and secondary colors.
+                lMaterial.Emissive.Set(lBlack)
+                lMaterial.Ambient.Set(lRed)
+                lMaterial.AmbientFactor.Set(1.)
+                # Add texture for diffuse channel
+                lMaterial.Diffuse.Set(lDiffuseColor)
+                lMaterial.DiffuseFactor.Set(1.)
+                lMaterial.TransparencyFactor.Set(0.4)
+                lMaterial.ShadingModel.Set(lShadingName)
+                lMaterial.Shininess.Set(0.5)
+                lMaterial.Specular.Set(lBlack)
+                lMaterial.SpecularFactor.Set(0.3)
+
+                lNode.AddMaterial(lMaterial)
+
+        lTexture = FbxFileTexture.Create(pSdkManager,"Diffuse Texture")
+        # Set texture properties.
+        lTexture.SetFileName("floor.jpg") # Resource file is in current directory.
+        lTexture.SetTextureUse(FbxTexture.eStandard)
+        lTexture.SetMappingType(FbxTexture.eUV)
+        lTexture.SetMaterialUse(FbxFileTexture.eModelMaterial)
+        lTexture.SetSwapUV(False)
+        lTexture.SetTranslation(0.0, 0.0)
+        lTexture.SetScale(1.0, 1.0)
+        lTexture.SetRotation(0.0, 0.0)
+
+        #connect tex. with material
+        if lMaterial:
+            pdb.set_trace()
+            lMaterial.Diffuse.ConnectSrcObject(lTexture)
+
+
+    def createFloorTextureLayer(self, room, roomMesh):
+
+        lLayer = roomMesh.GetLayer(0)
+        if lLayer == None:
+            roomMesh.CreateLayer()
+        lLayer = roomMesh.GetLayer(0)
+
+        # Set texture mapping for diffuse channel.
+        # lTextureDiffuseLayer=FbxLayerElementTexture.Create(roomMesh, "Diffuse Texture")
+        # lTextureDiffuseLayer.SetMappingMode(FbxLayerElement.eByPolygon)
+        # lTextureDiffuseLayer.SetReferenceMode(FbxLayerElement.eIndexToDirect)
+        # lLayer.SetTextures(FbxLayerElement.eTextureDiffuse, lTextureDiffuseLayer)
+
+        # Create UV for Diffuse channel
+        lUVDiffuseLayer = FbxLayerElementUV.Create(roomMesh, "DiffuseUV")
+        lUVDiffuseLayer.SetMappingMode(FbxLayerElement.eByPolygonVertex)
+        lUVDiffuseLayer.SetReferenceMode(FbxLayerElement.eIndexToDirect)
+        lLayer.SetUVs(lUVDiffuseLayer, FbxLayerElement.eTextureDiffuse)
+
+        #get image
+        im = Image.open("floor.jpg")
+        imsize = im.size;
+
+        #get room square
+        scale = 1000
+        minrv = np.min(room.floor_vertices, axis=0)
+        maxrv = np.max(room.floor_vertices, axis=0)
+        top_left = minrv[0:2]*scale
+        bottom_right = maxrv[0:2]*scale
+        room_height = bottom_right[0] - top_left[0]
+        room_width = bottom_right[1] - top_left[1]
+
+        #re-scale the image to match the room
+        factor = 1
+        if room_height > room_width:
+            factor = room_height/imsize[0]
+        else:
+            factor = room_width/imsize[1]
+
+        im = im.resize((int(imsize[0]*factor)+1,int(imsize[1]*factor)+1), Image.ANTIALIAS)
+        imsize = im.size;
+
+        #compute UV coordinates for each vertex
+        for v in room.floor_vertices:
+            coords_world = (v - minrv)*scale
+            coords_world[0] = 1 - coords_world[0]/room_height
+            coords_world[1] = 1 - coords_world[1]/room_width
+            room.uv_coords.append(coords_world)
+            uvVec = FbxVector2(coords_world[1], coords_world[0])
+            print uvVec
+            lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+
+        pdb.set_trace()
+
+        return lUVDiffuseLayer
+
+    #TODO def createFloorMesh
     def convertRoomToTriangleMesh(self, room):
 
         mesh = TriangleMesh();
@@ -454,9 +581,9 @@ class GameLevel:
             i0 = self.regions[reg].polygon[0]
 
             all_indices = all_indices + self.regions[reg].polygon
-            
+
             for ipol in range(1,len(self.regions[reg].polygon)-1):
-                
+
                 i1 = self.regions[reg].polygon[ipol]
                 i2 = self.regions[reg].polygon[ipol+1]
 
@@ -479,64 +606,55 @@ class GameLevel:
                 v01 = v01/np.linalg.norm(v01)
                 v12 = v12/np.linalg.norm(v12)
                 n = np.cross(v01,v12);
-
-                if n[2] > 0:                                
+                if n[2] < 0:
                     triangles.append((i0,i1,i2))
                 else:
                     triangles.append((i2,i1,i0))
 
-
-
-
         wall_vertices = []
         wall_indices = []
         wall_height = 0.05
-        unique_indices = list(OrderedDict.fromkeys(all_indices))                    
+        unique_indices = list(OrderedDict.fromkeys(all_indices))
         floor_vertices = vertices3d[unique_indices,:]
         index_dict = dict(zip(unique_indices, range(len(unique_indices))))
-        
+
         mapped_triangles = []
         for tri in triangles:
             mapped_tri = [index_dict[i] for i in tri]
             mapped_triangles.append(mapped_tri)
-        
+
+        room.floor_indices = mapped_triangles;
+
         wall_idx = len(unique_indices)
         wall_vertices = np.zeros((len(room.walls)*4,3))
         idx = 0
 
         #add the walls
-        for wall in room.walls:
-            v1 = vertices3d[wall[0],:]
-            v2 = vertices3d[wall[1],:]
-            v3 = np.copy(v1)
-            v3[2] = wall_height
-            v4 = np.copy(v2)
-            v4[2] = wall_height
+        # for wall in room.walls:
+        #     v1 = vertices3d[wall[0],:]
+        #     v2 = vertices3d[wall[1],:]
+        #     v3 = np.copy(v1)
+        #     v3[2] = wall_height
+        #     v4 = np.copy(v2)
+        #     v4[2] = wall_height
 
-            wall_vertices[idx+0] = v1
-            wall_vertices[idx+1] = v2
-            wall_vertices[idx+2] = v3
-            wall_vertices[idx+3] = v4
-            idx = idx + 4
+        #     wall_vertices[idx+0] = v1
+        #     wall_vertices[idx+1] = v2
+        #     wall_vertices[idx+2] = v3
+        #     wall_vertices[idx+3] = v4
+        #     idx = idx + 4
 
-            #invert order dependeing on centroid
-            n = np.cross(v1 - v2, room.centroid - v2)
-            mapped_triangles.append((wall_idx+2,wall_idx+1,wall_idx))
-            mapped_triangles.append((wall_idx+2,wall_idx+3,wall_idx+1))
-#            if n[2] < 0:                        
+        #     #invert order dependeing on centroid
+        #     #n = np.cross(v1 - v2, room.centroid - v2)
+        #     mapped_triangles.append((wall_idx,wall_idx+1,wall_idx+2))
+        #     mapped_triangles.append((wall_idx+1,wall_idx+3,wall_idx+2))
+        #     wall_idx = wall_idx + 4
 
-
- #           else:
-  #              mapped_triangles.append((wall_idx,wall_idx+1,wall_idx+2))
-   #             mapped_triangles.append((wall_idx+1,wall_idx+3,wall_idx+2))
-                
-            wall_idx = wall_idx + 4
-    
-
-        mesh.vertices = np.vstack((floor_vertices, wall_vertices))
+        mesh.vertices = np.vstack(floor_vertices)#, wall_vertices))
         mesh.indices = mapped_triangles
 
-        
+        room.floor_vertices = floor_vertices
+
         return mesh
 
     def show(self, ntiles):
@@ -559,14 +677,14 @@ class GameLevel:
         for wall in self.walls:
             vwall = self.graph.vertices[wall,:]
             po = (vwall - top_left) * scale
-            
+
             p1 = po[0].astype(int)
             p2 = po[1].astype(int)
 
             ImageDraw.Draw(img).ellipse((p1 - 5).tolist() + (p1+5).tolist(), fill='green')
             ImageDraw.Draw(img).ellipse((p2 - 5).tolist() + (p2+5).tolist(), fill='red')
-                                         
-           # ImageDraw.Draw(img).line(np.hstack(po.astype(int)).tolist(), fill='red', width=5)    
+
+           # ImageDraw.Draw(img).line(np.hstack(po.astype(int)).tolist(), fill='red', width=5)
 
 
         # cline1 =  np.vstack((self.corridors[0].points[0], self.corridors[0].points[1]))
@@ -575,7 +693,6 @@ class GameLevel:
 
         # cline2 =  np.vstack((self.corridor[1], self.corridor[3]))
         # po2 = (cline2 - top_left) * scale
-        # ImageDraw.Draw(img).line(np.hstack(po2.astype(int)).tolist(), fill='green', width=5)    
-            
-        img.show()        
-            
+        # ImageDraw.Draw(img).line(np.hstack(po2.astype(int)).tolist(), fill='green', width=5)
+
+        img.show()

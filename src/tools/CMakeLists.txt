@@ -1,8 +1,12 @@
-add_executable(fbx_viewer fbx_view_app.cpp)
+add_executable(fbx_viewer
+  fbx_view_app.cpp
+  fbx_loader.hpp
+  fbx_loader.cpp)
 target_link_libraries(fbx_viewer
   fbxsdk
   dl
   X11
   GL
+  pumpkin_engine
   ${BGFX_LIBS}
 )
