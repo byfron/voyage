@@ -8,6 +8,10 @@
 # target_include_directories(server PUBLIC
 #   ${CMAKE_CURRENT_SOURCE_DIR})
 
+SET(BGFX_LIBS
+  "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libexample-commonRelease.a"
+  "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbxRelease.a"
+  "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbgfxRelease.a")
 
 add_executable(client clients/main_client.cpp)
 target_link_libraries(client
@@ -18,11 +22,8 @@ target_link_libraries(client
   dl
   scriptSystem
   gameEngine
-  ${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libexample-commonRelease.a
-  ${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbxRelease.a
-  ${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbgfxRelease.a
+  ${BGFX_LIBS}
   )
-
 
 add_executable(server main_server.cpp)
 target_link_libraries(server
@@ -54,5 +55,6 @@ add_subdirectory(serverEngine)
 add_subdirectory(game)
 add_subdirectory(database)
 add_subdirectory(utils)
+add_subdirectory(tools)
 
 #add_subdirectory(scripts)
