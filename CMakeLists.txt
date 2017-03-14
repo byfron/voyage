@@ -81,7 +81,7 @@ SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_RUNTIME OFF)
 SET(Boost_INCLUDE_DIRS "/usr/local/include/boost")
 SET(Boost_LIBRARIES "/usr/local/lib/libboost_python.so")
-INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}" "/usr/include/python2.6")
+INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}" "/usr/include/python2.7")
 include_directories(${PYTHON_INCLUDE_PATH})
 
 #######################

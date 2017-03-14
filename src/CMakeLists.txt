@@ -20,7 +20,7 @@ target_link_libraries(client
   gameEngine
   ${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libexample-commonRelease.a
   ${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbxRelease.a
-  ${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbgfxRelease.a  
+  ${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbgfxRelease.a
   )
 
 
@@ -32,6 +32,7 @@ target_link_libraries(server
   gameEngine
   components
   utils
+  ${PYTHON_LIBRARIES}
   ${Boost_LIBRARIES}
   )
 
