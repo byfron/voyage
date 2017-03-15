@@ -630,27 +630,27 @@ class GameLevel:
         idx = 0
 
         #add the walls
-        # for wall in room.walls:
-        #     v1 = vertices3d[wall[0],:]
-        #     v2 = vertices3d[wall[1],:]
-        #     v3 = np.copy(v1)
-        #     v3[2] = wall_height
-        #     v4 = np.copy(v2)
-        #     v4[2] = wall_height
+        for wall in room.walls:
+            v1 = vertices3d[wall[0],:]
+            v2 = vertices3d[wall[1],:]
+            v3 = np.copy(v1)
+            v3[2] = wall_height
+            v4 = np.copy(v2)
+            v4[2] = wall_height
 
-        #     wall_vertices[idx+0] = v1
-        #     wall_vertices[idx+1] = v2
-        #     wall_vertices[idx+2] = v3
-        #     wall_vertices[idx+3] = v4
-        #     idx = idx + 4
+            wall_vertices[idx+0] = v1
+            wall_vertices[idx+1] = v2
+            wall_vertices[idx+2] = v3
+            wall_vertices[idx+3] = v4
+            idx = idx + 4
 
-        #     #invert order dependeing on centroid
-        #     #n = np.cross(v1 - v2, room.centroid - v2)
-        #     mapped_triangles.append((wall_idx,wall_idx+1,wall_idx+2))
-        #     mapped_triangles.append((wall_idx+1,wall_idx+3,wall_idx+2))
-        #     wall_idx = wall_idx + 4
+            #invert order dependeing on centroid
+            #n = np.cross(v1 - v2, room.centroid - v2)
+            mapped_triangles.append((wall_idx,wall_idx+1,wall_idx+2))
+            mapped_triangles.append((wall_idx+1,wall_idx+3,wall_idx+2))
+            wall_idx = wall_idx + 4
 
-        mesh.vertices = np.vstack(floor_vertices)#, wall_vertices))
+        mesh.vertices = np.vstack((floor_vertices, wall_vertices))
         mesh.indices = mapped_triangles
 
         room.floor_vertices = floor_vertices

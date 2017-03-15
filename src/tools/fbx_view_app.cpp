@@ -103,7 +103,7 @@ class FbxViewer : public entry::AppI
 
 		cameraCreate();
 
-		const float initialPos[3] = { 0.0f, 2.0f, -12.0f };
+		const float initialPos[3] = { 0.0f, 0.0f, -5.0f };
 		cameraSetPosition(initialPos);
 		cameraSetVerticalAngle(0.0f);
 
@@ -113,6 +113,8 @@ class FbxViewer : public entry::AppI
 		imageCheckerboard(data, 32, 32, 4, 0xff808080, 0xffc0c0c0);
 
 		m_sprite = ddCreateSprite(32, 32, data);
+
+		s_texColor  = bgfx::createUniform("s_texColor",  bgfx::UniformType::Int1);
 
 
 			// Prepare the FBX SDK.
@@ -158,6 +160,12 @@ class FbxViewer : public entry::AppI
 		ddShutdown();
 
 		cameraDestroy();
+
+		bgfx::destroyDynamicIndexBuffer(m_ibh);
+		bgfx::destroyDynamicVertexBuffer(m_vbh);
+		bgfx::destroyProgram(m_program);
+		bgfx::destroyTexture(m_textureColor);
+		bgfx::destroyUniform(s_texColor);
 
 		// Shutdown bgfx.
 		bgfx::shutdown();
@@ -207,18 +215,31 @@ class FbxViewer : public entry::AppI
 		FbxVector4* controlPoints = pMesh->GetControlPoints();
 		int num_triangles = pMesh->GetPolygonCount();
 
+		// TODO: texture should be in the mesh.
+		// Load diffuse texture.
+		m_textureColor = loadTexture("textures/floor.ktx");
 
+		// Layer 0?
+		FbxGeometryElementUV* leUV = pMesh->GetElementUV(0);
+
+		assert(pMesh->GetElementUVCount() == 1);
 
 		for (int i = 0; i < num_vertices; i++)
 		{
 
-			pumpkin::PosColorVertex p;
+			pumpkin::PosNormalTexCoordVertex p;
 			p.m_x = controlPoints[i][0];
 			p.m_y = controlPoints[i][1];
 			p.m_z = controlPoints[i][2];
+			p.m_normal = pumpkin::NORMAL_POSZ;
 
-			int color_idx = i%2;
-			p.m_abgr = s_colors[color_idx];
+			FbxVector2 uvCoord = leUV->GetDirectArray().GetAt(i);
+
+			std::cout << p.m_x << "," << p.m_y << "," << uvCoord[0] << "," << uvCoord[1] << std::endl;
+
+			p.m_u = uvCoord[0]*0x7fff;
+			p.m_v = uvCoord[1]*0x7fff;
+
 			m_scene_vertices.push_back(p);
 		}
 
@@ -238,8 +259,8 @@ class FbxViewer : public entry::AppI
 		// 	std::cout << idx << std::endl;
 		// }
 
-		pumpkin::PosColorVertex::init();
-		m_program = loadProgram("vs_cubes", "fs_cubes");
+		pumpkin::PosNormalTexCoordVertex::init();
+		m_program = loadProgram("vs_test", "fs_test");
 
 		// 	// Create static vertex buffer.
 		// m_vbh = bgfx::createVertexBuffer(
@@ -257,8 +278,8 @@ class FbxViewer : public entry::AppI
 		// return;
 
 		const bgfx::Memory* mem;
-		mem = bgfx::makeRef(&m_scene_vertices[0], sizeof(pumpkin::PosColorVertex)*m_scene_vertices.size());
-		m_vbh = bgfx::createDynamicVertexBuffer(mem, pumpkin::PosColorVertex::ms_decl);
+		mem = bgfx::makeRef(&m_scene_vertices[0], sizeof(pumpkin::PosNormalTexCoordVertex)*m_scene_vertices.size());
+		m_vbh = bgfx::createDynamicVertexBuffer(mem, pumpkin::PosNormalTexCoordVertex::ms_decl);
 		mem = bgfx::makeRef(&m_scene_triangles[0], sizeof(uint16_t) * m_scene_triangles.size() );
 		m_ibh = bgfx::createDynamicIndexBuffer(mem);
 
@@ -317,7 +338,11 @@ class FbxViewer : public entry::AppI
 			bx::mtxProj(proj, 45.0f, float(m_width)/float(m_height), 1.0f, 15.0f);
 			bx::mtxMul(mvp, view, proj);
 
-			// bgfx::setState(0
+			ddDrawOrb(0.0f, 0.0f, 0.0f, 1.0f);
+
+			// bgfx::setState(0 |
+			// 			   BGFX_STATE_DEFAULT |
+			// 			   BGFX_STATE_CULL_CCW);
 			// 			   | BGFX_STATE_DEFAULT
 			// 			   | BGFX_STATE_PT_TRISTRIP
 			// 	);
@@ -327,144 +352,10 @@ class FbxViewer : public entry::AppI
 
 			bgfx::setVertexBuffer(m_vbh);
 			bgfx::setIndexBuffer(m_ibh);
-
+			// Bind textures.
+			bgfx::setTexture(0, s_texColor,  m_textureColor);
 
 			bgfx::submit(0, m_program);
-
-
-
-			// ddBegin(0);
-			// // ddDrawAxis(0.0f, 0.0f, 0.0f);
-
-			// // ddPush();
-			// // 	ddSetColor(0xff00ff00);
-
-			// // 	Aabb aabb =
-			// // 	{
-			// // 		{  5.0f, 1.0f, 1.0f },
-			// // 		{ 10.0f, 5.0f, 5.0f },
-			// // 	};
-			// // 	ddDraw(aabb);
-			// // ddPop();
-
-			// float time = float(now/freq);
-
-			// // Obb obb;
-			// // bx::mtxRotateX(obb.m_mtx, time);
-			// // ddSetWireframe(true);
-			// // ddDraw(obb);
-
-			// // ddSetColor(0xffffffff);
-			// // bx::mtxSRT(obb.m_mtx, 1.0f, 1.0f, 1.0f, 0.0f, time, 0.0f, 3.0f, 0.0f, 0.0f);
-			// // ddSetWireframe(false);
-			// // ddDraw(obb);
-
-			// // ddSetTranslate(0.0f, -2.0f, 0.0f);
-			// // ddDrawGrid(Axis::Y, zero, 20, 1.0f);
-			// // ddSetTransform(NULL);
-
-			// // ddDrawFrustum(mvp);
-
-			// // ddPush();
-			// // 	Sphere sphere = { { 0.0f, 5.0f, 0.0f }, 1.0f };
-			// // 	ddSetColor(0xfff0c0ff);
-			// // 	ddSetWireframe(true);
-			// // 	ddSetLod(3);
-			// // 	ddDraw(sphere);
-			// // 	ddSetWireframe(false);
-
-			// // 	ddSetColor(0xc0ffc0ff);
-			// // 	sphere.m_center[0] = -2.0f;
-			// // 	ddSetLod(2);
-			// // 	ddDraw(sphere);
-
-			// // 	ddSetColor(0xa0f0ffff);
-			// // 	sphere.m_center[0] = -4.0f;
-			// // 	ddSetLod(1);
-			// // 	ddDraw(sphere);
-
-			// // 	ddSetColor(0xffc0ff00);
-			// // 	sphere.m_center[0] = -6.0f;
-			// // 	ddSetLod(0);
-			// // 	ddDraw(sphere);
-			// // ddPop();
-
-			// // ddSetColor(0xffffffff);
-
-			// // ddPush();
-			// // {
-			// // 	float normal[3] = {  0.0f, 0.0f, 1.0f };
-			// // 	float center[3] = { -8.0f, 0.0f, 0.0f };
-			// // 	ddPush();
-			// // 		ddSetStipple(true, 1.0f, time*0.1f);
-			// // 		ddSetColor(0xff0000ff);
-			// // 		ddDrawCircle(normal, center, 1.0f, 0.5f + bx::fsin(time*10.0f) );
-			// // 	ddPop();
-
-			// // 	ddSetSpin(time);
-			// // 	ddDrawQuad(m_sprite, normal, center, 2.0f);
-			// // }
-			// // ddPop();
-
-			// // ddPush();
-			// // 	ddSetStipple(true, 1.0f, -time*0.1f);
-			// // 	ddDrawCircle(Axis::Z, -8.0f, 0.0f, 0.0f, 1.25f, 2.0f);
-			// // ddPop();
-
-			// // ddPush();
-			// // 	ddSetLod(UINT8_MAX);
-
-			// // 	ddPush();
-			// // 		ddSetSpin(time*0.3f);
-			// // 		{
-			// // 			float from[3] = { -11.0f, 4.0f,  0.0f };
-			// // 			float to[3]   = { -13.0f, 6.0f,  1.0f };
-			// // 			ddDrawCone(from, to, 1.0f );
-			// // 		}
-
-			// // 		{
-			// // 			float from[3] = {  -9.0f, 2.0f, -1.0f };
-			// // 			float to[3]   = { -11.0f, 4.0f,  0.0f };
-			// // 			ddDrawCylinder(from, to, 0.5f );
-			// // 		}
-			// // 	ddPop();
-
-			// // 	{
-			// // 		float from[3] = {  0.0f, 7.0f, 0.0f };
-			// // 		float to[3]   = { -6.0f, 7.0f, 0.0f };
-			// // 		ddDrawCylinder(from, to, 0.5f, true);
-			// // 	}
-			// // ddPop();
-
-			// // ddPush();
-
-			// // 	float mtx[16];
-			// // 	bx::mtxSRT(mtx
-			// // 		, 1.0f, 1.0f, 1.0f
-			// // 		, 0.0f, time, time*0.53f
-			// // 		, -10.0f, 1.0f, 10.0f
-			// // 		);
-
-			// // 	Cylinder cylinder =
-			// // 	{
-			// // 		{ -10.0f, 1.0f, 10.0f },
-			// // 		{ 0.0f, 0.0f, 0.0f },
-			// // 		1.0f
-			// // 	};
-
-			// // 	float up[3] = { 0.0f, 4.0f, 0.0f };
-			// // 	bx::vec3MulMtx(cylinder.m_end, up, mtx);
-			// // 	ddDraw(cylinder);
-
-			// // 	toAabb(aabb, cylinder);
-			// // 	ddSetColor(0xff0000ff);
-			// // 	ddDraw(aabb);
-
-			// // ddPop();
-
-		    // ddDrawOrb(-11.0f, 0.0f, 0.0f, 1.0f);
-
-			// ddEnd();
 
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
@@ -490,13 +381,13 @@ class FbxViewer : public entry::AppI
 	FbxScene* _scene = NULL;
 	bool _result;
 
-	std::vector<pumpkin::PosColorVertex> m_scene_vertices;
+	std::vector<pumpkin::PosNormalTexCoordVertex> m_scene_vertices;
 	std::vector<uint16_t> m_scene_triangles;
 
 	bgfx::DynamicVertexBufferHandle m_vbh;
 	bgfx::DynamicIndexBufferHandle m_ibh;
-//	bgfx::VertexBufferHandle m_vbh;
-//	bgfx::IndexBufferHandle m_ibh;
+	bgfx::UniformHandle s_texColor;
+	bgfx::TextureHandle m_textureColor;
 	bgfx::ProgramHandle m_program;
 };
 
