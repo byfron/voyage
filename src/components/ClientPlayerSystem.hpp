@@ -25,7 +25,7 @@ static unsigned long getTimeSinceEpochMillis()
 using namespace PlayerInput;
 
 class ClientPlayerSystem : public PlayerSystem {
-	
+
 public:
 
 	ClientPlayerSystem(World::Ptr world,
@@ -36,13 +36,13 @@ public:
 
 		// search for entity and update network component
 		m_action_queue.push(UserAction());
-		
+
 	}
 
 	void sendActionToServer(const UserAction & action) {
 
 		assert(GameEngine::isClient);
-		
+
 		voyage::cs_userAction actionMsg;
 		actionMsg.set_seq_num(action.seq_num);
 		actionMsg.set_motion_x(action.motion_vec(0));
@@ -50,19 +50,17 @@ public:
 		actionMsg.set_angle(action.angle);
 		actionMsg.set_delta(action.delta);
 		actionMsg.set_timestamp(getTimeSinceEpochMillis());
-		
+
 		m_network_manager.sendData<voyage::cs_userAction>(ID_CS_USER_ACTION, actionMsg);
-	}	
+	}
 
 	// Computes the player state with the last state from the server and the queue of
 	// UserActions
-	BodyState computeConsistentState(const voyage::sc_playerState & server_state) {		
-		
-	}
-	
-	void update(EntityManager & em, EventManager &evm, float delta ) {
+	BodyState computeConsistentState(const voyage::sc_playerState & server_state) {
 
-		GameMap::Ptr game_map = m_world->getGameMap();
+	}
+
+	void update(EntityManager & em, EventManager &evm, float delta ) {
 
 		em.each<NetworkCmp, PlayerCmp, BodyCmp>
 			([&em, delta, this](Entity entity,
@@ -70,7 +68,7 @@ public:
 					    PlayerCmp &player,
 					    BodyCmp & body) {
 
-				
+
 			// Update with input data
 			if (entity.id().id == GameEngine::m_playerId)
 			{
@@ -78,13 +76,13 @@ public:
 
 				// send the delta with the user action now
 				action.delta = delta;
-				
+
 				UserAction last_action = m_action_queue.back();
 
 				// TODO: Only when the action changes?
 				// we register it and send ot to the server
-				//	if (action != last_action) 
-				{						
+				//	if (action != last_action)
+				{
 					action.seq_num = m_action_seq_num++;
 					m_action_queue.push(action);
 
@@ -95,13 +93,13 @@ public:
 				}
 				Vec3f tmp_move_vec = action.motion_vec *
 					body.m_moveSpeed * delta;
-					
+
 				Vec3f correction_vector =
 					CollisionManager::computeCorrectionVector(m_world,
 										  body.m_position,
 										  body.getPolygon(),
 										  tmp_move_vec);
-					       
+
 				// Update body
 				body.m_moveVec = tmp_move_vec - correction_vector;
 				body.m_rotAngle = pumpkin::InputManager::m_mouse_angle
@@ -129,7 +127,7 @@ public:
 				}
 			}
 			else { // other players
-				
+
 				if (m_msgPool.hasEntityMsg(entity.id().id)) {
 
 					voyage::sc_entityState update =
@@ -137,11 +135,11 @@ public:
 					body.m_position(0) = update.pos_x();
 					body.m_position(1) = update.pos_y();
 					body.m_rotAngle = update.angle();
-					body.updateRotation();					
-					
+					body.updateRotation();
+
 				}
-				
-			}		
+
+			}
 		});
 	}
 
@@ -149,6 +147,6 @@ private:
 
 	ClientNetworkManager & m_network_manager;
 	NetworkMessagePool & m_msgPool;
-	uint32_t m_action_seq_num;	
+	uint32_t m_action_seq_num;
 	std::queue<UserAction> m_action_queue;
 };

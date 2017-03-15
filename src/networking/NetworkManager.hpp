@@ -2,6 +2,7 @@
 
 #include <RakPeerInterface.h>
 #include <list>
+#include <map>
 #include "PacketHandler.hpp"
 
 using namespace RakNet;
@@ -12,7 +13,7 @@ public:
 	NetworkManager() {}
 
 	virtual ~NetworkManager() {}
-	
+
 	void registerHandler(PacketHandler::Ptr h, const std::list<int> & list) {
 
 		h->isRegistered = true;
@@ -20,12 +21,12 @@ public:
 		for (auto m : list) {
 			_msgHandlersMap[m] = h->getId();
 		}
-	
-		_handlers[h->getId()] = h;	
+
+		_handlers[h->getId()] = h;
 	}
 
 	RakNet::RakPeerInterface *getPeer() { return _peer; }
-	
+
 	void receiveData()
 	{
 		Packet *p;
@@ -42,7 +43,7 @@ public:
 
 		return;
 
-		
+
 		// Packet *p = _peer->Receive();
 		// if (p) {
 
@@ -82,8 +83,7 @@ protected:
 
 	bool _isConnected;
 	RakPeerInterface *_peer;
-	std::map<int, int> _msgHandlersMap;	
+	std::map<int, int> _msgHandlersMap;
 	std::map<int, PacketHandler::Ptr> _handlers;
 	int _port;
 };
-

@@ -6,8 +6,8 @@ add_library(gameEngine
   World.hpp
   World.cpp
   WorldProperties.hpp
-  GameMap.hpp
-  GameMap.cpp
+  GameLevel.hpp
+  GameLevel.cpp
   )
 
 target_link_libraries(gameEngine

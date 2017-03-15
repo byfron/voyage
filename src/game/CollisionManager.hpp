@@ -1,6 +1,7 @@
 #pragma once
 
 #include <game/World.hpp>
+#include <utils/GeometryUtils.hpp>
 
 namespace CollisionManager {
 
