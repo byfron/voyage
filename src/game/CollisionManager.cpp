@@ -17,12 +17,9 @@ namespace CollisionManager {
 		Vec2f accum_mtd = Vec2f::Zero();
 
 		std::cout << "candidates:" << collision_candidates.size() << std::endl;
-			
+
 		for (auto cand: collision_candidates) {
 
-			for (auto v : cand.vertices) {
-				std::cout << v << std::endl;
-			}
 //			if (not mask.isWalkable(candidate))
 			{
 				Vec2f MTD = Vec2f::Zero();

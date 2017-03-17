@@ -30,6 +30,12 @@ public:
 		FbxLoader loader("test2.fbx");
 		m_scene->loadFromFbxNode(loader.getRootNode());
 		m_scene->init();
+
+		for (auto room : _world->getGameLevel().getRoomVector()) {
+			for (auto poly : room.collision_polygons) {
+				m_scene->m_collision_polys.push_back(poly.vertices);
+			}
+		}
 	}
 
 	// bool loadTileMap() {
@@ -79,7 +85,9 @@ public:
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
-		m_scene->update(delta);
+
+	    m_scene->update(delta);
+
 
 		//	em.each<MapComponent>([delta](Entity entity,
 		//			      MapComponent &map) {

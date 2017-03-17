@@ -89,9 +89,6 @@ def findRidgeLength(graph, r1, r2):
     return np.linalg.norm(graph.vertices[intersect[0],:] - graph.vertices[intersect[1],:])
 
 
-def computeRoomCentroid(graph, room):
-    for reg in room.regions:
-        pdb.set_trace()
 
 class TriangleMesh:
     def __init__(self):
@@ -341,7 +338,7 @@ class GameLevel:
                         #to oder the wall indices properly
                         vdir = iv1 - iv0
                         vcenter = cv - cva
-                        if np.cross(vdir, vcenter)[2] > 0:
+                        if np.cross(vdir, vcenter)[2] < 0:
                             self.walls.append(intersect)
                         else:
                             self.walls.append(np.array([intersect[1], intersect[0]]))
@@ -421,14 +418,16 @@ class GameLevel:
             av = np.mean(tMesh.vertices, axis=0)
             av[2] = 0
             tMesh.vertices = tMesh.vertices - av
+            tMesh.collision_vertices = tMesh.collision_vertices - av
+
             scale = 20
-            
+
             for i in range(N):
                 fbxv = FbxVector4(tMesh.vertices[i][0]*scale,
                                   tMesh.vertices[i][1]*scale,
                                   tMesh.vertices[i][2]*scale)
 
-                lLayerNormal.GetDirectArray().Add(FbxVector4(0.0, 0.0, 1.0))
+                lLayerNormal.GetDirectArray().Add(FbxVector4(0.0, 0.0, -1.0))
                 roomMesh.SetControlPointAt(fbxv, i)
 
             lLayer.SetNormals(lLayerNormal)
@@ -471,15 +470,15 @@ class GameLevel:
                 for idx in col_indices:
                     collisionMesh.AddPolygon(idx)
                 collisionMesh.EndPolygon()
-                
-            collisionNode.SetNodeAttribute(collisionMesh)                
-            roomNode.AddChild(collisionNode)            
+
+            collisionNode.SetNodeAttribute(collisionMesh)
+            roomNode.AddChild(collisionNode)
 
             # add as polygons as well the convex polys of the room? much easier
             # to check locations!!
-            
-            
-            
+
+
+
             self.createFloorMaterial(pSdkManager, roomMesh)
 
         pScene.GetRootNode().AddChild(roomNode)
@@ -534,7 +533,6 @@ class GameLevel:
 
         #connect tex. with material
         if lMaterial:
-            pdb.set_trace()
             lMaterial.Diffuse.ConnectSrcObject(lTexture)
 
 
@@ -611,7 +609,7 @@ class GameLevel:
             all_indices = all_indices + self.regions[reg].polygon
 
             for ipol in range(1,len(self.regions[reg].polygon)-1):
-                
+
                 i1 = self.regions[reg].polygon[ipol]
                 i2 = self.regions[reg].polygon[ipol+1]
 
@@ -634,14 +632,14 @@ class GameLevel:
                 v01 = v01/np.linalg.norm(v01)
                 v12 = v12/np.linalg.norm(v12)
                 n = np.cross(v01,v12);
-                if n[2] < 0:
+                if n[2] > 0:
                     triangles.append((i0,i1,i2))
                 else:
                     triangles.append((i2,i1,i0))
 
         wall_vertices = []
         wall_indices = []
-        wall_height = 0.05
+        wall_height = -0.05
         wall_width = 0.01
         unique_indices = list(OrderedDict.fromkeys(all_indices))
         floor_vertices = vertices3d[unique_indices,:]
@@ -677,13 +675,13 @@ class GameLevel:
 
             mapped_triangles.append((wall_idx, wall_idx+1, wall_idx+2))
             mapped_triangles.append((wall_idx+1, wall_idx+3, wall_idx+2))
-            
+
             #add vertices of the up outer-wall
             wall_vec = v2 - v1;
             wall_adj_to_start = np.where(wall_idx_matrix[:,1] == wall[0])
-            wall_adj_to_end = np.where(wall_idx_matrix[:,0] == wall[1])           
+            wall_adj_to_end = np.where(wall_idx_matrix[:,0] == wall[1])
             wall_start = room.walls[wall_adj_to_start[0][0]]
-            wall_end = room.walls[wall_adj_to_end[0][0]]        
+            wall_end = room.walls[wall_adj_to_end[0][0]]
             wall_adj_vec0 = vertices3d[wall_start[1]] - vertices3d[wall_start[0]]
             wall_adj_vec1 = vertices3d[wall_end[1]] - vertices3d[wall_end[0]]
             edge_vec_start = (wall_adj_vec0 + wall_vec)/2.0
@@ -695,20 +693,20 @@ class GameLevel:
 
             wall_vertices[idx+4] = v3 + np.hstack((normal_start*wall_width, 0))
             wall_vertices[idx+5] = v4 + np.hstack((normal_end*wall_width, 0))
-            
-            mapped_triangles.append((wall_idx+2, wall_idx+3, wall_idx+4))
-            mapped_triangles.append((wall_idx+3, wall_idx+5, wall_idx+4))
+
+            mapped_triangles.append((wall_idx+4, wall_idx+3, wall_idx+2))
+            mapped_triangles.append((wall_idx+4, wall_idx+5, wall_idx+3))
 
             #add the wall polygon as metadata into the FBX file
             mesh.collision_vertices.append(wall_vertices[idx+2])
             mesh.collision_vertices.append(wall_vertices[idx+3])
             mesh.collision_vertices.append(wall_vertices[idx+4])
-            mesh.collision_vertices.append(wall_vertices[idx+5])            
+            mesh.collision_vertices.append(wall_vertices[idx+5])
             mesh.collision_indices.append((col_idx, col_idx+1, col_idx+2, col_idx+3))
 
             col_idx = col_idx + 4
             wall_idx = wall_idx + 6
-            idx = idx + 6            
+            idx = idx + 6
 
         mesh.vertices = np.vstack((floor_vertices, wall_vertices))
         mesh.indices = mapped_triangles
