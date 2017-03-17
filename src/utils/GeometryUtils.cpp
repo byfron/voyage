@@ -1,14 +1,22 @@
 #include "GeometryUtils.hpp"
 
 namespace GeometryUtils {
+
+	Polygon convertToPolygon(FbxLoader::FPolygon p) {
+		Polygon pp;
+		for (int i = 0; i < p.rows(); i++) {
+			pp.vertices.push_back(Vec2f(p(i,0), p(i,1)));
+		}
+		return pp;
+	}
 	
 	void CalculateInterval(Vec2f Axis, GeometryUtils::Polygon P, float& min, float& max)
 	{
-		float d = Axis.dot(P.vertex[0]);
+		float d = Axis.dot(P.vertices[0]);
 		min = max = d;
-		for(int I = 0; I < P.num_vertices; I ++)
+		for(int I = 0; I < P.num_vertices(); I ++)
 		{
-			float d = P.vertex[I].dot(Axis);
+			float d = P.vertices[I].dot(Axis);
 			if (d < min)
 				min = d;
 			else
@@ -45,9 +53,9 @@ namespace GeometryUtils {
 	bool Intersect(GeometryUtils::Polygon A, GeometryUtils::Polygon B)
 	{
 		int I = 0;
-		for(int J = A.num_vertices-1; I < A.num_vertices; J = I, I++)
+		for(int J = A.num_vertices()-1; I < A.num_vertices(); J = I, I++)
 		{
-			Vec2f E = A.vertex[I] - A.vertex[J];
+			Vec2f E = A.vertices[I] - A.vertices[J];
 			Vec2f N = Vec2f(-E(1), E(0));
 
 			if (AxisSeparatePolygons(N, A, B))
@@ -55,16 +63,15 @@ namespace GeometryUtils {
 		}
 
 		I = 0;
-		for(int J = B.num_vertices-1; I < B.num_vertices; J = I, I ++)
+		for(int J = B.num_vertices()-1; I < B.num_vertices(); J = I, I ++)
 		{
-			Vec2f E = B.vertex[I] - B.vertex[J];
+			Vec2f E = B.vertices[I] - B.vertices[J];
 			Vec2f N = Vec2f(-E(1), E(0));
 
 			if (AxisSeparatePolygons(N, A, B))
 				return false;
 		}
 	}
-
 
 	Vec2f FindMTD(Vec2f* PushVector, int iNumVectors)
 	{
@@ -82,6 +89,12 @@ namespace GeometryUtils {
 		return MTD;
 	}
 
+
+	bool isWithin(const Vec3f & point, std::vector<Polygon>) {
+//		assert(false);
+		return true;
+	}
+	
 	bool IntersectMTD(GeometryUtils::Polygon A, GeometryUtils::Polygon B, Vec2f& MTD)
 	{
 		// potential separation axes. they get converted into push
@@ -89,17 +102,17 @@ namespace GeometryUtils {
 		// max of 16 vertices per polygon
 		int iNumAxis = 0;
 		int J,I;
-		for(J = A.num_vertices-1, I = 0; I < A.num_vertices; J = I, I ++)
+		for(J = A.num_vertices()-1, I = 0; I < A.num_vertices(); J = I, I ++)
 		{
-			Vec2f E = A.vertex[I] - A.vertex[J];
+			Vec2f E = A.vertices[I] - A.vertices[J];
 			Axis[iNumAxis++] = Vec2f(-E(1), E(0));
 
 			if (AxisSeparatePolygons(Axis[iNumAxis-1], A, B))
 				return false;
 		}
-		for(J = B.num_vertices-1, I = 0; I < B.num_vertices; J = I, I ++)
+		for(J = B.num_vertices()-1, I = 0; I < B.num_vertices(); J = I, I ++)
 		{
-			Vec2f E = B.vertex[I] - B.vertex[J];
+			Vec2f E = B.vertices[I] - B.vertices[J];
 			Axis[iNumAxis++] = Vec2f(-E(1), E(0));
 
 			if (AxisSeparatePolygons (Axis[iNumAxis-1], A, B))

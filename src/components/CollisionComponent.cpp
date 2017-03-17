@@ -3,13 +3,13 @@
 void CollisionSystem::update(EntityManager & em, EventManager & evm, float delta) {
 
 // 		// copy current state of collision mask
-		GameLevel::CollisionMask mask = m_world->getLevelCollisionMask();
+	//GameLevel::CollisionMask mask = m_world->getLevelCollisionMask();
 
 // 		// solve candidates with characters
  		em.each<CollisionComponent, BodyCmp >
-			([delta, mask](Entity entity,
-						 CollisionComponent & collision,
-						 BodyCmp & body) {
+			([delta](Entity entity,
+				 CollisionComponent & collision,
+				 BodyCmp & body) {
 
 
 		      // Update collision geometry
@@ -22,7 +22,7 @@ void CollisionSystem::update(EntityManager & em, EventManager & evm, float delta
 			      // send message
 //			      evm.emit<CollideEvent>(entity, other_entity);
 
-			      std::cout << "isColliding!!!" << std::endl;
+//			      std::cout << "isColliding!!!" << std::endl;
  		  }
 
 	      });

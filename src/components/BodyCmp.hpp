@@ -80,10 +80,10 @@ public:
 		Vec2f pm2 = TO_2DVEC(centroid);
 
 		GeometryUtils::Polygon p;
-		p.vertex[0] = Vec2f(-0.25, -0.25) + pm2;
-		p.vertex[1] = Vec2f(-0.25,  0.25) + pm2;
-		p.vertex[2] = Vec2f( 0.25, -0.25) + pm2;
-		p.vertex[3] = Vec2f( 0.25,  0.25) + pm2;
+		p.vertices.push_back(Vec2f(-0.25, -0.25) + pm2);
+		p.vertices.push_back(Vec2f(-0.25,  0.25) + pm2);
+		p.vertices.push_back(Vec2f( 0.25, -0.25) + pm2);
+		p.vertices.push_back(Vec2f( 0.25,  0.25) + pm2);
 		return p;
 	}
 

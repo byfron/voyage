@@ -21,16 +21,15 @@ public:
 	MapDrawSystem(World::Ptr world) : _world(world) {
 		//	loadTileMap();
 
+		loadScene();
 	}
 
 	bool loadScene() {
 
 		m_scene = std::make_shared<pumpkin::SceneObject>();
-//		m_scene->loadFromFbxFile();
-//		m_scene->init();
-
-
-
+		FbxLoader loader("test2.fbx");
+		m_scene->loadFromFbxNode(loader.getRootNode());
+		m_scene->init();
 	}
 
 	// bool loadTileMap() {

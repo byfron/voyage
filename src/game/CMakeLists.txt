@@ -11,5 +11,7 @@ add_library(gameEngine
   )
 
 target_link_libraries(gameEngine
+  fbxsdk
+  dl
   components
   utils)

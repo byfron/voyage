@@ -14,7 +14,7 @@ public:
 
 	typedef std::shared_ptr<World> Ptr;
 
-	GameLevel::CollisionMask & getLevelCollisionMask() { return _game_level.getCollisionMask(); }
+	//GameLevel::CollisionMask & getLevelCollisionMask() { return _game_level.getCollisionMask(); }
 	GameLevel & getGameLevel() { return _game_level; }
 
 private:

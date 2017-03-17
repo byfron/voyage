@@ -99,6 +99,8 @@ class TriangleMesh:
         self.indices = []
         self.normals = []
         self.texuv = []
+        self.collision_vertices = []
+        self.collision_indices = []
 
 class Region:
     def __init__(self, polygon):
@@ -417,12 +419,14 @@ class GameLevel:
 
             #center the room at the mean. Remove this later
             av = np.mean(tMesh.vertices, axis=0)
+            av[2] = 0
             tMesh.vertices = tMesh.vertices - av
-
+            scale = 20
+            
             for i in range(N):
-                fbxv = FbxVector4(tMesh.vertices[i][0]*10,
-                                  tMesh.vertices[i][1]*10,
-                                  tMesh.vertices[i][2]*10)
+                fbxv = FbxVector4(tMesh.vertices[i][0]*scale,
+                                  tMesh.vertices[i][1]*scale,
+                                  tMesh.vertices[i][2]*scale)
 
                 lLayerNormal.GetDirectArray().Add(FbxVector4(0.0, 0.0, 1.0))
                 roomMesh.SetControlPointAt(fbxv, i)
@@ -443,14 +447,39 @@ class GameLevel:
 
                 roomMesh.EndPolygon();
 
-
-            roomNode = FbxNode.Create(pSdkManager, "Room")
+            roomNode = FbxNode.Create(pSdkManager, "Room") #change name with room id
             roomNode.SetNodeAttribute(roomMesh);
             roomNode.LclScaling.Set(FbxDouble3(1.0, 1.0, 1.0))
             roomNode.LclTranslation.Set(FbxDouble3(0.0, 0.0, 0.0))
             roomNode.LclRotation.Set(FbxDouble3(0.0, 0.0, 0.0))
             roomNode.SetShadingMode(FbxNode.eTextureShading)
 
+            #create a collision node for each collision polygon
+            collisionNode = FbxNode.Create(pSdkManager, "RoomCollision")
+            collisionMesh = FbxMesh.Create(pSdkManager, 'Polygon')
+
+            idx_col_vert = 0
+            for col_vert in tMesh.collision_vertices:
+                fbxv = FbxVector4(col_vert[0]*scale,
+                                  col_vert[1]*scale,
+                                  col_vert[2]*scale)
+                collisionMesh.SetControlPointAt(fbxv, idx_col_vert)
+                idx_col_vert = idx_col_vert + 1
+
+            for col_indices in tMesh.collision_indices:
+                collisionMesh.BeginPolygon()
+                for idx in col_indices:
+                    collisionMesh.AddPolygon(idx)
+                collisionMesh.EndPolygon()
+                
+            collisionNode.SetNodeAttribute(collisionMesh)                
+            roomNode.AddChild(collisionNode)            
+
+            # add as polygons as well the convex polys of the room? much easier
+            # to check locations!!
+            
+            
+            
             self.createFloorMaterial(pSdkManager, roomMesh)
 
         pScene.GetRootNode().AddChild(roomNode)
@@ -561,14 +590,13 @@ class GameLevel:
             print uvVec
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
-        pdb.set_trace()
-
         return lUVDiffuseLayer
 
     #TODO def createFloorMesh
     def convertRoomToTriangleMesh(self, room):
 
         mesh = TriangleMesh();
+        mesh.collision_polygons = []
         all_indices = []
         triangles = []
 
@@ -583,7 +611,7 @@ class GameLevel:
             all_indices = all_indices + self.regions[reg].polygon
 
             for ipol in range(1,len(self.regions[reg].polygon)-1):
-
+                
                 i1 = self.regions[reg].polygon[ipol]
                 i2 = self.regions[reg].polygon[ipol+1]
 
@@ -614,6 +642,7 @@ class GameLevel:
         wall_vertices = []
         wall_indices = []
         wall_height = 0.05
+        wall_width = 0.01
         unique_indices = list(OrderedDict.fromkeys(all_indices))
         floor_vertices = vertices3d[unique_indices,:]
         index_dict = dict(zip(unique_indices, range(len(unique_indices))))
@@ -626,8 +655,11 @@ class GameLevel:
         room.floor_indices = mapped_triangles;
 
         wall_idx = len(unique_indices)
-        wall_vertices = np.zeros((len(room.walls)*4,3))
+        wall_vertices = np.zeros((len(room.walls)*6,3))
         idx = 0
+        col_idx = 0
+
+        wall_idx_matrix = np.vstack([room.walls])
 
         #add the walls
         for wall in room.walls:
@@ -642,17 +674,44 @@ class GameLevel:
             wall_vertices[idx+1] = v2
             wall_vertices[idx+2] = v3
             wall_vertices[idx+3] = v4
-            idx = idx + 4
 
-            #invert order dependeing on centroid
-            #n = np.cross(v1 - v2, room.centroid - v2)
-            mapped_triangles.append((wall_idx,wall_idx+1,wall_idx+2))
-            mapped_triangles.append((wall_idx+1,wall_idx+3,wall_idx+2))
-            wall_idx = wall_idx + 4
+            mapped_triangles.append((wall_idx, wall_idx+1, wall_idx+2))
+            mapped_triangles.append((wall_idx+1, wall_idx+3, wall_idx+2))
+            
+            #add vertices of the up outer-wall
+            wall_vec = v2 - v1;
+            wall_adj_to_start = np.where(wall_idx_matrix[:,1] == wall[0])
+            wall_adj_to_end = np.where(wall_idx_matrix[:,0] == wall[1])           
+            wall_start = room.walls[wall_adj_to_start[0][0]]
+            wall_end = room.walls[wall_adj_to_end[0][0]]        
+            wall_adj_vec0 = vertices3d[wall_start[1]] - vertices3d[wall_start[0]]
+            wall_adj_vec1 = vertices3d[wall_end[1]] - vertices3d[wall_end[0]]
+            edge_vec_start = (wall_adj_vec0 + wall_vec)/2.0
+            edge_vec_end = (wall_adj_vec1 + wall_vec)/2.0
+            normal_start =  np.array([edge_vec_start[1], -edge_vec_start[0]])
+            normal_start = normal_start/np.linalg.norm(normal_start)
+            normal_end =  np.array([edge_vec_end[1], -edge_vec_end[0]])
+            normal_end = normal_end/np.linalg.norm(normal_end)
+
+            wall_vertices[idx+4] = v3 + np.hstack((normal_start*wall_width, 0))
+            wall_vertices[idx+5] = v4 + np.hstack((normal_end*wall_width, 0))
+            
+            mapped_triangles.append((wall_idx+2, wall_idx+3, wall_idx+4))
+            mapped_triangles.append((wall_idx+3, wall_idx+5, wall_idx+4))
+
+            #add the wall polygon as metadata into the FBX file
+            mesh.collision_vertices.append(wall_vertices[idx+2])
+            mesh.collision_vertices.append(wall_vertices[idx+3])
+            mesh.collision_vertices.append(wall_vertices[idx+4])
+            mesh.collision_vertices.append(wall_vertices[idx+5])            
+            mesh.collision_indices.append((col_idx, col_idx+1, col_idx+2, col_idx+3))
+
+            col_idx = col_idx + 4
+            wall_idx = wall_idx + 6
+            idx = idx + 6            
 
         mesh.vertices = np.vstack((floor_vertices, wall_vertices))
         mesh.indices = mapped_triangles
-
         room.floor_vertices = floor_vertices
 
         return mesh
@@ -668,24 +727,19 @@ class GameLevel:
         img = Image.new('RGB', (ntiles, ntiles), 0)
         idx = 0
         for region in self.regions:
-
             vertices = self.graph.vertices[region.polygon,:]
-
             po = (vertices - top_left) * scale
             ImageDraw.Draw(img).polygon(np.hstack(po.astype(int)).tolist(), outline='white', fill=region.color)
 
         for wall in self.walls:
             vwall = self.graph.vertices[wall,:]
             po = (vwall - top_left) * scale
-
             p1 = po[0].astype(int)
             p2 = po[1].astype(int)
-
             ImageDraw.Draw(img).ellipse((p1 - 5).tolist() + (p1+5).tolist(), fill='green')
             ImageDraw.Draw(img).ellipse((p2 - 5).tolist() + (p2+5).tolist(), fill='red')
 
            # ImageDraw.Draw(img).line(np.hstack(po.astype(int)).tolist(), fill='red', width=5)
-
 
         # cline1 =  np.vstack((self.corridors[0].points[0], self.corridors[0].points[1]))
         # po1 = (cline1 - top_left) * scale
