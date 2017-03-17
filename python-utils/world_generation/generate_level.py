@@ -1,13 +1,15 @@
-from graphUtils import RegionGraph
+from utils.graphUtils import RegionGraph
 from levelGen import GameLevel
+from exporters.FbxExporter import Exporter
 
 # Make voronoi diagram and start painting a "path".
 # Choose some polygons as rooms and edges as corridors.
 
-N = 200
+N = 100
 graph = RegionGraph(N)
 level = GameLevel(graph)
 
-level.exportToFbx()
+fbxExporter = Exporter(level)
+fbxExporter.exportToFbx('test2')
 
 level.show(2000)
