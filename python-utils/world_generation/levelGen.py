@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw
 import FbxCommon
 from fbx import *
 from collections import OrderedDict
+from TextureGen import Texture
 
 
 def saveScene(pFilename, pFbxManager, pFbxScene, pAsASCII=False ):
@@ -438,7 +439,7 @@ class GameLevel:
             #add floor polygon
             idx_vertex = 0
             for idx_triangle in tMesh.indices:
-                roomMesh.BeginPolygon()
+                roomMesh.BeginPolygon() #put here material ID
                 for vtri in range(3):
                     roomMesh.AddPolygon(idx_triangle[vtri])
                     UVLayer.GetIndexArray().SetAt(idx_vertex, idx_triangle[vtri])
@@ -536,6 +537,25 @@ class GameLevel:
             lMaterial.Diffuse.ConnectSrcObject(lTexture)
 
 
+    # def createWallTextureLayer(self, room, roomMesh):
+
+    #     lLayer = roomMesh.GetLayer(0)
+    #     if lLayer == None:
+    #         roomMesh.CreateLayer()
+    #     lLayer = roomMesh.GetLayer(0)
+
+    #     #compute UV coordinates for each vertex
+    #     for v in room.floor_vertices:
+    #         coords_world = (v - minrv)*scale
+    #         coords_world[0] = 1 - coords_world[0]/room_height
+    #         coords_world[1] = 1 - coords_world[1]/room_width
+    #         room.uv_coords.append(coords_world)
+    #         uvVec = FbxVector2(coords_world[1], coords_world[0])
+    #         print uvVec
+    #         lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+
+    #     return lUVDiffuseLayer
+
     def createFloorTextureLayer(self, room, roomMesh):
 
         lLayer = roomMesh.GetLayer(0)
@@ -588,6 +608,85 @@ class GameLevel:
             print uvVec
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
+        #add wall vertices
+        #create a plane texture of the right size
+        wall_height = 0.025
+        wall_width = 0.01
+        minrv = np.min(room.wall_vertices, axis=0)
+        top_left = minrv[0:2]*scale
+        #measure length of wall
+        total_wall_length = 0
+        for wall in room.walls:
+            v1 = self.graph.vertices[wall[0]]
+            v2 = self.graph.vertices[wall[1]]
+            total_wall_length = total_wall_length + np.linalg.norm(v2 - v1);
+
+        texture_height = int((wall_height + wall_width)*scale)
+        texture_width = int(total_wall_length*scale)
+
+        #wall vertices are order as:
+        #1-4 wall vertices (bottom1, bottom2, top1, top2)
+        #5-6 top vertices
+        #7... next wall
+        coord_length = 0.0
+        coord = np.array([0.,0.])
+
+        tex_ratio_height = wall_height/(wall_height + wall_width)
+
+        first_wall_vertex = self.graph.vertices[room.walls[0]]
+        for wall in room.walls:
+
+            v1 = self.graph.vertices[wall[0]]
+            v2 = self.graph.vertices[wall[1]]
+            wall_length = np.linalg.norm(v2 - v1)
+
+            # botom1
+            coord[0] = coord_length;
+            coord[1] = 0.0;
+            room.uv_coords.append(coord)
+            uvVec = FbxVector2(coord[1], coord[0])
+            lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+
+            #bottom 2
+            coord[0] = coord_length + wall_length/total_wall_length;
+            coord[1] = 0.0;
+            room.uv_coords.append(coord)
+            uvVec = FbxVector2(coord[1], coord[0])
+            lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+
+            #top1
+            coord[0] = coord_length;
+            coord[1] = tex_ratio_height
+            room.uv_coords.append(coord)
+            uvVec = FbxVector2(coord[1], coord[0])
+            lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+
+            #top2
+            coord[0] = coord_length + wall_length/total_wall_length;
+            coord[1] = tex_ratio_height
+            room.uv_coords.append(coord)
+            uvVec = FbxVector2(coord[1], coord[0])
+            lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+
+            #top1 (ceiling)
+            coord[0] = coord_length;
+            coord[1] = 1.0
+            room.uv_coords.append(coord)
+            uvVec = FbxVector2(coord[1], coord[0])
+            lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+
+            #top2 (ceiling)
+            coord[0] = coord_length + wall_length/total_wall_length;
+            coord[1] = 1.0
+            room.uv_coords.append(coord)
+            uvVec = FbxVector2(coord[1], coord[0])
+            lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+
+            coord_length = coord_length + wall_length/total_wall_length;
+
+        texture = Texture()
+        texture.generate(texture_width, texture_height)
+
         return lUVDiffuseLayer
 
     #TODO def createFloorMesh
@@ -639,7 +738,7 @@ class GameLevel:
 
         wall_vertices = []
         wall_indices = []
-        wall_height = -0.05
+        wall_height = -0.025
         wall_width = 0.01
         unique_indices = list(OrderedDict.fromkeys(all_indices))
         floor_vertices = vertices3d[unique_indices,:]
@@ -711,6 +810,7 @@ class GameLevel:
         mesh.vertices = np.vstack((floor_vertices, wall_vertices))
         mesh.indices = mapped_triangles
         room.floor_vertices = floor_vertices
+        room.wall_vertices = wall_vertices
 
         return mesh
 
