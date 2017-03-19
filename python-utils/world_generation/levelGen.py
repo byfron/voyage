@@ -5,43 +5,6 @@ import pdb
 from PIL import Image, ImageDraw
 from generators.RoomGenerator import Room
 
-def find_intersection( p0, p1, p2, p3 ) :
-
-    s10_x = p1[0] - p0[0]
-    s10_y = p1[1] - p0[1]
-    s32_x = p3[0] - p2[0]
-    s32_y = p3[1] - p2[1]
-
-    denom = s10_x * s32_y - s32_x * s10_y
-
-    if denom == 0 : return None # collinear
-
-    denom_is_positive = denom > 0
-
-    s02_x = p0[0] - p2[0]
-    s02_y = p0[1] - p2[1]
-
-    s_numer = s10_x * s02_y - s10_y * s02_x
-
-    if (s_numer < 0) == denom_is_positive : return None # no collision
-
-    t_numer = s32_x * s02_y - s32_y * s02_x
-
-    if (t_numer < 0) == denom_is_positive : return None # no collision
-
-    if (s_numer > denom) == denom_is_positive or (t_numer > denom) == denom_is_positive : return None # no collision
-
-
-    # collision detected
-
-    t = t_numer / denom
-
-    intersection_point = [ p0[0] + (t * s10_x), p0[1] + (t * s10_y) ]
-
-
-    return intersection_point
-
-
 #find set of adjacent indices of a region
 def findAdjacentRegions(graph, reg):
 
@@ -103,7 +66,9 @@ class GameLevel:
         #choose the starting region randomly
         starting_region_idx = self.valid_regions[random.randint(0, len(self.valid_regions)-1)]
 
-        room = Room()
+        room_counter = 0
+
+        room = Room(room_counter)
         room.create(starting_region_idx, self.regions, self.graph)
         self.rooms.append(room)
 

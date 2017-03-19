@@ -12,7 +12,8 @@ def findRidgeLength(graph, r1, r2):
 
 class Room:
 
-    def __init__(self):
+    def __init__(self, room_id):
+        self.room_id = room_id
         self.centroid = []
         self.regions = [];
         self.walls = []; #pairs of vertices for each wall
@@ -35,16 +36,16 @@ class Room:
             length = findRidgeLength(graph, adj, region_idx)
             lengths.append(length)
 
-        regions[region_idx].color = 'green'
-        for reg in adjacent_regions:
-            regions[reg].color = 'blue'
-
         room_size = min((room_size, len(adjacent_regions)))
         idx_largest_edges = np.argsort(lengths)[-room_size:]
 
         room_regions = [adjacent_regions[i] for i in idx_largest_edges if not regions[adjacent_regions[i]].isEdgeRegion]
         room_regions.append(region_idx)
         room_walls = []
+
+        for reg in room_regions:
+            regions[reg].color = 'blue'
+        regions[region_idx].color = 'green'
 
         vertices3d = np.hstack((graph.vertices, np.zeros((graph.vertices.shape[0],1))))
 
