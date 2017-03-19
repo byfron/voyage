@@ -2,11 +2,9 @@ package voyage;
 
 import "mesh.proto";
 
-message SpriteObjectCfg {
+message GraphicsObjectCfg {
 	required uint32 atlas_id = 1;
 	required uint32 shader_id = 2;
-	required float width = 3;
-	required float height = 4;
 	optional MeshCfg mesh = 5;
 }
 

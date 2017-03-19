@@ -5,8 +5,6 @@
 #include <entities/System.hpp>
 #include "PlayerSystem.hpp"
 
-class pumpkin::PosColorVertex;
-
 class DebugGraphicsCmp {
 
 public:
@@ -22,20 +20,10 @@ class GraphicsCmp {
 public:
 
 	GraphicsCmp() {
-		m_graphics.init();
+
 	}
 
-	pumpkin::GraphicsObject<pumpkin::PosColorVertex> m_graphics;
-};
-
-class SpriteCmp {
-
-public:
-
-	// Same as animation but with a fixed atlas offset!
-	SpriteCmp() {}
-
-	pumpkin::SpriteObject m_graphics;
+	pumpkin::GraphicsObject *m_graphics;
 };
 
 class GraphicsSystem : public System<GraphicsSystem> {
@@ -49,8 +37,8 @@ public:
 				GraphicsCmp &go,
 				BodyCmp &body) {
 
-				go.m_graphics.setTransform(body.getTransform());
-				go.m_graphics.update(delta);
+				go.m_graphics->setTransform(body.getTransform());
+				go.m_graphics->update(delta);
 		});
 	}
 

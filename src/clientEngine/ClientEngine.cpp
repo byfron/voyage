@@ -82,9 +82,11 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 
 	// TODO server spawn msg returns config file and initial params
 
+	pumpkin::Configuration<pumpkin::Animation::Config> config
+		(std::string(CONFIG_FILE_PATH) +
+		 "main_character_anim3.cfg");
 	_entityManager.assign<AnimationComponent>(player.id(),
-						  std::string(CONFIG_FILE_PATH) +
-						  "main_character_anim3.cfg");
+						  config.config());
 	
 	//TODO: This should be a response from a server createEntity message
 	_entityManager.assign<PlayerCmp>(player.id(), GameEngine::m_playerId);

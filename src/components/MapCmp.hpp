@@ -26,14 +26,18 @@ public:
 
 	bool loadScene() {
 
-		m_scene = std::make_shared<pumpkin::SceneObject>();
+		pumpkin::Configuration<pumpkin::Scene::Config> config
+			(std::string(CONFIG_FILE_PATH) +
+			 "scene.cfg");
+		
+		m_scene = std::make_shared<pumpkin::Scene>(config.config());
 		FbxLoader loader("test2.fbx");
 		m_scene->loadFromFbxNode(loader.getRootNode());
 		m_scene->init();
 
 		for (auto room : _world->getGameLevel().getRoomVector()) {
 			for (auto poly : room.collision_polygons) {
-				m_scene->m_collision_polys.push_back(poly.vertices);
+//				m_scene->m_collision_polys.push_back(poly.vertices);
 			}
 		}
 	}
@@ -99,7 +103,7 @@ public:
 	}
 
 	World::Ptr _world;
-	pumpkin::SceneObject::Ptr m_scene;
+	pumpkin::Scene::Ptr m_scene;
 
 	//pumpkin::TileMap m_tilemap;
 };

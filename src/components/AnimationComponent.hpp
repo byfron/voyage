@@ -11,8 +11,8 @@ using namespace PlayerInput;
 // shall the graphic elements be organized per texture?
 class AnimationComponent {
 public:
-	AnimationComponent(const std::string & config_file) :
-		m_animation(config_file) {
+	AnimationComponent(const pumpkin::Animation::Config & config) :
+		m_animation(config) {
 		m_animation.init();
 	}
 

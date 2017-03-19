@@ -4,7 +4,7 @@ import "texture_atlas.proto";
 import "graphics.proto";
 
 message AnimationListCfg {
-	required SpriteObjectCfg graphics_properties = 1;
+	required GraphicsObjectCfg graphics_properties = 1;
 	repeated AnimationCfg animation = 2;	
 }
 
