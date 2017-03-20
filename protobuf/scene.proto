@@ -4,4 +4,5 @@ import "graphics.proto";
 
 message SceneCfg {
 	required GraphicsObjectCfg graphics_properties = 1;
+	required string fbx_file = 2;
 }

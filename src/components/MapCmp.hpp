@@ -20,7 +20,6 @@ public:
 
 	MapDrawSystem(World::Ptr world) : _world(world) {
 		//	loadTileMap();
-
 		loadScene();
 	}
 
@@ -29,11 +28,15 @@ public:
 		pumpkin::Configuration<pumpkin::Scene::Config> config
 			(std::string(CONFIG_FILE_PATH) +
 			 "scene.cfg");
-		
+
 		m_scene = std::make_shared<pumpkin::Scene>(config.config());
-		FbxLoader loader("test2.fbx");
+		std::string fbx_file = config.config().fbx_file();
+		FbxLoader loader(std::string(SCENE_FILE_PATH) + fbx_file);
 		m_scene->loadFromFbxNode(loader.getRootNode());
 		m_scene->init();
+
+		//world->loadGameLevel(loader)
+
 
 		for (auto room : _world->getGameLevel().getRoomVector()) {
 			for (auto poly : room.collision_polygons) {
@@ -88,7 +91,6 @@ public:
 	// }
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
-
 
 		m_scene->update(delta);
 

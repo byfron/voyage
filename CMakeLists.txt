@@ -25,6 +25,7 @@ add_definitions(-DCONFIG_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/config/")
 add_definitions(-DTEXTURE_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/textures/")
 add_definitions(-DSHADER_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/shaders/")
 add_definitions(-DSCRIPT_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/scripts/")
+add_definitions(-DSCENE_FILE_PATH="${CMAKE_BINARY_DIR}/pumpkin/data/scenes/")
 
 add_definitions(-DDB_DIR="${DB_DIR}")
 add_definitions(-DDB_NAME="${DB_NAME}")
