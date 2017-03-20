@@ -1,0 +1,7 @@
+package voyage;
+
+import "graphics.proto";
+
+message SceneCfg {
+	required GraphicsObjectCfg graphics_properties = 1;
+}
