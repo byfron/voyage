@@ -90,7 +90,7 @@ public:
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
 
-	    m_scene->update(delta);
+		m_scene->update(delta);
 
 
 		//	em.each<MapComponent>([delta](Entity entity,

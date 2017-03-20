@@ -16,8 +16,6 @@ namespace CollisionManager {
 		// Check that all points lie in walkable tiles
 		Vec2f accum_mtd = Vec2f::Zero();
 
-		std::cout << "candidates:" << collision_candidates.size() << std::endl;
-
 		for (auto cand: collision_candidates) {
 
 //			if (not mask.isWalkable(candidate))
