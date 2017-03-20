@@ -18,6 +18,15 @@ class Texture:
         self.generateNoisyImage()
 
     def generateNoisyImage(self):
+
+        #wbar = self.width/10;        
+        # for y in range(self.height):
+        #     for x in range(self.width):
+        #         if int(x/wbar)%2 == 0:
+        #             self.image.putpixel((x,y), 255)
+        #         else:
+        #             self.image.putpixel((x,y), 0)
+        
         octaves = 2
         freq = 16.0 * octaves
         for y in range(self.height):

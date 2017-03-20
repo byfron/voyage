@@ -195,7 +195,7 @@ class Exporter:
         texture_name = self.generateFloorTextureName()
 
         self.generateFloorTexture(texture_name, vertices, UVLayer)
-        UVLayer.GetIndexArray().SetCount(len(indices)*3) #as many UV coordinate as vertices
+        UVLayer.GetIndexArray().SetCount(vertices.shape[0]) #as many UV coordinate as vertices
 
         #add floor polygon indices and material
         idx_vertex = 0
@@ -221,7 +221,7 @@ class Exporter:
         texture_name = self.generateWallTextureName()
 
         self.generateWallTexture(texture_name, wall_vecs, vertices, UVLayer)
-        UVLayer.GetIndexArray().SetCount(len(indices)*3) #as many UV coordinate as vertices
+        UVLayer.GetIndexArray().SetCount(vertices.shape[0]) #as many UV coordinate as vertices
 
         #add floor polygon indices and material
         idx_vertex = 0
@@ -318,7 +318,7 @@ class Exporter:
             uvVec = FbxVector2(coords_world[1], coords_world[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
-    def generateWallTexture(self, texture_name, vertices, wall_vecs, lUVDiffuseLayer):
+    def generateWallTexture(self, texture_name, wall_vecs, vertices, lUVDiffuseLayer):
 
         #add wall vertices
         #create a plane texture of the right size
@@ -352,37 +352,43 @@ class Exporter:
             coord[1] = 0.0;
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+            print(uvVec)
 
             #bottom 2
             coord[0] = coord_length + wall_length/total_wall_length;
             coord[1] = 0.0;
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
-
+            print(uvVec)
+            
             #top1
             coord[0] = coord_length;
             coord[1] = tex_ratio_height
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
-
+            print(uvVec)
+            
             #top2
             coord[0] = coord_length + wall_length/total_wall_length;
             coord[1] = tex_ratio_height
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
-
+            print(uvVec)
+            
             #top1 (ceiling)
             coord[0] = coord_length;
             coord[1] = 1.0
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
-
+            print(uvVec)
+            
             #top2 (ceiling)
             coord[0] = coord_length + wall_length/total_wall_length;
             coord[1] = 1.0
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
-
+            print(uvVec)
+            
             coord_length = coord_length + wall_length/total_wall_length;
 
         texture = Texture()
