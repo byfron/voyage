@@ -94,18 +94,15 @@ class Exporter:
 
             all_vertices = np.vstack([tMesh.floor_vertices, tMesh.wall_vertices]);
 
-            self.createFloorMaterial(pSdkManager, floorMesh,
-                                     tMesh.floor_vertices, tMesh.floor_indices)
-
-            self.createWallMaterial(pSdkManager, wallMesh, tMesh.wall_vecs,
-                                    tMesh.wall_vertices, tMesh.wall_indices)
-
             floorNode = FbxNode.Create(pSdkManager, "RoomFloor" + str(room.room_id))
             floorNode.SetNodeAttribute(floorMesh);
             floorNode.LclScaling.Set(FbxDouble3(1.0, 1.0, 1.0))
             floorNode.LclTranslation.Set(FbxDouble3(0.0, 0.0, 0.0))
             floorNode.LclRotation.Set(FbxDouble3(0.0, 0.0, 0.0))
             floorNode.SetShadingMode(FbxNode.eTextureShading)
+
+            collisionNode = self.createCollisionNode(pSdkManager, tMesh)
+            floorNode.AddChild(collisionNode)
 
             wallNode = FbxNode.Create(pSdkManager, "RoomWall" + str(room.room_id))
             wallNode.SetNodeAttribute(wallMesh);
@@ -114,32 +111,44 @@ class Exporter:
             wallNode.LclRotation.Set(FbxDouble3(0.0, 0.0, 0.0))
             wallNode.SetShadingMode(FbxNode.eTextureShading)
 
-            #create a collision node for each collision polygon
-            collisionNode = FbxNode.Create(pSdkManager, "RoomCollision")
-            collisionMesh = FbxMesh.Create(pSdkManager, 'Polygon')
+            pScene.GetRootNode().AddChild(floorNode)
+            pScene.GetRootNode().AddChild(wallNode)
 
-            idx_col_vert = 0
-            for col_vert in tMesh.collision_vertices:
-                fbxv = FbxVector4(col_vert[0]*self.mesh_scale,
-                                  col_vert[1]*self.mesh_scale,
-                                  col_vert[2]*self.mesh_scale)
-                collisionMesh.SetControlPointAt(fbxv, idx_col_vert)
-                idx_col_vert = idx_col_vert + 1
+            self.createFloorMaterial(pSdkManager, floorMesh,
+                                     tMesh.floor_vertices, tMesh.floor_indices)
 
-            for col_indices in tMesh.collision_indices:
-                collisionMesh.BeginPolygon()
-                for idx in col_indices:
-                    collisionMesh.AddPolygon(idx)
-                collisionMesh.EndPolygon()
+            self.createWallMaterial(pSdkManager, wallMesh, tMesh.wall_vecs,
+                                    tMesh.wall_vertices, tMesh.wall_indices)
 
-            collisionNode.SetNodeAttribute(collisionMesh)
-            floorNode.AddChild(collisionNode)
 
             # TODO: add as polygons as well the convex polys of the room? much easier
             # to check locations!!
 
-        pScene.GetRootNode().AddChild(floorNode)
-        pScene.GetRootNode().AddChild(wallNode)
+
+
+    def createCollisionNode(self, pSdkManager, tMesh):
+        #create a collision node for each collision polygon
+        collisionNode = FbxNode.Create(pSdkManager, "RoomCollision")
+        collisionMesh = FbxMesh.Create(pSdkManager, 'Polygon')
+
+        idx_col_vert = 0
+        for col_vert in tMesh.collision_vertices:
+            fbxv = FbxVector4(col_vert[0]*self.mesh_scale,
+                              col_vert[1]*self.mesh_scale,
+                              col_vert[2]*self.mesh_scale)
+            collisionMesh.SetControlPointAt(fbxv, idx_col_vert)
+            idx_col_vert = idx_col_vert + 1
+
+        for col_indices in tMesh.collision_indices:
+            collisionMesh.BeginPolygon()
+            for idx in col_indices:
+                collisionMesh.AddPolygon(idx)
+                collisionMesh.EndPolygon()
+
+        collisionNode.SetNodeAttribute(collisionMesh)
+        return collisionNode
+
+
 
     def createMesh(self, mesh, vertices, indices):
 
@@ -239,7 +248,6 @@ class Exporter:
         lNode = mesh.GetNode()
         if lNode:
             lMaterial = lNode.GetSrcObject(FbxCriteria.ObjectType(FbxSurfacePhong.ClassId), material_id)
-            pdb.set_trace()
             if not lMaterial:
                 lMaterialName = "toto"
                 lShadingName  = "Phong"
@@ -261,8 +269,6 @@ class Exporter:
                 lMaterial.Specular.Set(lBlack)
                 lMaterial.SpecularFactor.Set(0.3)
 
-                lNode.AddMaterial(lMaterial)
-
         lTexture = FbxFileTexture.Create(pSdkManager,"Diffuse Texture")
         # Set texture properties.
         lTexture.SetFileName(texture_file) # Resource file is in current directory.
@@ -277,6 +283,7 @@ class Exporter:
         #connect tex. with material
         if lMaterial:
             lMaterial.Diffuse.ConnectSrcObject(lTexture)
+            lNode.AddMaterial(lMaterial)
 
 
     def generateFloorTexture(self, texture_name, vertices, lUVDiffuseLayer):

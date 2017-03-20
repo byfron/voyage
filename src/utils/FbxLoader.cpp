@@ -155,7 +155,6 @@ bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
     return lStatus;
 }
 
-
 std::vector<FbxLoader::FPolygon> getMeshPolygonsFromNode(FbxNode *pNode) {
 
 	std::cout << "PPPPP" << std::endl;
@@ -233,6 +232,7 @@ std::vector<FbxLoader::FPolygon> FbxLoader::loadRoomCollisionPolygons(int node_i
 
 	FbxNode* pRootNode = _scene->GetRootNode();
 	FbxNode* pRoomNode = pRootNode->GetChild(node_id);
+
 	return getMeshPolygonsFromNode(pRoomNode->GetChild(0));
 
 }
