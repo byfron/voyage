@@ -1,13 +1,8 @@
 #include "GameLevel.hpp"
 #include <utils/FbxLoader.hpp>
 
-GameLevel::GameLevel(const std::string & file) {
-	loadFromFbxFile(file);
-}
 
-void GameLevel::loadFromFbxFile(const std::string & file) {
-
-	FbxLoader loader(file);
+void GameLevel::load(const FbxLoader & loader) {
 
 	for(int id : loader.getRoomNodeIds()) {
 		std::vector<FbxLoader::FPolygon> room_polygons =

@@ -13,16 +13,15 @@ public:
 
 	typedef Eigen::Matrix<float, Eigen::Dynamic, 3> FPolygon;
 
-		
+
 	FbxLoader(const std::string fbx_file);
-	~FbxLoader();		
+	~FbxLoader();
 
-	std::vector<FPolygon> loadRoomCollisionPolygons(int id);
-	std::vector<FPolygon> loadRoomPolygons(int id);		
-	std::vector<int> getRoomNodeIds();
+	std::vector<FPolygon> loadRoomCollisionPolygons(int id) const;
+	std::vector<FPolygon> loadRoomPolygons(int id) const;
+	std::vector<int> getRoomNodeIds() const;
 
-	FbxNode * getRootNode() { return _scene->GetRootNode(); }
-
+	FbxNode * getRootNode() const { return _scene->GetRootNode(); }
 
 private:
 

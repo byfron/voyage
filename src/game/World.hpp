@@ -17,6 +17,10 @@ public:
 	//GameLevel::CollisionMask & getLevelCollisionMask() { return _game_level.getCollisionMask(); }
 	GameLevel & getGameLevel() { return _game_level; }
 
+	void loadGameLevel(const FbxLoader & loader) {
+		_game_level.load(loader);
+	}
+
 private:
 
 //	GameMap::Ptr _game_map;

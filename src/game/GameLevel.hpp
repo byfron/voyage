@@ -31,8 +31,6 @@ class GameLevel {
 
 public:
 
-	void loadFromFbxFile(const std::string & file);
-
 	bool getRoomFromPos(const Vec3f & pos, LevelRoom & roompos) const {
 
 		// search which polygon pos falls in
@@ -74,7 +72,7 @@ public:
 
 	typedef std::shared_ptr<GameLevel> Ptr;
 
-	GameLevel(const std::string &);
+	void load(const FbxLoader & loader);
 
 private:
 

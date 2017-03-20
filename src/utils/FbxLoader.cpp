@@ -165,9 +165,9 @@ std::vector<FbxLoader::FPolygon> getMeshPolygonsFromNode(FbxNode *pNode) {
 	int num_polygons = pMesh->GetPolygonCount();
 	std::vector<FbxLoader::FPolygon> polygons;
 
-	std::cout << "num polys: " << num_polygons << std::endl; 
+	std::cout << "num polys: " << num_polygons << std::endl;
 	for (int i = 0; i < num_polygons; i++) {
-		
+
 		FbxLoader::FPolygon cpo;
 		cpo = FbxLoader::FPolygon::Zero(pMesh->GetPolygonSize(i), 3);
 
@@ -178,21 +178,21 @@ std::vector<FbxLoader::FPolygon> getMeshPolygonsFromNode(FbxNode *pNode) {
 			cpo(t,2) = controlPoints[vertexIndex][2];
 			std::cout << cpo << std::endl;
 		}
-		
+
 		polygons.push_back(cpo);
 	}
 
-	return polygons;		
+	return polygons;
 }
-	
+
 FbxLoader::FbxLoader(const std::string fbx_file) {
-	
+
 	// Prepare the FBX SDK.
 	InitializeSdkObjects(_sdkManager, _scene);
 
 	// The example can take a FBX file as an argument.
 	FbxString lFilePath(fbx_file.c_str());
-	
+
 	if( lFilePath.IsEmpty() )
 	{
 		_result = false;
@@ -215,26 +215,24 @@ FbxLoader::~FbxLoader() {
 	DestroySdkObjects(_sdkManager, _result);
 }
 
-std::vector<int> FbxLoader::getRoomNodeIds() {
+std::vector<int> FbxLoader::getRoomNodeIds() const {
 	std::vector<int> room_ids;
 	room_ids.push_back(0);
 	return room_ids;
 }
 
-std::vector<FbxLoader::FPolygon> FbxLoader::loadRoomPolygons(int node_id) {
+std::vector<FbxLoader::FPolygon> FbxLoader::loadRoomPolygons(int node_id) const {
 
 	// FbxNode* pRootNode = _scene->GetRootNode();
 	// FbxNode* pRoomNode = pRootNode->GetChild(node_id);
 	// return getMeshPolygonsFromNode(pRoomNode->GetChild(1));
 	return std::vector<FbxLoader::FPolygon>();
 }
-		
-std::vector<FbxLoader::FPolygon> FbxLoader::loadRoomCollisionPolygons(int node_id) {
+
+std::vector<FbxLoader::FPolygon> FbxLoader::loadRoomCollisionPolygons(int node_id) const {
 
 	FbxNode* pRootNode = _scene->GetRootNode();
 	FbxNode* pRoomNode = pRootNode->GetChild(node_id);
 	return getMeshPolygonsFromNode(pRoomNode->GetChild(0));
 
 }
-
-

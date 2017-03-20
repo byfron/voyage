@@ -9,16 +9,15 @@ import pdb
 
 class RoomTriangleMesh:
     def __init__(self):
-        self.vertices = []
+        self.floor_vertices = []
+        self.floor_indices = []
         self.normals = []
         self.floor_indices = []
         self.wall_indices = []
+        self.wall_vecs = []
         self.texuv = []
         self.collision_vertices = []
         self.collision_indices = []
-
-def generateWallTextureName(room):
-    return 'room_wall_' + str(room.room_id)
 
 def saveScene(pFilename, pFbxManager, pFbxScene, pAsASCII=False ):
     ''' Save the scene using the Python FBX API '''
@@ -48,6 +47,12 @@ class Exporter:
         self.tex_scale = 1000
         self.mesh_scale = 20
 
+    def generateWallTextureName(self):
+        return 'room_wall_tex' + str(self.material_counter)
+
+    def generateFloorTextureName(self):
+        return 'room_floor_tex' + str(self.material_counter)
+
     def exportToFbx(self, filename):
         (lSdkManager, lScene) = FbxCommon.InitializeSdkObjects()
         self.createFbxScene(lSdkManager, lScene)
@@ -72,74 +77,42 @@ class Exporter:
         # walls are created with two triangles per wall and two more triangles for top
         for room in self.rooms:
             tMesh = self.convertRoomToTriangleMesh(room);
-            roomMesh = FbxMesh.Create( pSdkManager, 'Room')
+            floorMesh = FbxMesh.Create( pSdkManager, 'RoomFloor' + str(room.room_id))
+            wallMesh = FbxMesh.Create( pSdkManager, 'RoomWalls' + str(room.room_id))
 
-            #Set the normals on Layer 0.
-            lLayer = roomMesh.GetLayer(0)
-            if lLayer == None:
-                roomMesh.CreateLayer()
-                lLayer = roomMesh.GetLayer(0)
-
-            lLayerNormal= FbxLayerElementNormal.Create(roomMesh, "")
-            lLayerNormal.SetMappingMode(FbxLayerElement.eByControlPoint)
-            lLayerNormal.SetReferenceMode(FbxLayerElement.eDirect)
-
-            N = len(tMesh.vertices)
-
-            roomMesh.InitControlPoints(N)
-
+            #######################################################
             #center the room at the mean. Remove this later
-            av = np.mean(tMesh.vertices, axis=0)
+            av = np.mean(tMesh.floor_vertices, axis=0)
             av[2] = 0
-            tMesh.vertices = tMesh.vertices - av
+            tMesh.floor_vertices = tMesh.floor_vertices - av
+            tMesh.wall_vertices = tMesh.wall_vertices - av
             tMesh.collision_vertices = tMesh.collision_vertices - av
+            #######################################################
 
-            for i in range(N):
-                fbxv = FbxVector4(tMesh.vertices[i][0]*self.mesh_scale,
-                                  tMesh.vertices[i][1]*self.mesh_scale,
-                                  tMesh.vertices[i][2]*self.mesh_scale)
+            self.createMesh(floorMesh, tMesh.floor_vertices, tMesh.floor_indices)
+            self.createMesh(wallMesh, tMesh.wall_vertices, tMesh.wall_indices)
 
-                lLayerNormal.GetDirectArray().Add(FbxVector4(0.0, 0.0, -1.0))
-                roomMesh.SetControlPointAt(fbxv, i)
+            all_vertices = np.vstack([tMesh.floor_vertices, tMesh.wall_vertices]);
 
-            lLayer.SetNormals(lLayerNormal)
+            self.createFloorMaterial(pSdkManager, floorMesh,
+                                     tMesh.floor_vertices, tMesh.floor_indices)
 
-            UVLayer = self.createRoomUVTexture(room, roomMesh)
-            UVLayer.GetIndexArray().SetCount(len(tMesh.floor_indices + tMesh.wall_indices)*3) #as many UV coordinate as vertices
+            self.createWallMaterial(pSdkManager, wallMesh, tMesh.wall_vecs,
+                                    tMesh.wall_vertices, tMesh.wall_indices)
 
-            roomNode = FbxNode.Create(pSdkManager, "Room") #change name with room id
-            roomNode.SetNodeAttribute(roomMesh);
-            roomNode.LclScaling.Set(FbxDouble3(1.0, 1.0, 1.0))
-            roomNode.LclTranslation.Set(FbxDouble3(0.0, 0.0, 0.0))
-            roomNode.LclRotation.Set(FbxDouble3(0.0, 0.0, 0.0))
-            roomNode.SetShadingMode(FbxNode.eTextureShading)
+            floorNode = FbxNode.Create(pSdkManager, "RoomFloor" + str(room.room_id))
+            floorNode.SetNodeAttribute(floorMesh);
+            floorNode.LclScaling.Set(FbxDouble3(1.0, 1.0, 1.0))
+            floorNode.LclTranslation.Set(FbxDouble3(0.0, 0.0, 0.0))
+            floorNode.LclRotation.Set(FbxDouble3(0.0, 0.0, 0.0))
+            floorNode.SetShadingMode(FbxNode.eTextureShading)
 
-            # add floor polygon indices and material
-            idx_vertex = 0
-            for idx_triangle in tMesh.floor_indices:
-                roomMesh.BeginPolygon(self.material_counter) #put here material ID
-                for vtri in range(3):
-                    roomMesh.AddPolygon(idx_triangle[vtri])
-                    UVLayer.GetIndexArray().SetAt(idx_vertex, idx_triangle[vtri])
-                    idx_vertex = idx_vertex + 1
-                roomMesh.EndPolygon();
-
-
-            self.createStandardMaterial(pSdkManager, roomMesh, self.material_counter, "floor.ktx")
-            self.material_counter = self.material_counter  + 1
-
-            #add wall polygon indices and material
-            for idx_triangle in tMesh.wall_indices:
-                roomMesh.BeginPolygon(self.material_counter) #put here material ID
-                for vtri in range(3):
-                    roomMesh.AddPolygon(idx_triangle[vtri])
-                    UVLayer.GetIndexArray().SetAt(idx_vertex, idx_triangle[vtri])
-                    idx_vertex = idx_vertex + 1
-
-
-            self.createStandardMaterial(pSdkManager, roomMesh, self.material_counter, generateWallTextureName(room) + '.ktx')
-            self.material_counter = self.material_counter  + 1
-
+            wallNode = FbxNode.Create(pSdkManager, "RoomWall" + str(room.room_id))
+            wallNode.SetNodeAttribute(wallMesh);
+            wallNode.LclScaling.Set(FbxDouble3(1.0, 1.0, 1.0))
+            wallNode.LclTranslation.Set(FbxDouble3(0.0, 0.0, 0.0))
+            wallNode.LclRotation.Set(FbxDouble3(0.0, 0.0, 0.0))
+            wallNode.SetShadingMode(FbxNode.eTextureShading)
 
             #create a collision node for each collision polygon
             collisionNode = FbxNode.Create(pSdkManager, "RoomCollision")
@@ -160,14 +133,98 @@ class Exporter:
                 collisionMesh.EndPolygon()
 
             collisionNode.SetNodeAttribute(collisionMesh)
-            roomNode.AddChild(collisionNode)
+            floorNode.AddChild(collisionNode)
 
             # TODO: add as polygons as well the convex polys of the room? much easier
             # to check locations!!
 
+        pScene.GetRootNode().AddChild(floorNode)
+        pScene.GetRootNode().AddChild(wallNode)
 
-        pScene.GetRootNode().AddChild(roomNode)
+    def createMesh(self, mesh, vertices, indices):
 
+        #Set the normals on Layer 0.
+        lLayer = mesh.GetLayer(0)
+        if lLayer == None:
+            mesh.CreateLayer()
+            lLayer = mesh.GetLayer(0)
+
+        lLayerNormal= FbxLayerElementNormal.Create(mesh, "")
+        lLayerNormal.SetMappingMode(FbxLayerElement.eByControlPoint)
+        lLayerNormal.SetReferenceMode(FbxLayerElement.eDirect)
+
+        N = len(vertices)
+        mesh.InitControlPoints(N)
+
+        for i in range(N):
+            fbxv = FbxVector4(vertices[i][0]*self.mesh_scale,
+                              vertices[i][1]*self.mesh_scale,
+                              vertices[i][2]*self.mesh_scale)
+
+            lLayerNormal.GetDirectArray().Add(FbxVector4(0.0, 0.0, -1.0))
+            mesh.SetControlPointAt(fbxv, i)
+
+        lLayer.SetNormals(lLayerNormal)
+
+        # add floor polygon indices and material
+        idx_vertex = 0
+        for idx_triangle in indices:
+            mesh.BeginPolygon(self.material_counter) #put here material ID
+            for vtri in range(3):
+                mesh.AddPolygon(idx_triangle[vtri])
+                idx_vertex = idx_vertex + 1
+            mesh.EndPolygon();
+
+    def createFloorMaterial(self, pSdkManager, mesh, vertices, indices):
+
+        lLayer = mesh.GetLayer(0)
+        UVLayer = FbxLayerElementUV.Create(mesh, "DiffuseUV")
+        UVLayer.SetMappingMode(FbxLayerElement.eByPolygonVertex)
+        UVLayer.SetReferenceMode(FbxLayerElement.eIndexToDirect)
+        lLayer.SetUVs(UVLayer, FbxLayerElement.eTextureDiffuse)
+
+        texture_name = self.generateFloorTextureName()
+
+        self.generateFloorTexture(texture_name, vertices, UVLayer)
+        UVLayer.GetIndexArray().SetCount(len(indices)*3) #as many UV coordinate as vertices
+
+        #add floor polygon indices and material
+        idx_vertex = 0
+        for idx_triangle in indices:
+            for vtri in range(3):
+                UVLayer.GetIndexArray().SetAt(idx_vertex, idx_triangle[vtri])
+                idx_vertex = idx_vertex + 1
+
+        self.createStandardMaterial(pSdkManager, mesh, self.material_counter,
+                                    texture_name + '.ktx')
+
+        self.material_counter = self.material_counter  + 1
+
+
+    def createWallMaterial(self, pSdkManager, mesh, wall_vecs, vertices, indices):
+
+        lLayer = mesh.GetLayer(0)
+        UVLayer = FbxLayerElementUV.Create(mesh, "DiffuseUV")
+        UVLayer.SetMappingMode(FbxLayerElement.eByPolygonVertex)
+        UVLayer.SetReferenceMode(FbxLayerElement.eIndexToDirect)
+        lLayer.SetUVs(UVLayer, FbxLayerElement.eTextureDiffuse)
+
+        texture_name = self.generateWallTextureName()
+
+        self.generateWallTexture(texture_name, wall_vecs, vertices, UVLayer)
+        UVLayer.GetIndexArray().SetCount(len(indices)*3) #as many UV coordinate as vertices
+
+        #add floor polygon indices and material
+        idx_vertex = 0
+        for idx_triangle in indices:
+            for vtri in range(3):
+                UVLayer.GetIndexArray().SetAt(idx_vertex, idx_triangle[vtri])
+                idx_vertex = idx_vertex + 1
+
+        self.createStandardMaterial(pSdkManager, mesh, self.material_counter,
+                                    texture_name + '.ktx')
+
+        self.material_counter = self.material_counter  + 1
 
     def createStandardMaterial(self, pSdkManager, mesh, material_id, texture_file):
 
@@ -221,45 +278,16 @@ class Exporter:
         if lMaterial:
             lMaterial.Diffuse.ConnectSrcObject(lTexture)
 
-    def createRoomUVTexture(self, room, roomMesh):
 
-        lLayer = roomMesh.GetLayer(0)
-        if lLayer == None:
-            roomMesh.CreateLayer()
-        lLayer = roomMesh.GetLayer(0)
-
-        # Set texture mapping for diffuse channel.
-        # lTextureDiffuseLayer=FbxLayerElementTexture.Create(roomMesh, "Diffuse Texture")
-        # lTextureDiffuseLayer.SetMappingMode(FbxLayerElement.eByPolygon)
-        # lTextureDiffuseLayer.SetReferenceMode(FbxLayerElement.eIndexToDirect)
-        # lLayer.SetTextures(FbxLayerElement.eTextureDiffuse, lTextureDiffuseLayer)
-
-        # Create UV for Diffuse channel
-        lUVDiffuseLayer = FbxLayerElementUV.Create(roomMesh, "DiffuseUV")
-        lUVDiffuseLayer.SetMappingMode(FbxLayerElement.eByPolygonVertex)
-        lUVDiffuseLayer.SetReferenceMode(FbxLayerElement.eIndexToDirect)
-        lLayer.SetUVs(lUVDiffuseLayer, FbxLayerElement.eTextureDiffuse)
-
-        floor_type = 0
-        self.generateFloorTexture(floor_type, room, lUVDiffuseLayer)
-
-        wall_type = 1
-        self.generateWallTexture(wall_type, room, lUVDiffuseLayer)
-
-        return lUVDiffuseLayer
-
-
-    def generateFloorTexture(self, floor_type, room, lUVDiffuseLayer):
-
-        #TODO: change to procedural
+    def generateFloorTexture(self, texture_name, vertices, lUVDiffuseLayer):
 
         #get image
         im = Image.open("textures/floor.jpg")
         imsize = im.size;
 
         #get room square
-        minrv = np.min(room.floor_vertices, axis=0)
-        maxrv = np.max(room.floor_vertices, axis=0)
+        minrv = np.min(vertices, axis=0)
+        maxrv = np.max(vertices, axis=0)
         top_left = minrv[0:2]*self.tex_scale
         bottom_right = maxrv[0:2]*self.tex_scale
         room_height = bottom_right[0] - top_left[0]
@@ -276,28 +304,25 @@ class Exporter:
         imsize = im.size;
 
         #compute UV coordinates for each vertex
-        for v in room.floor_vertices:
+        for v in vertices:
             coords_world = (v - minrv)*self.tex_scale
             coords_world[0] = 1 - coords_world[0]/room_height
             coords_world[1] = 1 - coords_world[1]/room_width
-            room.uv_coords.append(coords_world)
             uvVec = FbxVector2(coords_world[1], coords_world[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
-    def generateWallTexture(self, type, room, lUVDiffuseLayer):
+    def generateWallTexture(self, texture_name, vertices, wall_vecs, lUVDiffuseLayer):
 
         #add wall vertices
         #create a plane texture of the right size
         wall_height = 0.025
         wall_width = 0.01
-        minrv = np.min(room.wall_vertices, axis=0)
+        minrv = np.min(vertices, axis=0)
         top_left = minrv[0:2]*self.tex_scale
         #measure length of wall
         total_wall_length = 0
-        for wall in room.walls:
-            v1 = self.vertices[wall[0]]
-            v2 = self.vertices[wall[1]]
-            total_wall_length = total_wall_length + np.linalg.norm(v2 - v1);
+        for wall in wall_vecs:
+            total_wall_length = total_wall_length + np.linalg.norm(wall);
 
         texture_height = int((wall_height + wall_width)*self.tex_scale)
         texture_width = int(total_wall_length*self.tex_scale)
@@ -311,52 +336,43 @@ class Exporter:
 
         tex_ratio_height = wall_height/(wall_height + wall_width)
 
-        first_wall_vertex = self.vertices[room.walls[0]]
-        for wall in room.walls:
+        for wall in wall_vecs:
 
-            v1 = self.vertices[wall[0]]
-            v2 = self.vertices[wall[1]]
-            wall_length = np.linalg.norm(v2 - v1)
+            wall_length = np.linalg.norm(wall)
 
             # botom1
             coord[0] = coord_length;
             coord[1] = 0.0;
-            room.uv_coords.append(coord)
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
             #bottom 2
             coord[0] = coord_length + wall_length/total_wall_length;
             coord[1] = 0.0;
-            room.uv_coords.append(coord)
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
             #top1
             coord[0] = coord_length;
             coord[1] = tex_ratio_height
-            room.uv_coords.append(coord)
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
             #top2
             coord[0] = coord_length + wall_length/total_wall_length;
             coord[1] = tex_ratio_height
-            room.uv_coords.append(coord)
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
             #top1 (ceiling)
             coord[0] = coord_length;
             coord[1] = 1.0
-            room.uv_coords.append(coord)
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
             #top2 (ceiling)
             coord[0] = coord_length + wall_length/total_wall_length;
             coord[1] = 1.0
-            room.uv_coords.append(coord)
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
 
@@ -367,8 +383,6 @@ class Exporter:
 
         #save in texture folder and transform to ktx
         #texture.
-
-        texture_name = generateWallTextureName(room)
         texture.save_and_compile(texture_name);
 
     #TODO def createFloorMesh
@@ -433,7 +447,7 @@ class Exporter:
 
         room.floor_indices = mapped_triangles;
 
-        wall_idx = len(unique_indices)
+        wall_idx = 0#len(unique_indices)
         wall_vertices = np.zeros((len(room.walls)*6,3))
         idx = 0
         col_idx = 0
@@ -441,6 +455,7 @@ class Exporter:
         wall_idx_matrix = np.vstack([room.walls])
 
         mesh.floor_indices = mapped_triangles
+        mesh.wall_vecs = []
 
         mapped_triangles = []
 
@@ -448,6 +463,9 @@ class Exporter:
         for wall in room.walls:
             v1 = vertices3d[wall[0],:]
             v2 = vertices3d[wall[1],:]
+
+            mesh.wall_vecs.append(v2 - v1)
+
             v3 = np.copy(v1)
             v3[2] = wall_height
             v4 = np.copy(v2)
@@ -493,10 +511,8 @@ class Exporter:
             wall_idx = wall_idx + 6
             idx = idx + 6
 
-        mesh.vertices = np.vstack((floor_vertices, wall_vertices))
         mesh.wall_indices = mapped_triangles
-
-        room.floor_vertices = floor_vertices
-        room.wall_vertices = wall_vertices
+        mesh.floor_vertices = floor_vertices
+        mesh.wall_vertices = wall_vertices
 
         return mesh
