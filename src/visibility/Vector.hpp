@@ -8,25 +8,33 @@
 #include <ostream>
 #include <cmath>
 #include <cassert>
+#include <Eigen/Dense>
 
-namespace geometry
+namespace visibility
 {
     // Fixed-size vector
     template<typename T, std::size_t num_components>
     struct Vector
     {
+		typedef Eigen::Matrix<T, num_components, 1> EigenType;
+
         std::array<T, num_components> data;
 
         Vector() {}
+		Vector(const EigenType & vec) {
+			for (std::size_t i = 0; i < num_components; i++) {
+				data[i] = vec(i);
+			}
+		}
         Vector(const std::array<T, num_components>& data) : data(data) {}
         explicit Vector(const T& scalar) { for (std::size_t i = 0; i < num_components; i++) data[i] = scalar; }
         Vector(const Vector<T, num_components>&) = default;
         Vector& operator=(const Vector<T, num_components>&) = default;
-        Vector(const std::initializer_list<T>& list) 
-        { 
+        Vector(const std::initializer_list<T>& list)
+        {
             assert(list.size() == num_components);
             std::size_t index = 0;
-            for (auto value : list) data[index++] = value; 
+            for (auto value : list) data[index++] = value;
         }
 
         // Element access
@@ -42,13 +50,13 @@ namespace geometry
             for (std::size_t i = 0; i < num_components; i++) data[i] += vector.data[i];
             return *this;
         }
-        
+
         Vector<T, num_components>& operator-=(const Vector<T, num_components>& vector)
         {
             for (std::size_t i = 0; i < num_components; i++) data[i] -= vector.data[i];
             return *this;
         }
-        
+
         Vector<T, num_components>& operator*=(const T& scalar)
         {
             for (auto&& comp : data) comp *= scalar;
@@ -68,14 +76,14 @@ namespace geometry
             for (std::size_t i = 0; i < num_components; i++) result.data[i] = data[i] + vector.data[i];
             return result;
         }
-        
+
         Vector<T, num_components> operator-(const Vector<T, num_components>& vector) const
         {
             Vector<T, num_components> result;
             for (std::size_t i = 0; i < num_components; i++) result.data[i] = data[i] - vector.data[i];
             return result;
         }
-        
+
         Vector<T, num_components> operator*(const T& scalar) const
         {
             Vector<T, num_components> result;
@@ -126,11 +134,11 @@ namespace geometry
     template<typename T, std::size_t num_components>
     T length_squared(const Vector<T, num_components>& vector) { return dot(vector, vector); }
 
-    // squared distance of 2 points 
+    // squared distance of 2 points
     template<typename T, std::size_t num_components>
     T distance_squared(const Vector<T, num_components>& a, const Vector<T, num_components>& b) { return length_squared(a - b); }
 
-    // return perpendicular 2D vector 
+    // return perpendicular 2D vector
     template<typename T>
     Vector<T, 2> normal(const Vector<T, 2>& vector) { return{ -vector[1], vector[0] }; }
 

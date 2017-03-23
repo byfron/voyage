@@ -7,7 +7,7 @@
 #include "Vector.hpp"
 #include "Floats.hpp"
 
-namespace geometry
+namespace visibility
 {
     enum class Orientation
     {
@@ -16,12 +16,12 @@ namespace geometry
         Collinear = 0
     };
 
-    // compute orientation of 3 points in a plane 
+    // compute orientation of 3 points in a plane
     inline Orientation orientation(vec2 a, vec2 b, vec2 c)
     {
         auto det = cross(b - a, c - a);
         return static_cast<Orientation>(
-            static_cast<int>(strictly_less(0.f, det)) - 
+            static_cast<int>(strictly_less(0.f, det)) -
             static_cast<int>(strictly_less(det, 0.f))
         );
     }
@@ -72,7 +72,7 @@ namespace geometry
             auto u = cross(ao, direction) / det;
             if (strictly_less(u, 0.f, EPSILON) || strictly_less(1.f, u, EPSILON)) return false;
 
-            auto t = -cross(ab, ao) / det;
+            auto t =  -cross(ab,ao) / det;
             out_point = origin + t * direction;
             return approx_equal(t, 0.f, EPSILON) || t > 0;
         }

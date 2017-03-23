@@ -143,7 +143,7 @@ class Exporter:
             collisionMesh.BeginPolygon()
             for idx in col_indices:
                 collisionMesh.AddPolygon(idx)
-                collisionMesh.EndPolygon()
+            collisionMesh.EndPolygon()
 
         collisionNode.SetNodeAttribute(collisionMesh)
         return collisionNode
@@ -525,13 +525,15 @@ class Exporter:
             mapped_triangles.append((wall_idx+3, wall_idx+5, wall_idx+4))
 
             #add the wall polygon as metadata into the FBX file
-            mesh.collision_vertices.append(wall_vertices[idx+2])
-            mesh.collision_vertices.append(wall_vertices[idx+3])
-            mesh.collision_vertices.append(wall_vertices[idx+4])
-            mesh.collision_vertices.append(wall_vertices[idx+5])
-            mesh.collision_indices.append((col_idx, col_idx+1, col_idx+2, col_idx+3))
+            mesh.collision_vertices.append(wall_vertices[idx])
+            mesh.collision_vertices.append(wall_vertices[idx+1])
+        #     mesh.collision_vertices.append(wall_vertices[idx+2])
+        #     mesh.collision_vertices.append(wall_vertices[idx+3])
+        #     mesh.collision_vertices.append(wall_vertices[idx+4])
+        #     mesh.collision_vertices.append(wall_vertices[idx+5])
+            mesh.collision_indices.append((col_idx, col_idx+1))#, col_idx+2, col_idx+3))
 
-            col_idx = col_idx + 4
+            col_idx = col_idx + 2
             wall_idx = wall_idx + 6
             idx = idx + 6
 

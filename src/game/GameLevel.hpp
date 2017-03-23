@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include <utils/GeometryUtils.hpp>
+#include <visibility/Visibility.hpp>
 #include <memory>
 #include <iostream>
 
@@ -48,6 +49,21 @@ public:
 		std::vector<LevelRoom> adj_rooms;
 		adj_rooms.push_back(levelRoom);
 		return adj_rooms;
+	}
+
+	std::vector<visibility::LineSegment> getCollisionLineSegments() {
+
+		std::vector<visibility::LineSegment> segments;
+
+		// we could speed up visibility if we limit the polygons to nearby rooms
+		// and of course simplifying the geometry is the most important
+		for (auto r : m_rooms) {
+			for (auto pol : r.collision_polygons) {
+				for (auto line : pol.toLineSegmentList())
+					segments.push_back(line);
+			}
+		}
+		return segments;
 	}
 
 	std::vector<GeometryUtils::Polygon> getCollisionPolygonsNearby(const Vec3f & pos) {

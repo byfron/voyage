@@ -15,6 +15,7 @@
 #include <components/MapCmp.hpp>
 #include <components/GraphicsCmp.hpp>
 #include <components/ScriptSystem.hpp>
+#include <components/VisibilityComponent.hpp>
 
 //#include "handlers/ClientMapHandler.hpp"
 #include "voyage.pb.h"
@@ -94,7 +95,7 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 	_entityManager.assign<BodyCmp>(player.id(), "cfg");
 	_entityManager.assign<NetworkCmp>(player.id());
 	_entityManager.assign<CollisionComponent>(player.id());
-	_entityManager.assign<VisibilityComponent>(player.id());
+	_entityManager.assign<VisibilityCmp>(player.id());
 
 	// Client-side components
 	_entityManager.assign<DebugGraphicsCmp>(player.id());

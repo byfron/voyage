@@ -167,13 +167,11 @@ std::vector<FbxLoader::FPolygon> getMeshPolygonsFromNode(FbxNode *pNode) {
 
 		FbxLoader::FPolygon cpo;
 		cpo = FbxLoader::FPolygon::Zero(pMesh->GetPolygonSize(i), 3);
-
 		for (int t = 0; t < pMesh->GetPolygonSize(i); t++) {
 			int vertexIndex = pMesh->GetPolygonVertex(i, t);
 			cpo(t,0) = controlPoints[vertexIndex][0];
 			cpo(t,1) = controlPoints[vertexIndex][1];
 			cpo(t,2) = controlPoints[vertexIndex][2];
-			std::cout << cpo << std::endl;
 		}
 
 		polygons.push_back(cpo);

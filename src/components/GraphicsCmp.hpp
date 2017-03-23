@@ -28,10 +28,12 @@ public:
 
 class GraphicsSystem : public System<GraphicsSystem> {
 public:
+
 	GraphicsSystem() {};
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
+		// Draw all graphic elements
 		em.each<GraphicsCmp, BodyCmp>(
 			[delta](Entity entity,
 				GraphicsCmp &go,
@@ -40,6 +42,11 @@ public:
 				go.m_graphics->setTransform(body.getTransform());
 				go.m_graphics->update(delta);
 		});
+
+		// Draw visibility component (in the client there should be only one)
+
+
+
 	}
 
 };

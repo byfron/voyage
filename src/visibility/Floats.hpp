@@ -6,8 +6,8 @@
 
 #include "Vector.hpp"
 
-namespace geometry
-{ 
+namespace visibility
+{
     inline bool approx_equal(float a, float b, float epsilon = std::numeric_limits<float>::epsilon())
     {
         return std::abs(a - b) <= std::max(std::abs(a), std::abs(b)) * epsilon;
@@ -20,8 +20,8 @@ namespace geometry
 
     template<typename T, std::size_t num_components>
     bool approx_equal(
-        const Vector<T, num_components>& a, 
-        const Vector<T, num_components>& b, 
+        const Vector<T, num_components>& a,
+        const Vector<T, num_components>& b,
         T epsilon = std::numeric_limits<T>::epsilon())
     {
         for (std::size_t i = 0; i < num_components; i++)
