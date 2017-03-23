@@ -360,35 +360,35 @@ class Exporter:
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
             print(uvVec)
-            
+
             #top1
             coord[0] = coord_length;
             coord[1] = tex_ratio_height
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
             print(uvVec)
-            
+
             #top2
             coord[0] = coord_length + wall_length/total_wall_length;
             coord[1] = tex_ratio_height
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
             print(uvVec)
-            
+
             #top1 (ceiling)
             coord[0] = coord_length;
             coord[1] = 1.0
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
             print(uvVec)
-            
+
             #top2 (ceiling)
             coord[0] = coord_length + wall_length/total_wall_length;
             coord[1] = 1.0
             uvVec = FbxVector2(coord[1], coord[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
             print(uvVec)
-            
+
             coord_length = coord_length + wall_length/total_wall_length;
 
         texture = Texture()
@@ -472,8 +472,13 @@ class Exporter:
 
         mapped_triangles = []
 
+
+
+        prev_wall_end_idx = -1
+
         #add the walls
         for wall in room.walls:
+
             v1 = vertices3d[wall[0],:]
             v2 = vertices3d[wall[1],:]
 
@@ -496,22 +501,28 @@ class Exporter:
             wall_vec = v2 - v1;
             wall_adj_to_start = np.where(wall_idx_matrix[:,1] == wall[0])
             wall_adj_to_end = np.where(wall_idx_matrix[:,0] == wall[1])
+
+
             wall_start = room.walls[wall_adj_to_start[0][0]]
             wall_end = room.walls[wall_adj_to_end[0][0]]
+
             wall_adj_vec0 = vertices3d[wall_start[1]] - vertices3d[wall_start[0]]
             wall_adj_vec1 = vertices3d[wall_end[1]] - vertices3d[wall_end[0]]
-            edge_vec_start = (wall_adj_vec0 + wall_vec)/2.0
-            edge_vec_end = (wall_adj_vec1 + wall_vec)/2.0
-            normal_start =  np.array([edge_vec_start[1], -edge_vec_start[0]])
+            normal_start =  np.array([wall_adj_vec0[1], -wall_adj_vec0[0]])
             normal_start = normal_start/np.linalg.norm(normal_start)
-            normal_end =  np.array([edge_vec_end[1], -edge_vec_end[0]])
+            normal_end =  np.array([wall_adj_vec1[1], -wall_adj_vec1[0]])
             normal_end = normal_end/np.linalg.norm(normal_end)
+            wall_normal = np.array([wall_vec[1], -wall_vec[0]])
+            wall_normal = wall_normal/np.linalg.norm(wall_normal)
 
-            wall_vertices[idx+4] = v3 + np.hstack((normal_start*wall_width, 0))
-            wall_vertices[idx+5] = v4 + np.hstack((normal_end*wall_width, 0))
+            normal_av1 = (normal_start + wall_normal)/2.0
+            normal_av2 = (normal_end + wall_normal)/2.0
 
-            mapped_triangles.append((wall_idx+4, wall_idx+3, wall_idx+2))
-            mapped_triangles.append((wall_idx+4, wall_idx+5, wall_idx+3))
+            wall_vertices[idx+4] = v3 - np.hstack((normal_av1*wall_width, 0))
+            wall_vertices[idx+5] = v4 - np.hstack((normal_av2*wall_width, 0))
+
+            mapped_triangles.append((wall_idx+2, wall_idx+3, wall_idx+4))
+            mapped_triangles.append((wall_idx+3, wall_idx+5, wall_idx+4))
 
             #add the wall polygon as metadata into the FBX file
             mesh.collision_vertices.append(wall_vertices[idx+2])

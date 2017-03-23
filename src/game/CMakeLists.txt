@@ -14,4 +14,5 @@ target_link_libraries(gameEngine
   fbxsdk
   dl
   components
+  visibility
   utils)

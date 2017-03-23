@@ -30,7 +30,13 @@ public:
 	}
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
-		m_scene->update(delta);
+		for (auto room : _world->getGameLevel().getRoomVector()) {
+			for (auto poly : room.collision_polygons) {
+				pumpkin::DebugManager::push_polygon(poly.vertices);
+			}
+		}
+
+		//m_scene->update(delta);
 	}
 
 	World::Ptr _world;

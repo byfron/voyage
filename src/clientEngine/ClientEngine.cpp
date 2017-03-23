@@ -27,7 +27,7 @@ void ClientEngine::init() {
 	std::cout << "Initializing ClientEngine";
 
 	GameEngine::init();
-		
+
 	_netManager.start("127.0.0.1", 1234);
 	_netManager.connect();
 	_running = true;
@@ -60,7 +60,8 @@ void ClientEngine::createSubsystems() {
 	add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
 	add<AnimationSystem>(std::make_shared<AnimationSystem>());
 	add<MapDrawSystem>(std::make_shared<MapDrawSystem>(_world));
-	
+	add<VisibilitySystem>(std::make_shared<VisibilitySystem>(_world));
+
 }
 
 void ClientEngine::createWorld() {
@@ -68,7 +69,7 @@ void ClientEngine::createWorld() {
 	_world = std::make_shared<World>();
 
 	// Entity map = _entityManager.createLocal();
-		
+
 	// _entityManager.assign<MapComponent>(map.id(),
 	// 				    _world->getGameMap()->getTileMap());
 }
@@ -77,7 +78,7 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 
 	// NO! This id isNetweorked. will be assigned by the server
 	//Entity player1 = _entityManager.createNetworked(id);
-		
+
 	Entity player = _entityManager.createFromId(entity_id);
 
 	// TODO server spawn msg returns config file and initial params
@@ -87,12 +88,13 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 		 "main_character_anim3.cfg");
 	_entityManager.assign<AnimationComponent>(player.id(),
 						  config.config());
-	
+
 	//TODO: This should be a response from a server createEntity message
 	_entityManager.assign<PlayerCmp>(player.id(), GameEngine::m_playerId);
-	_entityManager.assign<BodyCmp>(player.id(), "cfg");	
-	_entityManager.assign<NetworkCmp>(player.id());		
+	_entityManager.assign<BodyCmp>(player.id(), "cfg");
+	_entityManager.assign<NetworkCmp>(player.id());
 	_entityManager.assign<CollisionComponent>(player.id());
+	_entityManager.assign<VisibilityComponent>(player.id());
 
 	// Client-side components
 	_entityManager.assign<DebugGraphicsCmp>(player.id());
@@ -102,12 +104,12 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 	body->m_position(0) = x;
 	body->m_position(1) = y;
 
-	
+
 // 	Entity player2 = _entityManager.create();
 // 	_entityManager.assign<PlayerCmp>(player2.id());
 // 	_entityManager.assign<CollisionComponent>(player2.id());
 // 	_entityManager.assign<NetworkCmp>(player2.id());
-// 	_entityManager.assign<BodyCmp>(player2.id(), "cfg");	
+// 	_entityManager.assign<BodyCmp>(player2.id(), "cfg");
 // 	_entityManager.assign<AnimationComponent>(player2.id(),
 // 						  std::string(CONFIG_FILE_PATH) +
 // 						  "main_character_anim3.cfg");
@@ -121,7 +123,7 @@ void ClientEngine::_registerHandlers() {
 					    ID_SC_LOGIN_ACCEPTED,
 					    ID_CONNECTION_REQUEST_ACCEPTED
 				    });
-	
+
 //	_netManager.registerHandler(std::make_shared<ClientCustomHandler<voyage::sc_worldState> >
 //				     (&_eventManager), {ID_SC_WORLD_STATE});
 
@@ -133,10 +135,10 @@ void ClientEngine::_registerHandlers() {
 				    {
 					    ID_SC_SPAWN_PLAYER,
 					    ID_SC_SPAWN_ENTITY,
-					    ID_SC_DESTROY_ENTITY,	    
+					    ID_SC_DESTROY_ENTITY,
 				    });
 
-	
+
 }
 
 void ClientEngine::requestQuit() {

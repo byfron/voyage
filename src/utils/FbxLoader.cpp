@@ -157,14 +157,12 @@ bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
 
 std::vector<FbxLoader::FPolygon> getMeshPolygonsFromNode(FbxNode *pNode) {
 
-	std::cout << "PPPPP" << std::endl;
 	FbxMesh* pMesh = (FbxMesh*) pNode->GetNodeAttribute();
 	int num_vertices = pMesh->GetControlPointsCount();
 	FbxVector4* controlPoints = pMesh->GetControlPoints();
 	int num_polygons = pMesh->GetPolygonCount();
 	std::vector<FbxLoader::FPolygon> polygons;
 
-	std::cout << "num polys: " << num_polygons << std::endl;
 	for (int i = 0; i < num_polygons; i++) {
 
 		FbxLoader::FPolygon cpo;

@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 #find length of the ridge between two regions (0 if not adjacent)
 def findRidgeLength(graph, r1, r2):
@@ -24,24 +25,30 @@ class Room:
     def getRandomRoomSize(self):
         return 3;
 
-    def create(self, region_idx, regions, graph):
+    def growRoom(self, regions, region_idx, valid_regions, room_size):
+        room_regions = []
+        lengths = []
+        adjacent_regions = regions[region_idx].adjacent_regions
+
+        while len(room_regions) < room_size:
+            adj = adjacent_regions[random.randint(0, len(adjacent_regions)-1)]
+            if adj in valid_regions and adj not in room_regions:
+                room_regions.append(adj)
+                adjacent_regions = adjacent_regions + regions[adj].adjacent_regions
+
+        room_regions.append(region_idx)
+
+        return room_regions
+
+
+    def create(self, region_idx, regions, graph, valid_regions):
 
         room_size = self.getRandomRoomSize();
         room_polygon = graph.polygons[region_idx];
 
-        lengths = []
-        adjacent_regions = regions[region_idx].adjacent_regions
 
-        for adj in adjacent_regions:
-            length = findRidgeLength(graph, adj, region_idx)
-            lengths.append(length)
-
-        room_size = min((room_size, len(adjacent_regions)))
-        idx_largest_edges = np.argsort(lengths)[-room_size:]
-
-        room_regions = [adjacent_regions[i] for i in idx_largest_edges if not regions[adjacent_regions[i]].isEdgeRegion]
-        room_regions.append(region_idx)
         room_walls = []
+        room_regions = self.growRoom(regions, region_idx, valid_regions, 20)
 
         for reg in room_regions:
             regions[reg].color = 'blue'
@@ -75,6 +82,9 @@ class Room:
 
         self.regions = room_regions;
         self.walls = room_walls;
+
+        #mark regions and neighbors of those regions as "used"
+
 
         # create doors in random walls
         # num_doors = 1

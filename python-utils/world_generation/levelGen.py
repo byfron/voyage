@@ -4,22 +4,9 @@ import numpy as np
 import pdb
 from PIL import Image, ImageDraw
 from generators.RoomGenerator import Room
-
-#find set of adjacent indices of a region
-def findAdjacentRegions(graph, reg):
-
-    reg_vertices = graph.voronoi_regions[reg]
-
-    neighbors = []
-
-    #find regions with shared vertices that are NOT at the border
-    for idx in range(len(graph.voronoi_regions)):
-        region = graph.voronoi_regions[idx]
-        intersect = np.intersect1d(region, reg_vertices)
-        if (intersect.size != 0 and idx != reg):
-            neighbors.append(idx)
-
-    return neighbors
+from generators.CorridorGenerator import Corridor
+from utils.graphUtils import findAdjacentRegions
+from collections import OrderedDict
 
 class Region:
     def __init__(self, polygon):
@@ -64,13 +51,30 @@ class GameLevel:
             idx = idx + 1
 
         #choose the starting region randomly
-        starting_region_idx = self.valid_regions[random.randint(0, len(self.valid_regions)-1)]
 
-        room_counter = 0
+        num_rooms = 1
+        for room_counter in range(num_rooms):
+            region_idx = self.valid_regions[random.randint(0, len(self.valid_regions)-1)]
+            room = Room(room_counter)
+            room.create(region_idx, self.regions, self.graph, self.valid_regions)
 
-        room = Room(room_counter)
-        room.create(starting_region_idx, self.regions, self.graph)
-        self.rooms.append(room)
+            #remove room regions (and adjacent regions from valid vector)
+            invalid_regions = room.regions
+            for reg in room.regions:
+                invalid_regions = invalid_regions + self.regions[reg].adjacent_regions
+            invalid_regions = list(OrderedDict.fromkeys(invalid_regions))
+            for inv in invalid_regions:
+                if inv in self.valid_regions:
+                    self.valid_regions.remove(inv)
+
+            self.rooms.append(room)
+
+
+
+        # corridor = Corridor()
+        # corridor.create(room, self.regions, self.graph)
+        # self.corridors.append(corridor)
+        #self.rooms.append(corridor)
 
 
     def show(self, ntiles):
@@ -102,8 +106,13 @@ class GameLevel:
         # po1 = (cline1 - top_left) * scale
         # ImageDraw.Draw(img).line(np.hstack(po1.astype(int)).tolist(), fill='green', width=5)
 
-        # cline2 =  np.vstack((self.corridor[1], self.corridor[3]))
-        # po2 = (cline2 - top_left) * scale
-        # ImageDraw.Draw(img).line(np.hstack(po2.astype(int)).tolist(), fill='green', width=5)
+        # for r_idx in self.corridors[0].intersecting_regions:
+        #     vertices = self.graph.vertices[self.regions[r_idx].polygon,:]
+        #     po = (vertices - top_left) * scale
+        #     ImageDraw.Draw(img).polygon(np.hstack(po.astype(int)).tolist(), outline='white', fill='pink')
+
+    # cline2 =  np.vstack((self.corridors[1], self.corridors[3]))
+    #     po2 = (cline2 - top_left) * scale
+    #     ImageDraw.Draw(img).line(np.hstack(po2.astype(int)).tolist(), fill='green', width=5)
 
         img.show()
