@@ -11,18 +11,18 @@ public:
 	void start() {};
 	void clientLoop();
 	void requestQuit();
-	
-       	EntityManager & entityManager() { return _entityManager; }
+
+	EntityManager & entityManager() { return _entityManager; }
 	EventManager & eventManager() { return _eventManager; }
 
 	World::Ptr getWorld() { return _world; }
 
 	void createSubsystems();
 	void createWorld();
-	void createPlayer(uint32_t index, float x, float y);	
+	void createPlayer(uint32_t index, float x, float y);
 
 	void receiveData()  { _netManager.receiveData(); }
-	
+
 //	ClientTileMap::Ptr getTileMap() { return _tileMap; };
 
 	ClientNetworkManager & getNetManager() { return _netManager; }

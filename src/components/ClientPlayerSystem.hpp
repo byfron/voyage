@@ -110,6 +110,9 @@ public:
 				// Move camera
 				pumpkin::GraphicsEngine::camera().moveAlong(body.m_moveVec);
 
+				// Update visibilityManager with new player position
+				m_visibilityManager.setPlayerPosition(body.m_position);
+
 				// HERE. check for messages of this entity in the common
 				// WorldUpdate pool
 				if (m_msgPool.hasPlayerMsg()) {
@@ -145,6 +148,7 @@ public:
 
 private:
 
+	VisibilityManager & m_visibilityManager;
 	ClientNetworkManager & m_network_manager;
 	NetworkMessagePool & m_msgPool;
 	uint32_t m_action_seq_num;

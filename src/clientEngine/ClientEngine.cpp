@@ -56,13 +56,27 @@ void ClientEngine::createSubsystems() {
 		std::make_shared<ClientPlayerSystem>(_world, _netMsgPool, _netManager);
 	ps->configure(_eventManager);
 	add<ClientPlayerSystem>(ps);
-
 	add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
 	add<CollisionSystem>(std::make_shared<CollisionSystem>(_world));
-	add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
+
+
+
+
+
+	// updates animations
 	add<AnimationSystem>(std::make_shared<AnimationSystem>());
-	add<MapDrawSystem>(std::make_shared<MapDrawSystem>(_world));
-	add<VisibilitySystem>(std::make_shared<VisibilitySystem>(_world));
+	// updates graphics objects
+	add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
+
+
+	// handles orderly rendering: submits render calls
+	// of components so that things display correctly (stencil, depth, etc...)
+	add<DrawSystem>(std::make_shared<DrawSystem>());)
+
+
+
+	//add<MapDrawSystem>(std::make_shared<MapDrawSystem>(_world));
+	//add<VisibilitySystem>(std::make_shared<VisibilitySystem>(_world));
 
 }
 
