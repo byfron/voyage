@@ -39,7 +39,6 @@ public:
 
 			vis.visi_polygon.clear();
 			for (auto v : visi_polygon) {
-				std::cout << v << std::endl;
 				vis.visi_polygon.push_back(Vec2f(v.data[0], v.data[1]));
 			}
 		});

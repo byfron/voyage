@@ -1,5 +1,7 @@
 #include <entities/System.hpp>
 #include <pumpkin.hpp>
+#include <graphics/VisibilityLayer.hpp>
+#include <components/VisibilityComponent.hpp>
 
 class MapDrawSystem : public System<MapDrawSystem> {
 public:
@@ -36,9 +38,19 @@ public:
 			}
 		}
 
+		//m_scene->updateVisibilityLayer();
 		//m_scene->update(delta);
+
+        em.each<VisibilityCmp>([delta, this](Entity entity,
+                                             VisibilityCmp &visCmp) {
+            m_visibility_layer.m_polygon = visCmp.visi_polygon;
+            m_visibility_layer.update(delta);
+        });
+
+		// paint the visiblity polygon
 	}
 
 	World::Ptr _world;
 	pumpkin::Scene::Ptr m_scene;
+    pumpkin::VisibilityLayer m_visibility_layer;
 };

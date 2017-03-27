@@ -30,11 +30,13 @@ public:
 
 	typedef std::shared_ptr<ClientEngine> Ptr;
 
+	static Entity::Id playerEntityId() { return _player_entity_id; }
 
 private:
 
 	void _registerHandlers();
 	NetworkMessagePool _netMsgPool;
 	ClientNetworkManager  _netManager;
+	static Entity::Id _player_entity_id;
 
 };

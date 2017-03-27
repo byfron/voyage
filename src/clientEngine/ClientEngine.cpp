@@ -22,6 +22,7 @@
 #include <iostream>
 
 namespace spd = spdlog;
+Entity::Id ClientEngine::_player_entity_id;
 
 void ClientEngine::init() {
 
@@ -80,33 +81,34 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 	// NO! This id isNetweorked. will be assigned by the server
 	//Entity player1 = _entityManager.createNetworked(id);
 
-	Entity player = _entityManager.createFromId(entity_id);
+	Entity player_entity = _entityManager.createFromId(entity_id);
+    _player_entity_id = player_entity.id();
 
 	// TODO server spawn msg returns config file and initial params
 
 	pumpkin::Configuration<pumpkin::Animation::Config> config
 		(std::string(CONFIG_FILE_PATH) +
 		 "main_character_anim3.cfg");
-	_entityManager.assign<AnimationComponent>(player.id(),
+	_entityManager.assign<AnimationComponent>(player_entity.id(),
 						  config.config());
 
 	//TODO: This should be a response from a server createEntity message
-	_entityManager.assign<PlayerCmp>(player.id(), GameEngine::m_playerId);
-	_entityManager.assign<BodyCmp>(player.id(), "cfg");
-	_entityManager.assign<NetworkCmp>(player.id());
-	_entityManager.assign<CollisionComponent>(player.id());
-	_entityManager.assign<VisibilityCmp>(player.id());
+	_entityManager.assign<PlayerCmp>(player_entity.id(), GameEngine::m_playerId);
+	_entityManager.assign<BodyCmp>(player_entity.id(), "cfg");
+	_entityManager.assign<NetworkCmp>(player_entity.id());
+	_entityManager.assign<CollisionComponent>(player_entity.id());
+	_entityManager.assign<VisibilityCmp>(player_entity.id());
 
 	// Client-side components
-	_entityManager.assign<DebugGraphicsCmp>(player.id());
+	_entityManager.assign<DebugGraphicsCmp>(player_entity.id());
 
 
-	BodyCmp *body = _entityManager.getComponentPtr<BodyCmp>(player.id());
+	BodyCmp *body = _entityManager.getComponentPtr<BodyCmp>(player_entity.id());
 	body->m_position(0) = x;
 	body->m_position(1) = y;
 
 
-// 	Entity player2 = _entityManager.create();
+// 	Entity player_entity2 = _entityManager.create();
 // 	_entityManager.assign<PlayerCmp>(player2.id());
 // 	_entityManager.assign<CollisionComponent>(player2.id());
 // 	_entityManager.assign<NetworkCmp>(player2.id());

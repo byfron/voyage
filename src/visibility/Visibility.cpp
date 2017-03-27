@@ -61,7 +61,7 @@ std::vector<vec2> VisibilityPolygon(vec2 point, const std::vector<LineSegment>& 
 		{
 			vec2 intersection;
 			auto result = Ray{ point, event.point() - point }.Intersects(*state.begin(), intersection);
-			assert(result && "Ray intersects a line segment iff the line segment is in the state");
+//			assert(result && "Ray intersects a line segment iff the line segment is in the state");
 
 			if (event.type == VisibilityEventType::StartVertex)
 			{
