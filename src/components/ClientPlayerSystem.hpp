@@ -114,7 +114,7 @@ public:
 				pumpkin::GraphicsEngine::camera().moveAlong(body.m_moveVec);
 
 				// Update visibilityManager with new player position
-				m_visibilityManager.setPlayerPosition(body.m_position.segment<2>(0, 2));
+				m_visibilityManager.update(body.m_position.segment<2>(0, 2), m_world);
 
 				// HERE. check for messages of this entity in the common
 				// WorldUpdate pool

@@ -64,7 +64,10 @@ public:
                 });
 
         // Render game level
-        renderScene(em, delta);
+        //renderScene(em, delta);
+
+		// Render debug stuff
+		m_visibilityManager.render(delta);
 
     }
 
