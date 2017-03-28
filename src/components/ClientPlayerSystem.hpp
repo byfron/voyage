@@ -11,6 +11,7 @@
 #include <game/GameEngine.hpp>
 #include <networking/ClientNetworkManager.hpp>
 #include <utils/PlayerInput.hpp>
+#include <visibility/VisibilityManager.hpp>
 #include <voyage.pb.h>
 
 
@@ -30,9 +31,11 @@ public:
 
 	ClientPlayerSystem(World::Ptr world,
 			   NetworkMessagePool & msgPool,
-			   ClientNetworkManager & net) : PlayerSystem(world),
-							 m_msgPool(msgPool),
-							 m_network_manager(net) {
+			   ClientNetworkManager & net,
+                       VisibilityManager & vm): PlayerSystem(world),
+                                                m_msgPool(msgPool),
+                                                m_network_manager(net),
+                                                m_visibilityManager(vm) {
 
 		// search for entity and update network component
 		m_action_queue.push(UserAction());
@@ -111,7 +114,7 @@ public:
 				pumpkin::GraphicsEngine::camera().moveAlong(body.m_moveVec);
 
 				// Update visibilityManager with new player position
-				m_visibilityManager.setPlayerPosition(body.m_position);
+				m_visibilityManager.setPlayerPosition(body.m_position.segment<2>(0, 2));
 
 				// HERE. check for messages of this entity in the common
 				// WorldUpdate pool

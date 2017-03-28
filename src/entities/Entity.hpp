@@ -115,7 +115,7 @@ public:
 	}
 
 	uint32_t generateLocalId() {
-		uint32_t id = EntityManager::entity_local_count++;
+		uint32_t id = ++EntityManager::entity_local_count;
 		assert(id > EntityManager::max_networked_ids);
 		return id;
 	}

@@ -7,15 +7,14 @@
 #include "handlers/ClientCustomHandler.hpp"
 #include "handlers/ClientEntitySpawnHandler.hpp"
 #include "handlers/ClientWorldStateHandler.hpp"
-
+#include <visibility/VisibilityManager.hpp>
 #include <components/BodyCmp.hpp>
 #include <components/ClientPlayerSystem.hpp>
 #include <components/AnimationComponent.hpp>
 #include <components/CollisionComponent.hpp>
-#include <components/MapCmp.hpp>
 #include <components/GraphicsCmp.hpp>
 #include <components/ScriptSystem.hpp>
-#include <components/VisibilityComponent.hpp>
+#include <components/RenderSystem.hpp>
 
 //#include "handlers/ClientMapHandler.hpp"
 #include "voyage.pb.h"
@@ -53,30 +52,24 @@ void ClientEngine::createSubsystems() {
 
 	// Player system
 	std::shared_ptr<ClientPlayerSystem> ps =
-		std::make_shared<ClientPlayerSystem>(_world, _netMsgPool, _netManager);
+		std::make_shared<ClientPlayerSystem>(_world, _netMsgPool, _netManager, _visManager);
 	ps->configure(_eventManager);
 	add<ClientPlayerSystem>(ps);
 	add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
 	add<CollisionSystem>(std::make_shared<CollisionSystem>(_world));
 
 
-
-
+    // Client-only SYSTEMS!
 
 	// updates animations
 	add<AnimationSystem>(std::make_shared<AnimationSystem>());
+
 	// updates graphics objects
 	add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
 
-
 	// handles orderly rendering: submits render calls
 	// of components so that things display correctly (stencil, depth, etc...)
-	add<DrawSystem>(std::make_shared<DrawSystem>());)
-
-
-
-	//add<MapDrawSystem>(std::make_shared<MapDrawSystem>(_world));
-	//add<VisibilitySystem>(std::make_shared<VisibilitySystem>(_world));
+	add<RenderSystem>(std::make_shared<RenderSystem>(_world, _visManager));
 
 }
 
@@ -84,10 +77,21 @@ void ClientEngine::createWorld() {
 
 	_world = std::make_shared<World>();
 
-	// Entity map = _entityManager.createLocal();
+    pumpkin::Configuration<pumpkin::Scene::Config> config
+            (std::string(CONFIG_FILE_PATH) +
+             "scene.cfg");
+    std::string fbx_file = config.config().fbx_file();
+    FbxLoader loader(std::string(SCENE_FILE_PATH) + fbx_file);
 
-	// _entityManager.assign<MapComponent>(map.id(),
-	// 				    _world->getGameMap()->getTileMap());
+    // Create scene component (for rendering) This should happen only in the client
+    Entity scene_entity = _entityManager.createLocal();
+    _entityManager.assign<SceneComponent>(scene_entity.id(),
+                                          config,
+                                          loader);
+
+    // Create world
+    _world->loadGameLevel(loader);
+
 }
 
 void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
@@ -111,7 +115,7 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 	_entityManager.assign<BodyCmp>(player_entity.id(), "cfg");
 	_entityManager.assign<NetworkCmp>(player_entity.id());
 	_entityManager.assign<CollisionComponent>(player_entity.id());
-	_entityManager.assign<VisibilityCmp>(player_entity.id());
+//	_entityManager.assign<VisibilityCmp>(player_entity.id());
 
 	// Client-side components
 	_entityManager.assign<DebugGraphicsCmp>(player_entity.id());

@@ -44,9 +44,11 @@ public:
 			m_animation.switchToAnim(1);
 		}
 
-
-		
 		else m_animation.stop();
+	}
+
+	void render(float delta) {
+		m_animation.render(delta);
 	}
 
 	void update(float delta ) {

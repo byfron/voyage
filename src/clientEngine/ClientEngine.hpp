@@ -3,6 +3,7 @@
 #include <networking/ClientNetworkManager.hpp>
 #include <game/GameEngine.hpp>
 #include <networking/NetworkMessagePool.hpp>
+#include <visibility/VisibilityManager.hpp>
 
 class ClientEngine : public GameEngine {
 public:
@@ -37,6 +38,7 @@ private:
 	void _registerHandlers();
 	NetworkMessagePool _netMsgPool;
 	ClientNetworkManager  _netManager;
+	VisibilityManager _visManager;
 	static Entity::Id _player_entity_id;
 
 };

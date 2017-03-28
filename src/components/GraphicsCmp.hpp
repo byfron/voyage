@@ -23,6 +23,10 @@ public:
 
 	}
 
+	void render(float delta) {
+		m_graphics->render(delta);
+	}
+
 	pumpkin::GraphicsObject *m_graphics;
 };
 
