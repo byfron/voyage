@@ -1,5 +1,6 @@
 #include <entities/System.hpp>
 #include <graphics/Stencil.hpp>
+#include <graphics/GraphicsEngine.hpp>
 
 class SceneComponent {
 
@@ -11,7 +12,6 @@ public:
         m_scene->loadFromFbxNode(loader.getRootNode());
         m_scene->init();
     }
-
 
     void render(float delta)
     {
@@ -33,45 +33,49 @@ public:
 
 	}
 
-
 	void update(EntityManager & em, EventManager &evm, float delta ) {
-
+		
 		//Set-up stencil buffer
-//		m_stencil.craftStencil(m_visibilityManager.getPolygon());
+		m_stencil.craftStencil(m_visibilityManager.getPolygon(),
+				       m_visibilityManager.getPlayerPos());
+		
+		// bgfx::setViewClear(pumpkin::RENDER_PASS_GEOMETRY,
+		// 		   BGFX_CLEAR_DEPTH,
+		// 		   (uint16_t) 0x30,   //rgba
+		// 		   1.0f,           //depth
+		// 		   (uint8_t) 0);   //stencil
 
-		//Set-up lights
-		//m_lightManager
-
-		//Draw everything
+		
+		//Draw everything (this breaks sometimes)
 		render(em, delta);
+		
 	}
-
 
 	void render(EntityManager & em, float delta) {
 
-        // Render graphics
-        em.each<GraphicsCmp>(
-                [delta](Entity entity,
-                        GraphicsCmp &go) {
-                    go.render(delta);
-                });
+		// Render game level
+//	renderScene(em, delta);
+	
+		// Render graphics
+		em.each<GraphicsCmp>(
+			[delta](Entity entity,
+				GraphicsCmp &go) {
+				go.render(delta);
+			});
 
-        // Render animations
-        em.each<AnimationComponent>(
-                [delta](Entity entity,
-                        AnimationComponent &ac) {
-                    ac.render(delta);
-                });
-
-        // Render game level
-        //renderScene(em, delta);
-
+		// Render animations
+		em.each<AnimationComponent>(
+			[delta](Entity entity,
+				AnimationComponent &ac) {
+				ac.render(delta);
+			});
+       
 		// Render debug stuff
 		m_visibilityManager.render(delta);
 
-    }
+	}
 
-    void renderScene(EntityManager & em, float delta) {
+	void renderScene(EntityManager & em, float delta) {
 
         em.each<SceneComponent>(
                 [delta](Entity entity,

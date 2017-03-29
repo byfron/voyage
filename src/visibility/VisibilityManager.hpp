@@ -16,6 +16,8 @@ public:
 
 	void update(const Vec2f & player_pos, World::Ptr world) {
 
+		m_player_pos = player_pos;
+		
 		std::vector<visibility::LineSegment> collision_polygons =
 				world->getGameLevel().getCollisionLineSegments();
 
@@ -29,28 +31,22 @@ public:
 
 	}
 
+	Vec2f getPlayerPos() {
+		return m_player_pos;
+	}
+
 	// Remove this when stencil is done
 	void render(float delta) {
 
-			// std::vector<Vec2f> triangles;
-			// Triangulate::Process(m_polygon, triangles);
-			// updateDynamicVertexBuffer(triangles);
-
-			// bgfx::setState(m_craftStencilState)
-
-			// bgfx::setIndexBuffer(m_dibh);
-			// bgfx::setVertexBuffer(m_dvbh);
-
-			// bgfx::submit(m_viewId,
-			// 			 m_shader->getHandle())
-
-		if (m_polygon.size())
-            pumpkin::DebugManager::push_polygon(m_polygon);
+		if (m_polygon.size()) {
+			pumpkin::DebugManager::push_polygon(m_polygon);
+		}
 	}
 
 protected:
 
-			std::vector<Vec2f> m_polygon;
+	std::vector<Vec2f> m_polygon;
+	Vec2f m_player_pos = Vec2f::Zero();
 };
 
 
