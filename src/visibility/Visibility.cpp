@@ -1,4 +1,5 @@
 #include "Visibility.hpp"
+#include <iostream>
 
 namespace visibility {
 
@@ -39,6 +40,8 @@ std::vector<vec2> VisibilityPolygon(vec2 point, const std::vector<LineSegment>& 
 		}
 	}
 
+	std::cout <<"udt"<<std::endl;
+
 	// sort events by angle
 	AngleComparator cmp_angle{ point };
 	std::sort(events.begin(), events.end(), [&cmp_angle](const VisibilityEvent& a, const VisibilityEvent& b) {
@@ -78,6 +81,7 @@ std::vector<vec2> VisibilityPolygon(vec2 point, const std::vector<LineSegment>& 
 		if (event.type == VisibilityEventType::StartVertex) state.insert(event.segment);
 	}
 
+
 	// remove collinear points
 	auto top = vertices.begin();
 	for (auto it = vertices.begin(); it != vertices.end(); ++it)
@@ -87,6 +91,7 @@ std::vector<vec2> VisibilityPolygon(vec2 point, const std::vector<LineSegment>& 
 		if (orientation(*prev, *it, *next) != Orientation::Collinear) *top++ = *it;
 	}
 	vertices.erase(top, vertices.end());
+
 	return vertices;
 }
 

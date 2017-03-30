@@ -34,28 +34,25 @@ public:
 	}
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
-		
+
 		//Set-up stencil buffer
 		m_stencil.craftStencil(m_visibilityManager.getPolygon(),
-				       m_visibilityManager.getPlayerPos());
-		
-		// bgfx::setViewClear(pumpkin::RENDER_PASS_GEOMETRY,
-		// 		   BGFX_CLEAR_DEPTH,
-		// 		   (uint16_t) 0x30,   //rgba
-		// 		   1.0f,           //depth
-		// 		   (uint8_t) 0);   //stencil
+							   m_visibilityManager.getPlayerPos());
 
-		
-		//Draw everything (this breaks sometimes)
+		bgfx::setViewClear(pumpkin::RENDER_PASS_GEOMETRY,
+				   BGFX_CLEAR_DEPTH,
+				   0x30303000,   //rgba
+				   1.0f,           //depth
+				   (uint8_t) 0);   //stencil
+
+
+		//draw everything (this breaks sometimes)
 		render(em, delta);
-		
 	}
 
 	void render(EntityManager & em, float delta) {
 
-		// Render game level
-//	renderScene(em, delta);
-	
+
 		// Render graphics
 		em.each<GraphicsCmp>(
 			[delta](Entity entity,
@@ -69,9 +66,12 @@ public:
 				AnimationComponent &ac) {
 				ac.render(delta);
 			});
-       
+
+		// Render game level
+		renderScene(em, delta);
+
 		// Render debug stuff
-		m_visibilityManager.render(delta);
+		//m_visibilityManager.render(delta);
 
 	}
 
@@ -82,12 +82,6 @@ public:
                         SceneComponent &sc) {
                     sc.render(delta);
                 });
-
-        for (auto room : m_world->getGameLevel().getRoomVector()) {
-            for (auto poly : room.collision_polygons) {
-                pumpkin::DebugManager::push_polygon(poly.vertices);
-            }
-        }
     }
 
 

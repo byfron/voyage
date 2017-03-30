@@ -17,17 +17,19 @@ public:
 	void update(const Vec2f & player_pos, World::Ptr world) {
 
 		m_player_pos = player_pos;
-		
+
 		std::vector<visibility::LineSegment> collision_polygons =
-				world->getGameLevel().getCollisionLineSegments();
+			world->getGameLevel().getCollisionLineSegments();
 
-			std::vector<visibility::vec2> visi_polygon =
-				visibility::VisibilityPolygon(player_pos, collision_polygons);
+		std::cout << "updating" <<std::endl;
 
-			m_polygon.clear();
-			for (auto v : visi_polygon) {
-				m_polygon.push_back(Vec2f(v.data[0], v.data[1]));
-			}
+		std::vector<visibility::vec2> visi_polygon =
+			visibility::VisibilityPolygon(player_pos, collision_polygons);
+
+		m_polygon.clear();
+		for (auto v : visi_polygon) {
+			m_polygon.push_back(Vec2f(v.data[0], v.data[1]));
+		}
 
 	}
 

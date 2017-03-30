@@ -113,6 +113,8 @@ public:
 				// Move camera
 				pumpkin::GraphicsEngine::camera().moveAlong(body.m_moveVec);
 
+				std::cout << "what?"<<std::endl;
+
 				// Update visibilityManager with new player position
 				m_visibilityManager.update(body.m_position.segment<2>(0, 2), m_world);
 
