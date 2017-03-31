@@ -8,9 +8,8 @@ public:
 	int m_type;
 	float m_damage;
 	float m_lifespan;
-	
-};
 
+};
 
 class BulletSystem : public System<BulletSystem>, public Receiver<BulletSystem> {
 
@@ -25,9 +24,9 @@ class BulletSystem : public System<BulletSystem>, public Receiver<BulletSystem> 
 	// 	m_collided_bullets.insert(collision.left);
 
 	// 	// emit particles on impact
-		
+
 	// 	// send damage message to entity
-		
+
 	// }
 
 	// void update(float delta) {
@@ -36,11 +35,11 @@ class BulletSystem : public System<BulletSystem>, public Receiver<BulletSystem> 
 	// 	for (auto e : m_collided_bullets) {
 	// 		e.destroy();
 	// 	}
-		
+
 	// }
 
 	// private:
 
 	// std::unordered_set<Entity> m_collided_bullets;
-	
+
 };

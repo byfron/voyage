@@ -43,7 +43,7 @@ struct UserAction {
 class NetworkCmp {
 
 public:
-	bool dirty = true;
+	bool dirty = truew;
 };
 
 class PlayerCmp  {
@@ -52,8 +52,8 @@ public:
 	PlayerCmp(int pid) : player_id(pid) {}
 
 	std::string player_name;
-	//player session?
 	int player_id;
+
 };
 
 class PlayerSystem : public System<PlayerSystem>,

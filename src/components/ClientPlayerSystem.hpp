@@ -63,6 +63,16 @@ public:
 
 	}
 
+
+	// void movePlayer() {
+
+	// }
+
+	// void shoot() {
+
+	// }
+
+
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
 		em.each<NetworkCmp, PlayerCmp, BodyCmp>
@@ -106,6 +116,9 @@ public:
 
 				m_action_queue.push(action);
 
+
+				////////////////////////////////////////////////////////////
+				// TODO: refactor this (repeated in ServerPlayerSystem)
 				Vec3f tmp_move_vec = action.motion_vec *
 					body.m_moveSpeed * delta;
 
@@ -115,11 +128,21 @@ public:
 										  body.getPolygon(),
 										  tmp_move_vec);
 
-				// Update body
+				// applyAction
+				if (action.action_code & (1 << Action::SHOOTING)) {
+					InventoryComponent* inv = em.getComponentPtr<InventoryComponent>(entity.id());
+					WeaponComponent* weapon = em.getComponentPtr<WeaponComponent>(inv->getActiveWeaponId());
+					weapon->fire();
+				}
+
+				// Update body motion
 				body.m_moveVec = tmp_move_vec - correction_vector;
-				body.m_rotAngle = pumpkin::InputManager::m_mouse_angle
+				body.m_rotAngle = action.angle
 					+ M_PI/4;
 				body.m_position += body.m_moveVec;
+				////////////////////////////////////////////////////////////
+
+
 				body.updateRotation();
 
 				// Move camera

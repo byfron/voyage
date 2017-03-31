@@ -67,6 +67,13 @@ voyage::sc_worldState ServerEngine::computeWorldState(uint32_t player_entity_id 
 
 void ServerEngine::createWorld() {
 	_world = std::make_shared<World>();
+
+	//TODO: load this after migrating config manager to voyage
+	std::string fbx_file = "test2.fbx";
+	FbxLoader loader(std::string(SCENE_FILE_PATH) + fbx_file);
+
+	_world->loadGameLevel(loader);
+
 }
 
 
@@ -82,8 +89,8 @@ Entity ServerEngine::createPlayerEntity(int player_id) {
 
 	// initial position of player?
 	BodyCmp *body = _entityManager.getComponentPtr<BodyCmp>(entity.id());
-	body->m_position(0) = 0.8;
-	body->m_position(1) = 0.8;
+	body->m_position(0) = 0.0;
+	body->m_position(1) = 0.0;
 
 
 	return entity;

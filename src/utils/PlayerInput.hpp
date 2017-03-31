@@ -9,7 +9,7 @@ struct UserAction;
 
 namespace PlayerInput {
 
-	
+
 	enum class CardinalDirection {
 		East,
 			North,
@@ -28,8 +28,9 @@ namespace PlayerInput {
 			FACING_UP_RIGHT,
 			FACING_DOWN_LEFT,
 			FACING_DOWN_RIGHT,
-			SHOOTING
-			};	
+			SHOOTING,
+			FOCUSING
+			};
 
 	UserAction getUserAction();
 	void getMovementVector(Vec3f & direction, int32_t & action);

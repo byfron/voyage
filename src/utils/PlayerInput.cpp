@@ -20,6 +20,16 @@ namespace PlayerInput {
 		return action;
 	}
 
+	void getActionCode(int32_t & action) {
+		if (pumpkin::InputManager::isLeftMouseButtonJustPressed()) {
+			action |= (1 << (int)Action::SHOOTING);
+		}
+
+		if (pumpkin::InputManager::isRightMouseButtonPressed()) {
+			action |= (1 << (int)Action::FOCUSING);
+		}
+	}
+
 	void getMovementVector(Vec3f & direction, int32_t & action) {
 
 		//TODO: make input manager more generic to allow for pads/key remaps

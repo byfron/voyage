@@ -14,10 +14,14 @@
 *** Splash and menu screens
 *** Fix camera rotation + add zoom (Move camera slightly where pointer goes? - screen center should stay between player and pointer)
 
+**** Migrate config manager to voyage
+Now we are hardcoding the game level load in ServerEngine.cpp
+
 ** Game Content
 
+**** Rename every component to "System" files to organize better
 **** Fix player position and "clunky" motion
-*** Add ceiling alpha-layer (simulate ceiling structure like teleglitch)
+*** Add ceiling alpha-layer (simulate ceiling structure liddWdke teleglitch)
 **** Add missing animations and input mechanisms (rolling, shooting, etc...)
 **** 4 Procedural texture generation and blending
 *** Pre-defined textures and deco objects

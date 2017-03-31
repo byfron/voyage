@@ -110,11 +110,15 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 	_entityManager.assign<AnimationComponent>(player_entity.id(),
 						  config.config());
 
+	//TODO: REFACTOR THIS code also replicated in server!
 	//TODO: This should be a response from a server createEntity message
+
 	_entityManager.assign<PlayerCmp>(player_entity.id(), GameEngine::m_playerId);
 	_entityManager.assign<BodyCmp>(player_entity.id(), "cfg");
 	_entityManager.assign<NetworkCmp>(player_entity.id());
 	_entityManager.assign<CollisionComponent>(player_entity.id());
+	_entityManager.assign<InventoryComponent>(player_entity.id());
+
 //	_entityManager.assign<VisibilityCmp>(player_entity.id());
 
 	// Client-side components
@@ -124,6 +128,17 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 	BodyCmp *body = _entityManager.getComponentPtr<BodyCmp>(player_entity.id());
 	body->m_position(0) = x;
 	body->m_position(1) = y;
+
+
+	// create a weapon as well
+	// TODO: move this to server
+	Entity weapon = _entityManager.createNetworked();
+	_entityManager.assign<WeaponComponent>(weapon.id());
+	_entityManager.assign<ItemComponent>(weapon.id());
+	_entityManager.assign<BodyCmp>(weapon.id());
+	_entityManager.assign<CollisionComponent>(weapon.id());
+	_entityManager.assign<NetworkCmp>(player_entity.id());
+
 
 
 // 	Entity player_entity2 = _entityManager.create();
