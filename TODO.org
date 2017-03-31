@@ -1,0 +1,36 @@
+** Misc
+
+**** 1 Clean engine
+**** 2 Check leaks / initialization and correctness
+*** Port to other platforms
+
+** Graphic Engine features
+
+**** 3 Shadows and light manager (light color, light switching, etc...)
+**** 5 Finish vision cone (fix visibility so that shadow polygon spans from the wall-base)
+*** Effects manager (particles and other FX)
+*** Improve resource management (animations/meshes/shaders/textures)
+*** GUI
+*** Splash and menu screens
+*** Fix camera rotation + add zoom (Move camera slightly where pointer goes? - screen center should stay between player and pointer)
+
+** Game Content
+
+*** Fix player position and "clunky" motion
+*** Add ceiling alpha-layer (simulate ceiling structure like teleglitch)
+*** Add missing animations and input mechanisms (rolling, shooting, etc...)
+**** 4 Procedural texture generation and blending
+*** Pre-defined textures and deco objects
+*** Bake static shadows in floor texture (wall sides, ceiling shadows)
+*** Finish level generation (add more structure to the rooms (rectangular shaped))
+*** Define game entities (characters, doors, items, etc...)
+*** Sounds/Music
+*** Add automatic camera motion
+*** Implement level metadata (spawning areas, random item generation, light placement, etc...)
+
+** Networking
+
+*** User profile database
+*** Client-side prediction
+*** Authoritative server correction
+*** Game level synchronization
