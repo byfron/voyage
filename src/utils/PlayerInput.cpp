@@ -12,14 +12,14 @@ namespace PlayerInput {
 
 		getMovementVector(motion_vec, action_code);
 		getLookatVector(lookat_vec, lookat_dir, action_code);
-		
+
 		UserAction action;
 		action.motion_vec = motion_vec;
 		action.angle = pumpkin::InputManager::m_mouse_angle;
 		action.action_code = action_code;
 		return action;
 	}
-	
+
 	void getMovementVector(Vec3f & direction, int32_t & action) {
 
 		//TODO: make input manager more generic to allow for pads/key remaps

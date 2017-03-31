@@ -10,7 +10,7 @@ class ClientWorldStateHandler : public PacketHandler {
 public:
 	ClientWorldStateHandler(ClientEngine::Ptr c) : _client(c) {
 
-	}	
+	}
 
 	void onMessage(RakNet::Packet *p) {
 
@@ -22,7 +22,7 @@ public:
 		for (auto update : msgWorldState.entity_update()) {
 			_client->msg_pool().pushEntityUpdateMsg(update);
 		}
-		
+
 		//push player update in the pool
 		if (msgWorldState.has_player_update()) {
 			_client->msg_pool().pushPlayerUpdateMsg(msgWorldState.player_update());
@@ -30,5 +30,5 @@ public:
 	}
 
 private:
-	ClientEngine::Ptr _client;	
+	ClientEngine::Ptr _client;
 };

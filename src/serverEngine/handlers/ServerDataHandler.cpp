@@ -18,7 +18,7 @@ void ServerDataHandler::onMessage(RakNet::Packet * p) {
 
 
 	PlayerSession::Ptr ps;
-	
+
 	switch(p->data[0]) {
 
 // 	case ID_CS_USER_MOVEMENT: {
@@ -37,21 +37,21 @@ void ServerDataHandler::onMessage(RakNet::Packet * p) {
 
 
 		PlayerSessionPtr player_session = _gameServer->getPlayerSession(p->guid);
-		
+
 		if (player_session) {
-			_gameServer->engine().dispatchMessage(UserAction(player_session->getPlayerId(), m->getContent()));
+			_gameServer->engine().dispatchMessage(UserAction(player_session->getPlayerId(),
+															 m->getContent()));
 		}
 	}
-		
+
 	}
-	
-		
+
+
 	//test:run script
 	// ScriptEngine::Ptr se = _gameServer->getScriptEngine();
 
 	// se->runScript(ps, SCRIPTS_DIR "/test.py");
-	
-	//send message to the corresponding playerSession	
+
+	//send message to the corresponding playerSession
 
 }
-

@@ -18,7 +18,7 @@ class ServerNetworkManager : public NetworkManager
 {
 public:
 	ServerNetworkManager();
-	~ServerNetworkManager();	
+	~ServerNetworkManager();
 	void start(const int port);
 	void stop();
 
@@ -44,6 +44,13 @@ public:
 		m_player_response_messages[player_id] = ps;
 	}
 
+	voyage::sc_playerState popPlayerStateMsg(uint32_t player_id) {
+		assert(hasWaitingMsg(player_id));
+		voyage::sc_playerState msg = m_player_response_messages[player_id];
+		m_player_response_messages.erase(player_id);
+		return msg;
+	}
+
 	voyage::sc_playerState getPlayerStateMsg(uint32_t player_id) {
 		assert(hasWaitingMsg(player_id));
 		return m_player_response_messages[player_id];
@@ -52,10 +59,10 @@ public:
 	bool hasWaitingMsg(uint32_t player_id) {
 		return m_player_response_messages.count(player_id) > 0;
 	}
-	
+
 private:
 	bool _server_running;
-	
+
 	// keep a map of which entities are controled by which players
 	std::map<uint32_t, uint32_t> m_map_player_entity;
 

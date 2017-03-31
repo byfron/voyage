@@ -18,7 +18,7 @@ void break_loop(int s) {
 }
 
 GameServer::GameServer(int portNum) {
-       
+
 	_gameEngine.init(portNum);
 
 
@@ -28,8 +28,8 @@ GameServer::GameServer(int portNum) {
 
 	_gameEngine.getNetManager().registerHandler(std::make_shared<ServerDataHandler>
 						      (this), {ID_CS_USER_ACTION});
- 		
-	
+
+
 
 }
 
@@ -63,10 +63,14 @@ void GameServer::broadcastWorldState() {
 
 		voyage::sc_worldState playerWorldState =
 			_gameEngine.computeWorldState(session->getPlayerEntityId()/*player_area*/);
-			
+
 		if (_gameEngine.getNetManager().hasWaitingMsg(session->getPlayerId())) {
+
+			spd::get("Server")->info("has waiting");
+
+
 			playerWorldState.mutable_player_update()->CopyFrom(_gameEngine.getNetManager().
-								     getPlayerStateMsg(session->getPlayerId()));
+								     popPlayerStateMsg(session->getPlayerId()));
 		}
 
 
@@ -74,10 +78,12 @@ void GameServer::broadcastWorldState() {
 		if (playerWorldState.entity_update().size() > 0 ||
 		    playerWorldState.has_player_update() ) {
 
+ 			spd::get("Server")->info("sending world update");
+
 			session->sendMessage(std::make_shared<Message<voyage::sc_worldState> >
 					     (ID_SC_WORLD_STATE, playerWorldState));
 		}
-	}	
+	}
 
 }
 
@@ -85,10 +91,10 @@ void GameServer::start() {
 
 	spd::get("Server")->info("Starting game server");
 	signal(SIGINT, break_loop);
-	
+
 	while (!finished_sig && !_finished) {
 
-		// wait a bit? which frequency?		
+		// wait a bit? which frequency?
 		_gameEngine.processFrame();
 
 		// send data to clients
@@ -98,5 +104,5 @@ void GameServer::start() {
 		//sleep(1.0f/60.0f);
 	}
 
-	stop();       
+	stop();
 }

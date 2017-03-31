@@ -40,8 +40,6 @@ std::vector<vec2> VisibilityPolygon(vec2 point, const std::vector<LineSegment>& 
 		}
 	}
 
-	std::cout <<"udt"<<std::endl;
-
 	// sort events by angle
 	AngleComparator cmp_angle{ point };
 	std::sort(events.begin(), events.end(), [&cmp_angle](const VisibilityEvent& a, const VisibilityEvent& b) {

@@ -12,7 +12,7 @@ class GameClient : public pumpkin::GraphicsEngine {
 public:
 
 	GameClient() {
-
+		auto console = spd::stdout_logger_mt("Client");
 	}
 
 	~GameClient() {}

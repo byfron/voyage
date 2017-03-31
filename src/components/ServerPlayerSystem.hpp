@@ -101,7 +101,7 @@ public:
 					ps.set_pos_y(body.m_position(1));
 					ps.set_angle(body.m_rotAngle);
 
-//					netdata.dirty = true;
+					netdata.dirty = true;
 
 					m_network_manager.pushPlayerStateMsg(player.player_id, ps);
 

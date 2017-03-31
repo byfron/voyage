@@ -25,7 +25,7 @@ struct UserAction {
 		action_code = ua.action_code();
 		delta = ua.delta();
 	}
-	
+
 	int player_id = -1;
 	Vec3f motion_vec;
 	float angle = 0;
@@ -42,6 +42,8 @@ struct UserAction {
 
 class NetworkCmp {
 
+public:
+	bool dirty = true;
 };
 
 class PlayerCmp  {
@@ -58,7 +60,7 @@ class PlayerSystem : public System<PlayerSystem>,
 		     public Receiver<PlayerSystem> {
 public:
 
-	PlayerSystem(World::Ptr world) : m_world(world) {}		
+	PlayerSystem(World::Ptr world) : m_world(world) {}
 	void update(EntityManager & em, EventManager &evm, float delta );
 
 protected:

@@ -21,8 +21,6 @@ public:
 		std::vector<visibility::LineSegment> collision_polygons =
 			world->getGameLevel().getCollisionLineSegments();
 
-		std::cout << "updating" <<std::endl;
-
 		std::vector<visibility::vec2> visi_polygon =
 			visibility::VisibilityPolygon(player_pos, collision_polygons);
 

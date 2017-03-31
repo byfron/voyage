@@ -240,7 +240,7 @@ class Exporter:
         lLayer = mesh.GetLayer(0)
         if lLayer == None:
             mesh.CreateLayer()
-        lLayer = mesh.GetLayer(0)
+            lLayer = mesh.GetLayer(0)
 
         lMaterial = None
 
@@ -288,10 +288,6 @@ class Exporter:
 
     def generateFloorTexture(self, texture_name, vertices, lUVDiffuseLayer):
 
-        #get image
-        im = Image.open("textures/floor.jpg")
-        imsize = im.size;
-
         #get room square
         minrv = np.min(vertices, axis=0)
         maxrv = np.max(vertices, axis=0)
@@ -300,15 +296,8 @@ class Exporter:
         room_height = bottom_right[0] - top_left[0]
         room_width = bottom_right[1] - top_left[1]
 
-        #re-self.tex_scale the image to match the room
-        factor = 1
-        if room_height > room_width:
-            factor = room_height/imsize[0]
-        else:
-            factor = room_width/imsize[1]
-
-        im = im.resize((int(imsize[0]*factor)+1,int(imsize[1]*factor)+1), Image.ANTIALIAS)
-        imsize = im.size;
+        texture_height = int(room_height/10)
+        texture_width = int(room_width/10)
 
         #compute UV coordinates for each vertex
         for v in vertices:
@@ -317,6 +306,14 @@ class Exporter:
             coords_world[1] = 1 - coords_world[1]/room_width
             uvVec = FbxVector2(coords_world[1], coords_world[0])
             lUVDiffuseLayer.GetDirectArray().Add(uvVec)
+
+        texture = Texture()
+        texture.generate(texture_width, texture_height)
+
+        #save in texture folder and transform to ktx
+        #texture.
+        texture.save_and_compile(texture_name);
+
 
     def generateWallTexture(self, texture_name, wall_vecs, vertices, lUVDiffuseLayer):
 

@@ -75,25 +75,37 @@ public:
 			// Update with input data
 			if (entity.id().id == GameEngine::m_playerId)
 			{
+
 				UserAction action = PlayerInput::getUserAction();
 
 				// send the delta with the user action now
 				action.delta = delta;
 
-				UserAction last_action = m_action_queue.back();
+				UserAction last_action = m_action_queue.front();
+				m_action_queue.pop();
+
+
 
 				// TODO: Only when the action changes?
 				// we register it and send ot to the server
-				//	if (action != last_action)
+				//if (action != last_action)
+				if ((action.motion_vec.norm() != 0) ||
+					action.angle != last_action.angle ||
+					action.action_code != last_action.action_code)
 				{
+					spd::get("Client")->info("sending input update");
+
 					action.seq_num = m_action_seq_num++;
-					m_action_queue.push(action);
+
 
 					// TODO DO NOT TRANSFORM DE ACTION WITH
 					// THE CAMERA ROTATION!
 					sendActionToServer(action);
 
 				}
+
+				m_action_queue.push(action);
+
 				Vec3f tmp_move_vec = action.motion_vec *
 					body.m_moveSpeed * delta;
 
@@ -112,8 +124,6 @@ public:
 
 				// Move camera
 				pumpkin::GraphicsEngine::camera().moveAlong(body.m_moveVec);
-
-				std::cout << "what?"<<std::endl;
 
 				// Update visibilityManager with new player position
 				m_visibilityManager.update(body.m_position.segment<2>(0, 2), m_world);
