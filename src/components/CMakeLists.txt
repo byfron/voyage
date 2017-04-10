@@ -4,6 +4,8 @@ add_library(components
   CollisionComponent.cpp
   PlayerSystem.hpp
   PlayerSystem.cpp
+  WeaponSystem.hpp
+  WeaponSystem.cpp
   BodyCmp.hpp
   BodyCmp.cpp)
 

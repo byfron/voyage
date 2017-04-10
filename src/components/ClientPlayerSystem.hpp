@@ -4,6 +4,8 @@
 #include "BodyCmp.hpp"
 #include "PlayerSystem.hpp"
 #include "CollisionComponent.hpp"
+#include "InventoryComponent.hpp"
+#include "WeaponSystem.hpp"
 #include <entities/System.hpp>
 #include <common/GameMessages.hpp>
 #include <game/World.hpp>
@@ -129,10 +131,11 @@ public:
 										  tmp_move_vec);
 
 				// applyAction
-				if (action.action_code & (1 << Action::SHOOTING)) {
+				if (action.action_code & (1 << int(Action::SHOOTING))) {
 					InventoryComponent* inv = em.getComponentPtr<InventoryComponent>(entity.id());
 					WeaponComponent* weapon = em.getComponentPtr<WeaponComponent>(inv->getActiveWeaponId());
-					weapon->fire();
+					Vec2f from, direction;
+					weapon->fire(delta, em, from, direction);
 				}
 
 				// Update body motion

@@ -43,7 +43,7 @@ struct UserAction {
 class NetworkCmp {
 
 public:
-	bool dirty = truew;
+	bool dirty = true;
 };
 
 class PlayerCmp  {
