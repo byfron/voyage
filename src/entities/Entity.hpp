@@ -31,7 +31,7 @@ public:
 
 		Id() : valid(false) {}
 		Id(uint32_t idx) : id(idx), valid(true) {}
-		
+
 		uint32_t id;
 //		union {
 //			uint32_t flags;
@@ -49,30 +49,30 @@ public:
 	 * Id of an invalid Entity.
 	 */
 	static const Id INVALID;
-	
+
 	Entity(Id id) : _id(id) {}
 	Entity(EntityManager *em, Id id) : _em(em), _id(id) {}
-	
+
 	//std::bitset<MAX_COMPONENTS> component_mask() const;
 
 	Id id() { return _id; }
-	
+
 	bool valid() {
 		return _id.valid;
 	}
-	
+
 	template <typename C>
 	void has_component();
-	
+
 	template <typename C, typename ... Args>
 	ComponentHandle<C> assign(Args && ... args);
 
 	template <typename C>
 	void remove();
-	
+
 	template <typename C>
 	ComponentHandle<C> component();
-	
+
 	template <typename ... Components>
 	std::tuple<ComponentHandle<Components>...> components();
 
@@ -107,10 +107,9 @@ public:
 	static uint32_t entity_networked_count;
 	static uint32_t entity_local_count;
 
-	uint32_t generateNetworkedId() {		
-		uint32_t id = EntityManager::entity_networked_count++;
-		
-		assert(id < EntityManager::max_networked_ids);		
+	uint32_t generateNetworkedId() {
+		uint32_t id = ++EntityManager::entity_networked_count;
+		assert(id < EntityManager::max_networked_ids);
 		return id;
 	}
 
@@ -125,20 +124,20 @@ public:
 
 		Entity::Id id;
 		if (networked) {
-			id.id = generateNetworkedId();		
+			id.id = generateNetworkedId();
 		}
 		else {
-			id.id = generateLocalId();			
-		}			     
+			id.id = generateLocalId();
+		}
 
 		id.valid = true;
 		return id.index();
 	}
-	
+
 	Entity::Id getFreeId(bool networked) {
 
 		uint32_t index;
-		if (networked) {			
+		if (networked) {
 			assert(not _freeNetworkedIdList.empty());
 			index = _freeNetworkedIdList.back();
 			_freeNetworkedIdList.pop_back();
@@ -159,7 +158,7 @@ public:
 			_freeNetworkedIdList.push_back(id);
 		}
 	}
-	
+
 public:
 
 	EntityManager()  {
@@ -189,35 +188,33 @@ public:
 
 	Entity createFromId(int index) {
 
-		std::cout << index << std::endl;
 		assert(index < EntityManager::max_networked_ids);
-		
 		Entity::Id id(index);
 		Entity entity(this, id);
 		_valid_entities[id.index()] = true;
 		EntityManager::entity_count++;
 		return entity;
 	}
-	
+
 	Entity createNetworked() {
 		return create(true);
 	}
 
 	Entity createLocal() {
 		return create(false);
-	}       	
+	}
 
 	bool isIdListEmpty(bool networked) {
 		if (networked)
 			return _freeNetworkedIdList.size() == 0;
-		else 
+		else
 			return _freeLocalIdList.size() == 0;
 	}
-	
+
 	bool valid(Entity::Id id) {
 		return _valid_entities[id.id];
 	}
-	
+
 	void destroy(Entity::Id id) {
 		assert(valid(id));
 		releaseId(id.id);
@@ -265,13 +262,13 @@ public:
 	}
 
 	size_t capacity() const { return _entity_component_mask.size(); }
-	
+
 	ComponentMask component_mask(Entity::Id id) {
 		valid(id);
 		return _entity_component_mask.at(id.index());
 	}
 
-	
+
 	template <typename CType>
 	ComponentMask component_mask() {
 		ComponentMask mask;
@@ -282,10 +279,10 @@ public:
 	ComponentMask component_mask() {
 		return component_mask<C1>() | component_mask<C2, Components ...>();
 	}
-	
+
 
 	template <typename T> struct identity { typedef T type; };
-	
+
 	template <typename ... Components>
 	void each(typename identity<std::function<void(Entity entity, Components&...)> >::type f) {
 		auto mask = component_mask<Components...>();
@@ -294,17 +291,17 @@ public:
 	}
 
 
-	
+
 	// template <typename ... Components>b
 	// void each(std::function<void(Entity entity, Components&...)> f) {
 	// 	auto mask = component_mask<Components...>();
 	// 	auto view = ComponentsView<Components...>(this, mask);
 	// 	return view.each(f);
 	// }
-	
+
 protected:
 
-	
+
 	Entity create(bool networked = false) {
 
 		Entity::Id id;
@@ -312,23 +309,23 @@ protected:
 		if (isIdListEmpty(networked)) {
 			id = generateNewId(networked);
 		}
-		else {		    
+		else {
 			id = getFreeId(networked);
 		}
-		
-		Entity entity(this, id);		
+
+		Entity entity(this, id);
 		reserveEntityData(id.index());
 		_valid_entities[id.index()] = true;
-		
+
 		//event_manager.broadcast<EntityCreatedEvent>(entity);
 		return entity;
 	}
-	
+
 	template <typename ... Components>
 	class ComponentsView {
 
 	public:
-		
+
 		//Iterator over entities
 		class Iterator {
 		public:
@@ -356,7 +353,7 @@ protected:
 					_i++;
 				}
 			}
-			
+
 			bool operator == (const Iterator& rhs) const { return _i == rhs._i; }
 			bool operator != (const Iterator& rhs) const { return _i != rhs._i; }
 			Entity operator * () { return Entity(_em, Entity::Id(_i)); }
@@ -367,11 +364,11 @@ protected:
 			size_t _capacity;
 			ComponentMask _mask;
 			uint32_t _i;
-			
+
 		};
 
 		ComponentsView(EntityManager *em, ComponentMask mask) : _em(em), _mask(mask) {}
-		
+
 		Iterator begin() { return Iterator(_em, _mask, 0); }
 		Iterator end() { return Iterator(_em, _mask, uint32_t(_em->capacity())); }
 		const Iterator begin() const { return Iterator(_em, _mask, 0); }
@@ -386,13 +383,13 @@ protected:
 			}
 		}
 
-		
+
 	protected:
 
 		EntityManager * _em;
 		ComponentMask _mask;
 	};
-	
+
 	void reserveEntityData(uint32_t id) {
 		if (_valid_entities.size() <= id) {
 			_valid_entities.resize(id+1);
@@ -410,16 +407,16 @@ protected:
 		if (poolIndex >= _component_pools.size()) {
 			_component_pools.resize(poolIndex + 1);
 		}
-		
+
 		if (not _component_pools[poolIndex]) {
 			_component_pools[poolIndex] = new Pool<C>();
 			_component_pools[poolIndex]->expand(EntityManager::max_networked_ids +
-							    EntityManager::entity_local_count);
+												EntityManager::entity_local_count);
 		}
 
 		return static_cast<Pool<C>*>(_component_pools[poolIndex]);
 	}
-	
+
 	std::vector<BasePool*> _component_pools;
 	std::vector<ComponentMask> _entity_component_mask;
 	std::vector<bool> _valid_entities;
@@ -435,7 +432,7 @@ protected:
 
 template <typename CType>
 class ComponentHandle {
-       
+
 public:
 	ComponentHandle() : _em(nullptr) {}
 	ComponentHandle(Entity::Id id, EntityManager *em) : _id(id), _em(em) {}
@@ -448,10 +445,10 @@ public:
 		assert(valid());
 		return _em->getComponentPtr<CType>(_id);
 	}
-	
+
 	/**
 	 * Remove the component from its entity and destroy it.
-	 */	
+	 */
 	void remove() {
 		assert(valid());
 		_em->remove<CType>();
@@ -464,8 +461,8 @@ public:
 		assert(valid());
 		return _em->get(_id);
 	}
-	
-	
+
+
 protected:
 	Entity::Id _id;
 	EntityManager *_em;
@@ -486,7 +483,7 @@ public:
 		static PoolIndex index = pool_index_counter++;
 		assert(index < MAX_COMPONENTS);
 		return index;
-	}			
+	}
 };
 
 
@@ -498,7 +495,7 @@ void Entity::has_component() {
 
 template <typename C, typename ... Args>
 ComponentHandle<C> Entity::assign(Args && ... args) {
-	assert(valid());     	
+	assert(valid());
 	return _em->assign<C>(_id, std::forward<Args>(args) ...);
 }
 
@@ -527,6 +524,9 @@ ComponentHandle<C> EntityManager::assign(Entity::Id id, Args && ... args) {
 	PoolIndex poolIndex = Component<C>::poolIndex();
 
 	//check (wth mask) that the entity does not have this component already
+
+	std::cout << "checking entity:"<< id.index() << "component:" << poolIndex << std::endl;
+
 	assert(!_entity_component_mask[id.index()].test(poolIndex));
 
 	BasePool *pool = reserveComponentData<C>();
