@@ -1,9 +1,10 @@
 ** Misc
 
+**** 0 Fix the Entity Identity system
 **** 1 Clean engine
 **** 2 Check leaks / initialization and correctness
 *** Port to other platforms
-
+	
 ** Graphic Engine features
 
 *** Shadows and light manager (light color, light switching, etc...)

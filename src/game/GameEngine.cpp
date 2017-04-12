@@ -3,7 +3,7 @@
 #include <components/PlayerSystem.hpp>
 
 bool GameEngine::isClient = true;
-uint32_t GameEngine::m_playerId = 0;
+Entity::Id GameEngine::m_playerId = Entity::Id(0);
 
 void GameEngine::init() {
 

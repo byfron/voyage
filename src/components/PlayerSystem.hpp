@@ -49,10 +49,10 @@ public:
 class PlayerCmp  {
 
 public:
-	PlayerCmp(int pid) : player_id(pid) {}
+	PlayerCmp(Entity::Id pid) : player_id(pid) {}
 
 	std::string player_name;
-	int player_id;
+	Entity::Id player_id;
 
 };
 

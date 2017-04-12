@@ -33,10 +33,7 @@ public:
 		Id(uint32_t idx) : id(idx), valid(true) {}
 
 		uint32_t id;
-//		union {
-//			uint32_t flags;
-			bool valid;
-//		};
+		bool valid;
 
 		uint32_t index() { return id; }
 

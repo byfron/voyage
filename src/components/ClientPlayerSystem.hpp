@@ -85,7 +85,7 @@ public:
 
 
 			// Update with input data
-			if (entity.id().id == GameEngine::m_playerId)
+			if (entity.id() == GameEngine::m_playerId)
 			{
 
 				UserAction action = PlayerInput::getUserAction();
@@ -136,6 +136,7 @@ public:
 					WeaponComponent* weapon = em.getComponentPtr<WeaponComponent>(inv->getActiveWeaponId());
 					Vec2f from, direction;
 					weapon->fire(delta, em, from, direction);
+					std::cout << "firing weapon" << std::endl;
 				}
 
 				// Update body motion
@@ -144,7 +145,6 @@ public:
 					+ M_PI/4;
 				body.m_position += body.m_moveVec;
 				////////////////////////////////////////////////////////////
-
 
 				body.updateRotation();
 
@@ -172,10 +172,10 @@ public:
 			}
 			else { // other players
 
-				if (m_msgPool.hasEntityMsg(entity.id().id)) {
+				if (m_msgPool.hasEntityMsg(entity.id().index())) {
 
 					voyage::sc_entityState update =
-					m_msgPool.popEntityUpdateMsg(entity.id().id);
+						m_msgPool.popEntityUpdateMsg(entity.id().index());
 					body.m_position(0) = update.pos_x();
 					body.m_position(1) = update.pos_y();
 					body.m_rotAngle = update.angle();

@@ -113,8 +113,6 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 	//TODO: REFACTOR THIS code also replicated in server!
 	//TODO: This should be a response from a server createEntity message
 
-	std::cout << "player entity:" << player_entity.id().id << std::endl;
-
 	_entityManager.assign<PlayerCmp>(player_entity.id(), GameEngine::m_playerId);
 	_entityManager.assign<BodyCmp>(player_entity.id(), "cfg");
 	_entityManager.assign<NetworkCmp>(player_entity.id());
@@ -136,15 +134,15 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 	// TODO: move this to server
 	Entity weapon = _entityManager.createFromId(100);
 
-	std::cout << "weapon entity:" << player_entity.id().id << std::endl;
-
-
 	_entityManager.assign<WeaponComponent>(weapon.id());
 	_entityManager.assign<ItemComponent>(weapon.id());
 	_entityManager.assign<BodyCmp>(weapon.id());
 	_entityManager.assign<CollisionComponent>(weapon.id());
 	_entityManager.assign<NetworkCmp>(weapon.id());
 
+	// add weapon in inventory
+	InventoryComponent *inv = _entityManager.getComponentPtr<InventoryComponent>(player_entity.id());
+	inv->addItem(weapon.id().id);
 
 
 // 	Entity player_entity2 = _entityManager.create();
@@ -179,8 +177,6 @@ void ClientEngine::_registerHandlers() {
 					    ID_SC_SPAWN_ENTITY,
 					    ID_SC_DESTROY_ENTITY,
 				    });
-
-
 }
 
 void ClientEngine::requestQuit() {

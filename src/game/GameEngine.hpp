@@ -31,7 +31,7 @@ public:
 	EntityManager & entity_manager() { return _entityManager; }
 
 	static bool isClient;
-	static uint32_t m_playerId;
+	static Entity::Id m_playerId;
 
 protected:
 

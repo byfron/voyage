@@ -63,11 +63,11 @@ public:
 					    BodyCmp & body) {
 
 				// get any client messages in the queue for this player/entity
-				uint32_t player_id = player.player_id;
+				Entity::Id player_id = player.player_id;
 
-				if (messagesWaiting(player_id))  {
+				if (messagesWaiting(player_id.index()))  {
 					UserAction action =
-						getFirstMessage(player_id);
+						getFirstMessage(player_id.index());
 
 					// TODO: compute delta as the time since
 					// the last message - RTT/2
@@ -103,9 +103,9 @@ public:
 
 					netdata.dirty = true;
 
-					m_network_manager.pushPlayerStateMsg(player.player_id, ps);
+					m_network_manager.pushPlayerStateMsg(player.player_id.index(), ps);
 
-					popFirstMessage(player_id);
+					popFirstMessage(player_id.index());
 				}
 
 
