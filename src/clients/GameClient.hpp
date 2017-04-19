@@ -1,6 +1,6 @@
 #pragma once
 
-#include <components/BodyCmp.hpp>
+#include <components/BodyComponent.hpp>
 #include <components/AnimationComponent.hpp>
 #include <clientEngine/ClientEngine.hpp>
 #include <pumpkin.hpp>

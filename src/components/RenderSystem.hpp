@@ -54,9 +54,9 @@ public:
 
 
 		// Render graphics
-		em.each<GraphicsCmp>(
+		em.each<GraphicsComponent>(
 			[delta](Entity entity,
-				GraphicsCmp &go) {
+				GraphicsComponent &go) {
 				go.render(delta);
 			});
 

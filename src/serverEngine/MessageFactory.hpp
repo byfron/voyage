@@ -1,6 +1,6 @@
 #pragma once
 
-#include <components/BodyCmp.hpp>
+#include <components/BodyComponent.hpp>
 #include <networking/Messages.hpp>
 
 using namespace voyage;
@@ -9,7 +9,7 @@ class MessageFactory {
 
 public:
 
-	static Message<sc_entitySpawn>::Ptr createSpawnPlayerMsg(uint32_t id, const BodyCmp &body) {
+	static Message<sc_entitySpawn>::Ptr createSpawnPlayerMsg(uint32_t id, const BodyComponent &body) {
 		sc_entitySpawn spawn_player;
 		spawn_player.set_entityid(id);
 		spawn_player.set_x(body.m_position(0));
@@ -17,7 +17,7 @@ public:
 		return std::make_shared<Message<sc_entitySpawn> >(ID_SC_SPAWN_PLAYER, spawn_player);
 	}
 
-	static Message<sc_entitySpawn>::Ptr createSpawnEntityMsg(uint32_t id, const BodyCmp &body) {
+	static Message<sc_entitySpawn>::Ptr createSpawnEntityMsg(uint32_t id, const BodyComponent &body) {
 		sc_entitySpawn spawn_entity;
 		spawn_entity.set_entityid(id);
 		spawn_entity.set_x(body.m_position(5));
@@ -25,7 +25,7 @@ public:
 		return std::make_shared<Message<sc_entitySpawn> >(ID_SC_SPAWN_ENTITY, spawn_entity);
 	}
 
-	// static Message<sc_entitySpawn>::Ptr createDestroyEntityMsg(uint32_t id, const BodyCmp &body) {
+	// static Message<sc_entitySpawn>::Ptr createDestroyEntityMsg(uint32_t id, const BodyComponent &body) {
 	// 	sc_entitySpawn spawn_entity;
 	// 	spawn_entity.set_entityid(id);
 	// 	spawn_entity.set_x(body.m_position(5));

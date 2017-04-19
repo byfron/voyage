@@ -39,10 +39,10 @@ voyage::sc_worldState ServerEngine::computeWorldState(uint32_t player_entity_id 
 	voyage::sc_worldState ws;
 
 	//TODO: send only entities that are "marked" as dirty? (only non players!)
-	_entityManager.each<NetworkCmp, BodyCmp>([player_entity_id,
+	_entityManager.each<NetworkComponent, BodyComponent>([player_entity_id,
 						  this, &ws](Entity entity,
-							     NetworkCmp &netdata,
-							     BodyCmp & body) {
+							     NetworkComponent &netdata,
+							     BodyComponent & body) {
 
 	     //do not fill the world state with the player entity
 	     if (entity.id().id != player_entity_id) {
@@ -81,14 +81,14 @@ Entity ServerEngine::createPlayerEntity(int player_id) {
 
 	Entity entity = _entityManager.createNetworked();
 
-	_entityManager.assign<PlayerCmp>(entity.id(), player_id);
-	_entityManager.assign<BodyCmp>(entity.id(), "cfg");
-	_entityManager.assign<NetworkCmp>(entity.id());
+	_entityManager.assign<PlayerComponent>(entity.id(), player_id);
+	_entityManager.assign<BodyComponent>(entity.id(), "cfg");
+	_entityManager.assign<NetworkComponent>(entity.id());
 	_entityManager.assign<CollisionComponent>(entity.id());
 
 
 	// initial position of player?
-	BodyCmp *body = _entityManager.getComponentPtr<BodyCmp>(entity.id());
+	BodyComponent *body = _entityManager.getComponentPtr<BodyComponent>(entity.id());
 	body->m_position(0) = 0.0;
 	body->m_position(1) = 0.0;
 

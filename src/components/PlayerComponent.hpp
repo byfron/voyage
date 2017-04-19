@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BulletCmp.hpp"
+#include "BulletComponent.hpp"
 #include "CollisionComponent.hpp"
 #include <entities/System.hpp>
 #include <common/GameMessages.hpp>
@@ -40,16 +40,16 @@ struct UserAction {
 	}
 };
 
-class NetworkCmp {
+class NetworkComponent {
 
 public:
 	bool dirty = true;
 };
 
-class PlayerCmp  {
+class PlayerComponent  {
 
 public:
-	PlayerCmp(Entity::Id pid) : player_id(pid) {}
+	PlayerComponent(Entity::Id pid) : player_id(pid) {}
 
 	std::string player_name;
 	Entity::Id player_id;

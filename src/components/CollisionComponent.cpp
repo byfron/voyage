@@ -6,10 +6,10 @@ void CollisionSystem::update(EntityManager & em, EventManager & evm, float delta
 	//GameLevel::CollisionMask mask = m_world->getLevelCollisionMask();
 
 // 		// solve candidates with characters
- 		em.each<CollisionComponent, BodyCmp >
+ 		em.each<CollisionComponent, BodyComponent >
 			([delta](Entity entity,
 				 CollisionComponent & collision,
-				 BodyCmp & body) {
+				 BodyComponent & body) {
 
 
 		      // Update collision geometry

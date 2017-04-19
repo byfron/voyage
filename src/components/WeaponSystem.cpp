@@ -1,9 +1,9 @@
-#include "BodyCmp.hpp"
+#include "BodyComponent.hpp"
 #ifdef CLIENT_BUILD
-#include "GraphicsCmp.hpp"
-#include "ParticleCmp.hpp"
+#include "GraphicsComponent.hpp"
+#include "ParticleComponent.hpp"
 #endif
-#include "PlayerSystem.hpp"
+#include "PlayerComponent.hpp"
 #include "WeaponSystem.hpp"
 
 void WeaponComponent::fire(float delta, EntityManager & em,
@@ -27,12 +27,14 @@ void WeaponComponent::generateBullets(EntityManager & em, const Vec2f & from,
 									  const Vec2f & direction) {
 	// how many bullets
 	Entity bullet = em.createLocal();
-	em.assign<BodyCmp>(bullet.id(), bullet_speed, TO_3DVEC(direction), TO_3DVEC(from));
-	em.assign<NetworkCmp>(bullet.id());
+	em.assign<BodyComponent>(bullet.id(), bullet_speed, TO_3DVEC(direction), TO_3DVEC(from));
+	em.assign<NetworkComponent>(bullet.id());
 	em.assign<CollisionComponent>(bullet.id());
 
-	//assign graphics if is the client!
+	//assign graphics if is the client! 
+	//Is this the best way to deal with this?
 #ifdef CLIENT_BUILD
+	std::cout << "adding graph" << std::endl;
 		uint16_t particle_type = 0;
 		em.assign<ParticleCmp>(bullet.id(), particle_type);
 #endif

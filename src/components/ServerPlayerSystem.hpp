@@ -1,8 +1,8 @@
 #pragma once
 
-#include "BulletCmp.hpp"
-#include "BodyCmp.hpp"
-#include "PlayerSystem.hpp"
+#include "BulletComponent.hpp"
+#include "BodyComponent.hpp"
+#include "PlayerComponent.hpp"
 #include "CollisionComponent.hpp"
 #include <entities/System.hpp>
 #include <common/GameMessages.hpp>
@@ -38,7 +38,7 @@ public:
 	}
 
 	// Computes player state as an interpolation of the two previous states
-	BodyState interpolateToNewState(const PlayerCmp & body) {
+	BodyState interpolateToNewState(const PlayerComponent & body) {
 
 	}
 
@@ -56,11 +56,11 @@ public:
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
-		em.each<NetworkCmp, PlayerCmp, BodyCmp>
+		em.each<NetworkComponent, PlayerComponent, BodyComponent>
 			([&em, delta, this](Entity entity,
-					    NetworkCmp &netdata,
-					    PlayerCmp &player,
-					    BodyCmp & body) {
+					    NetworkComponent &netdata,
+					    PlayerComponent &player,
+					    BodyComponent & body) {
 
 				// get any client messages in the queue for this player/entity
 				Entity::Id player_id = player.player_id;

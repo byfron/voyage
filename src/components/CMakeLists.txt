@@ -2,12 +2,12 @@ add_library(components
   VisibilityComponent.hpp
   CollisionComponent.hpp
   CollisionComponent.cpp
-  PlayerSystem.hpp
-  PlayerSystem.cpp
+  PlayerComponent.hpp
+  PlayerComponent.cpp
   WeaponSystem.hpp
   WeaponSystem.cpp
-  BodyCmp.hpp
-  BodyCmp.cpp)
+  BodyComponent.hpp
+  BodyComponent.cpp)
 
 add_library(scriptSystem
   ScriptSystem.hpp

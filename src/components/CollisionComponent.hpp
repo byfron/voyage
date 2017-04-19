@@ -3,7 +3,7 @@
 #include <entities/System.hpp>
 #include <game/World.hpp>
 #include <common/math.hpp>
-#include "BodyCmp.hpp"
+#include "BodyComponent.hpp"
 #include <utils/GeometryUtils.hpp>
 
 struct CollisionEvent {

@@ -1,5 +1,5 @@
 #include "PlayerInput.hpp"
-#include <components/PlayerSystem.hpp>
+#include <components/PlayerComponent.hpp>
 
 namespace PlayerInput {
 

@@ -2,7 +2,8 @@
 
 **** 0 Fix the Entity Identity system
 **** 1 Clean engine
-**** 2 Check leaks / initialization and correctness
+**** 2 Fix relationship components/graphics/...
+**** 3 Check leaks / initialization and correctness
 *** Port to other platforms
 	
 ** Graphic Engine features

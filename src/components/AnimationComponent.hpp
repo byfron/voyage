@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BodyCmp.hpp"
+#include "BodyComponent.hpp"
 #include "PlayerInput.hpp"
 #include <entities/System.hpp>
 #include <graphics/Animation.hpp>
@@ -68,14 +68,14 @@ private:
 class AnimationSystem : public System<AnimationSystem> {
 public:
 
-	void updateAnimation(AnimationComponent &anim, BodyCmp & body) {
+	void updateAnimation(AnimationComponent &anim, BodyComponent & body) {
 
 	}
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
-		em.each<AnimationComponent, BodyCmp>([delta](Entity entity,
+		em.each<AnimationComponent, BodyComponent>([delta](Entity entity,
 							     AnimationComponent &anim,
-							     BodyCmp & body) {
+							     BodyComponent & body) {
 //			 if (state.isDirty()) {
 
 			     //   anim.retrieveAnimation(body.m_action_id);

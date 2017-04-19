@@ -1,6 +1,6 @@
 #include "GameEngine.hpp"
-#include <components/BodyCmp.hpp>
-#include <components/PlayerSystem.hpp>
+#include <components/BodyComponent.hpp>
+#include <components/PlayerComponent.hpp>
 
 bool GameEngine::isClient = true;
 Entity::Id GameEngine::m_playerId = Entity::Id(0);

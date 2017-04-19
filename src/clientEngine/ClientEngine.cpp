@@ -8,14 +8,14 @@
 #include "handlers/ClientEntitySpawnHandler.hpp"
 #include "handlers/ClientWorldStateHandler.hpp"
 #include <visibility/VisibilityManager.hpp>
-#include <components/BodyCmp.hpp>
+#include <components/BodyComponent.hpp>
 #include <components/ClientPlayerSystem.hpp>
 #include <components/AnimationComponent.hpp>
 #include <components/CollisionComponent.hpp>
-#include <components/GraphicsCmp.hpp>
+#include <components/GraphicsComponent.hpp>
 #include <components/ScriptSystem.hpp>
 #include <components/RenderSystem.hpp>
-#include <components/ParticleCmp.hpp>
+#include <components/ParticleComponent.hpp>
 
 //#include "handlers/ClientMapHandler.hpp"
 #include "voyage.pb.h"
@@ -56,7 +56,7 @@ void ClientEngine::createSubsystems() {
 		std::make_shared<ClientPlayerSystem>(_world, _netMsgPool, _netManager, _visManager);
 	ps->configure(_eventManager);
 	add<ClientPlayerSystem>(ps);
-	add<ScriptSystem<BodyCmp> >(std::make_shared<ScriptSystem<BodyCmp> >());
+	add<ScriptSystem<BodyComponent> >(std::make_shared<ScriptSystem<BodyComponent> >());
 	add<CollisionSystem>(std::make_shared<CollisionSystem>(_world));
 
 
@@ -120,19 +120,19 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 	//TODO: REFACTOR THIS code also replicated in server!
 	//TODO: This should be a response from a server createEntity message
 
-	_entityManager.assign<PlayerCmp>(player_entity.id(), GameEngine::m_playerId);
-	_entityManager.assign<BodyCmp>(player_entity.id(), "cfg");
-	_entityManager.assign<NetworkCmp>(player_entity.id());
+	_entityManager.assign<PlayerComponent>(player_entity.id(), GameEngine::m_playerId);
+	_entityManager.assign<BodyComponent>(player_entity.id(), "cfg");
+	_entityManager.assign<NetworkComponent>(player_entity.id());
 	_entityManager.assign<CollisionComponent>(player_entity.id());
 	_entityManager.assign<InventoryComponent>(player_entity.id());
 
-//	_entityManager.assign<VisibilityCmp>(player_entity.id());
+//	_entityManager.assign<VisibilityComponent>(player_entity.id());
 
 	// Client-side components
-	_entityManager.assign<DebugGraphicsCmp>(player_entity.id());
+	_entityManager.assign<DebugGraphicsComponent>(player_entity.id());
 
 
-	BodyCmp *body = _entityManager.getComponentPtr<BodyCmp>(player_entity.id());
+	BodyComponent *body = _entityManager.getComponentPtr<BodyComponent>(player_entity.id());
 	body->m_position(0) = x;
 	body->m_position(1) = y;
 
@@ -143,9 +143,9 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 
 	_entityManager.assign<WeaponComponent>(weapon.id());
 	_entityManager.assign<ItemComponent>(weapon.id());
-	_entityManager.assign<BodyCmp>(weapon.id());
+	_entityManager.assign<BodyComponent>(weapon.id());
 	_entityManager.assign<CollisionComponent>(weapon.id());
-	_entityManager.assign<NetworkCmp>(weapon.id());
+	_entityManager.assign<NetworkComponent>(weapon.id());
 
 	// add weapon in inventory
 	InventoryComponent *inv = _entityManager.getComponentPtr<InventoryComponent>(player_entity.id());
@@ -153,10 +153,10 @@ void ClientEngine::createPlayer(uint32_t entity_id, float x, float y) {
 
 
 // 	Entity player_entity2 = _entityManager.create();
-// 	_entityManager.assign<PlayerCmp>(player2.id());
+// 	_entityManager.assign<PlayerComponent>(player2.id());
 // 	_entityManager.assign<CollisionComponent>(player2.id());
-// 	_entityManager.assign<NetworkCmp>(player2.id());
-// 	_entityManager.assign<BodyCmp>(player2.id(), "cfg");
+// 	_entityManager.assign<NetworkComponent>(player2.id());
+// 	_entityManager.assign<BodyComponent>(player2.id(), "cfg");
 // 	_entityManager.assign<AnimationComponent>(player2.id(),
 // 						  std::string(CONFIG_FILE_PATH) +
 // 						  "main_character_anim3.cfg");

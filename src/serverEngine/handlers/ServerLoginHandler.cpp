@@ -5,7 +5,6 @@
 #include <serverEngine/PlayerSession.hpp>
 #include <serverEngine/GameServer.hpp>
 #include <serverEngine/MessageFactory.hpp>
-#include <components/components.hpp>
 #include <entities/Entity.hpp>
 #include "ServerLoginHandler.hpp"
 #include "voyage.pb.h"
@@ -44,8 +43,8 @@ void ServerLoginHandler::onMessage(RakNet::Packet *p) {
 		session->sendMessage(msg);	
 
 		// Create player entity and send spawn message to client
-		BodyCmp *body = _gameServer->engine().entity_manager().
-			getComponentPtr<BodyCmp>(pe.id());
+		BodyComponent *body = _gameServer->engine().entity_manager().
+			getComponentPtr<BodyComponent>(pe.id());
 
 		Message<sc_entitySpawn>::Ptr spawn_msg =
 		MessageFactory::createSpawnPlayerMsg(pe.id().id, *body);
@@ -55,10 +54,10 @@ void ServerLoginHandler::onMessage(RakNet::Packet *p) {
 
 		// spawn every other player entity to the session
 		_gameServer->engine().entity_manager().
-			each<NetworkCmp, PlayerCmp, BodyCmp>([session](Entity entity,
-								       NetworkCmp &netdata,
-								       PlayerCmp &player,
-								       BodyCmp &body) {
+			each<NetworkComponent, PlayerComponent, BodyComponent>([session](Entity entity,
+								       NetworkComponent &netdata,
+								       PlayerComponent &player,
+								       BodyComponent &body) {
 
 		     if (session->getPlayerEntityId() != entity.id().id) {			 
 			     Message<sc_entitySpawn>::Ptr spawn_msg =

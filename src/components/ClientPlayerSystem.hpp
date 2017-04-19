@@ -1,8 +1,8 @@
 #pragma once
 
-#include "BulletCmp.hpp"
-#include "BodyCmp.hpp"
-#include "PlayerSystem.hpp"
+#include "BulletComponent.hpp"
+#include "BodyComponent.hpp"
+#include "PlayerComponent.hpp"
 #include "CollisionComponent.hpp"
 #include "InventoryComponent.hpp"
 #include "WeaponSystem.hpp"
@@ -76,11 +76,11 @@ public:
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
-		em.each<NetworkCmp, PlayerCmp, BodyCmp>
+		em.each<NetworkComponent, PlayerComponent, BodyComponent>
 			([&em, delta, this](Entity entity,
-					    NetworkCmp &netdata,
-					    PlayerCmp &player,
-					    BodyCmp & body) {
+					    NetworkComponent &netdata,
+					    PlayerComponent &player,
+					    BodyComponent & body) {
 
 			// Update with input data
 			if (entity.id() == GameEngine::m_playerId)

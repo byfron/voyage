@@ -1,7 +1,7 @@
 #include <entities/EventManager.hpp>
 #include <entities/System.hpp>
 #include <boost/python.hpp>
-#include "BodyCmp.hpp"
+#include "BodyComponent.hpp"
 
 // Class Exposure
 using namespace boost::python;

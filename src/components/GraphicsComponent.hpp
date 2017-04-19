@@ -3,9 +3,9 @@
 #include <pumpkin.hpp>
 #include "CollisionComponent.hpp"
 #include <entities/System.hpp>
-#include "PlayerSystem.hpp"
+#include "PlayerComponent.hpp"
 
-class DebugGraphicsCmp {
+class DebugGraphicsComponent {
 
 public:
 	void update(float delta) {
@@ -16,10 +16,10 @@ public:
 
 };
 
-class GraphicsCmp {
+class GraphicsComponent {
 public:
 
-	GraphicsCmp() {
+	GraphicsComponent() {
 
 	}
 
@@ -38,10 +38,10 @@ public:
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
 		// Draw all graphic elements
-		em.each<GraphicsCmp, BodyCmp>(
+		em.each<GraphicsComponent, BodyComponent>(
 			[delta](Entity entity,
-				GraphicsCmp &go,
-				BodyCmp &body) {
+				GraphicsComponent &go,
+				BodyComponent &body) {
 
 				go.m_graphics->setTransform(body.getTransform());
 				go.m_graphics->update(delta);
@@ -63,11 +63,11 @@ public:
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
-		em.each<DebugGraphicsCmp, CollisionComponent, BodyCmp>(
+		em.each<DebugGraphicsComponent, CollisionComponent, BodyComponent>(
 			[delta](Entity entity,
-				DebugGraphicsCmp &debug,
+				DebugGraphicsComponent &debug,
 				CollisionComponent &col,
-				BodyCmp &body) {
+				BodyComponent &body) {
 
 
 			debug.update(delta);
