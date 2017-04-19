@@ -24,8 +24,6 @@ public:
 
 	void receiveData()  { _netManager.receiveData(); }
 
-//	ClientTileMap::Ptr getTileMap() { return _tileMap; };
-
 	ClientNetworkManager & getNetManager() { return _netManager; }
 	NetworkMessagePool & msg_pool() { return _netMsgPool; }
 

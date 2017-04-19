@@ -16,7 +16,6 @@
 #include <visibility/VisibilityManager.hpp>
 #include <voyage.pb.h>
 
-
 static unsigned long getTimeSinceEpochMillis()
 {
     return static_cast<unsigned long>
@@ -83,11 +82,9 @@ public:
 					    PlayerCmp &player,
 					    BodyCmp & body) {
 
-
 			// Update with input data
 			if (entity.id() == GameEngine::m_playerId)
 			{
-
 				UserAction action = PlayerInput::getUserAction();
 
 				// send the delta with the user action now
@@ -95,8 +92,6 @@ public:
 
 				UserAction last_action = m_action_queue.front();
 				m_action_queue.pop();
-
-
 
 				// TODO: Only when the action changes?
 				// we register it and send ot to the server
@@ -109,15 +104,12 @@ public:
 
 					action.seq_num = m_action_seq_num++;
 
-
 					// TODO DO NOT TRANSFORM DE ACTION WITH
 					// THE CAMERA ROTATION!
 					sendActionToServer(action);
-
 				}
 
 				m_action_queue.push(action);
-
 
 				////////////////////////////////////////////////////////////
 				// TODO: refactor this (repeated in ServerPlayerSystem)
@@ -180,9 +172,7 @@ public:
 					body.m_position(1) = update.pos_y();
 					body.m_rotAngle = update.angle();
 					body.updateRotation();
-
 				}
-
 			}
 		});
 	}

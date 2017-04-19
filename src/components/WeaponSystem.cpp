@@ -1,12 +1,13 @@
 #include "BodyCmp.hpp"
+#ifdef CLIENT_BUILD
 #include "GraphicsCmp.hpp"
+#include "ParticleCmp.hpp"
+#endif
 #include "PlayerSystem.hpp"
 #include "WeaponSystem.hpp"
 
-
 void WeaponComponent::fire(float delta, EntityManager & em,
 						   const Vec2f & from, const Vec2f & direction) {
-
 	if (is_firing) {
 		if (bulletInChamber(delta)) {
 			time_since_last_shot = 0.0f;
@@ -15,33 +16,33 @@ void WeaponComponent::fire(float delta, EntityManager & em,
 
 		// switch(type) {
 		// case WeaponType::GUN_TYPE: //TODO: separate in two different components
-		// 	shoot(delta);
+		// shoot(delta);
 		// case WeaponType::KNIFE_TYPE:
-		// 	stab(delta);
+		// stab(delta);
 		// };
 	}
 }
 
 void WeaponComponent::generateBullets(EntityManager & em, const Vec2f & from,
 									  const Vec2f & direction) {
-
-	// how many bullets?
-	Entity bullet = em.createNetworked();
+	// how many bullets
+	Entity bullet = em.createLocal();
 	em.assign<BodyCmp>(bullet.id(), bullet_speed, TO_3DVEC(direction), TO_3DVEC(from));
 	em.assign<NetworkCmp>(bullet.id());
 	em.assign<CollisionComponent>(bullet.id());
 
 	//assign graphics if is the client!
-	if (GameEngine::isClient) {
-		//	em.assign<GraphicsCmp>(bullet.id(), ConfigManager::getBulletConfig());
-	}
+#ifdef CLIENT_BUILD
+		uint16_t particle_type = 0;
+		em.assign<ParticleCmp>(bullet.id(), particle_type);
+#endif
 }
 
 bool WeaponComponent::bulletInChamber(float delta) {
+	return true;
 	time_since_last_shot+=delta;
 	return time_since_last_shot >= rate_of_fire;
 }
-
 
 // // TODO can't we run fire directly from the clientsystem???
 

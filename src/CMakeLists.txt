@@ -8,10 +8,21 @@
 # target_include_directories(server PUBLIC
 #   ${CMAKE_CURRENT_SOURCE_DIR})
 
+SET(BX_LIBS 
+  "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbxRelease.a")
+
 SET(BGFX_LIBS
   "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libexample-commonRelease.a"
   "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbxRelease.a"
+  "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbimgRelease.a"
+  "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbimg_decodeRelease.a"
+  "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbimg_encodeRelease.a"
   "${CMAKE_SOURCE_DIR}/pumpkin/bgfx/.build/linux64_gcc/bin/libbgfxRelease.a")
+#  "${CMAKE_SOURCE_DIR}/pumpkin/bx/.build/linux64_gcc/bin/libbxRelease.a"
+#  "${CMAKE_SOURCE_DIR}/pumpkin/bimg/.build/linux64_gcc/bin/libbimgRelease.a"
+#  "${CMAKE_SOURCE_DIR}/pumpkin/bimg/.build/linux64_gcc/bin/libbimg_decodeRelease.a"
+#  "${CMAKE_SOURCE_DIR}/pumpkin/bimg/.build/linux64_gcc/bin/libbimg_encodeRelease.a"
+ 
 
 add_executable(client clients/main_client.cpp)
 target_link_libraries(client
@@ -25,6 +36,8 @@ target_link_libraries(client
   ${BGFX_LIBS}
   )
 
+target_compile_definitions(client PRIVATE CLIENT_BUILD)
+
 add_executable(server main_server.cpp)
 target_link_libraries(server
   serverEngine
@@ -35,6 +48,7 @@ target_link_libraries(server
   utils
   ${PYTHON_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${BX_LIBS}
   )
 
 target_include_directories(client PUBLIC

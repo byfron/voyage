@@ -16,7 +16,7 @@ public:
 	void generateBullets(EntityManager & em, const Vec2f & from,
 						 const Vec2f & direction);
 
-	bool is_firing = false;
+	bool is_firing = true;
 	float bullet_speed = 0.0;
 	WeaponType type;
 	int num_bullets;
