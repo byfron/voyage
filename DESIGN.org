@@ -176,3 +176,14 @@ If we right-click on an tile: fills the console and waits for input
 ** We should categorize certain actions as synchronous or async. so that they run in C++
 ** with an efficient cache-friendly task pool
 ** 
+
+SYSTEMS:
+
+** RenderSystem:
+
+** AnimationSystem:
+
+COMPONENTS:
+
+** SceneComponent:
+** AnimationComponent

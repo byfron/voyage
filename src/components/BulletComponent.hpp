@@ -1,7 +1,7 @@
 #pragma once
 #include <entities/System.hpp>
 
-class BulletCmp {
+class BulletComponent {
 
 public:
 
