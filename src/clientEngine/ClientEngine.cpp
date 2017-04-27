@@ -15,7 +15,6 @@
 #include <components/GraphicsComponent.hpp>
 #include <components/ScriptSystem.hpp>
 #include <components/RenderSystem.hpp>
-#include <components/ParticleComponent.hpp>
 
 //#include "handlers/ClientMapHandler.hpp"
 #include "voyage.pb.h"
@@ -69,9 +68,9 @@ void ClientEngine::createSubsystems() {
 	add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
 
 	// handles particles
-	std::vector<pumpkin::ParticleRenderer> renderers = {pumpkin::ParticleRenderer(0)};
-	add<ParticleSystem>(std::make_shared<ParticleSystem>(renderers));
-		
+	// std::vector<pumpkin::ParticleRenderer> renderers = {pumpkin::ParticleRenderer(0)};
+	// add<ParticleSystem>(std::make_shared<ParticleSystem>(renderers));
+
 	// handles orderly rendering: submits render calls
 	// of components so that things display correctly (stencil, depth, etc...)
 	add<RenderSystem>(std::make_shared<RenderSystem>(_world, _visManager));
