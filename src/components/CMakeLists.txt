@@ -1,4 +1,4 @@
-add_library(components
+SET (COMPONENTS_SRC
   VisibilityComponent.hpp
   CollisionComponent.hpp
   CollisionComponent.cpp
@@ -9,10 +9,20 @@ add_library(components
   BodyComponent.hpp
   BodyComponent.cpp)
 
+add_library(components_client
+  GraphicsComponent.hpp
+  ParticleComponent.hpp
+  ${COMPONENTS_SRC})
+
+add_library(components_server
+  ${COMPONENTS_SRC})
+
 add_library(scriptSystem
   ScriptSystem.hpp
   ScriptSystem.cpp
   )
+
+target_compile_definitions(components_client PUBLIC CLIENT=1)
 
 target_link_libraries(scriptSystem
   ${Boost_LIBRARIES}

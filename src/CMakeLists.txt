@@ -19,10 +19,11 @@ target_link_libraries(client
   dl
   scriptSystem
   gameEngine
+  components_client
   ${BGFX_LIBS}
   )
 
-target_compile_definitions(client PUBLIC CLIENT_BUILD)
+target_compile_definitions(client PUBLIC CLIENT=1)
 
 add_executable(server main_server.cpp)
 target_link_libraries(server
@@ -30,7 +31,7 @@ target_link_libraries(server
   EntitiesCore
   proto
   gameEngine
-  components
+  components_server
   utils
   ${PYTHON_LIBRARIES}
   ${Boost_LIBRARIES}

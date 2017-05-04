@@ -1,3 +1,7 @@
+** Bugs
+
+**** clip2tri fails with an assert on the Edge constructor
+
 ** Misc
 
 **** 0 Fix the Entity Identity system

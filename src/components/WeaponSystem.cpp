@@ -1,5 +1,5 @@
 #include "BodyComponent.hpp"
-#ifdef CLIENT_BUILD
+#if CLIENT
 #include "GraphicsComponent.hpp"
 #include "ParticleComponent.hpp"
 #endif
@@ -31,13 +31,16 @@ void WeaponComponent::generateBullets(EntityManager & em, const Vec2f & from,
 	em.assign<NetworkComponent>(bullet.id());
 	em.assign<CollisionComponent>(bullet.id());
 
+	std::cout << "generating bullets 2222 asd" << std::endl;
+	
 	//assign graphics if is the client! 
 	//Is this the best way to deal with this?
-#ifdef CLIENT_BUILD
-	std::cout << "adding graph" << std::endl;
+
+#if CLIENT
 		uint16_t particle_type = 0;
-		em.assign<ParticleCmp>(bullet.id(), particle_type);
+		em.assign<ParticleComponent>(bullet.id(), particle_type);
 #endif
+	
 }
 
 bool WeaponComponent::bulletInChamber(float delta) {

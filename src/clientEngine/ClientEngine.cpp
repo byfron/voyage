@@ -74,9 +74,6 @@ void ClientEngine::createSubsystems() {
 	// handles orderly rendering: submits render calls
 	// of components so that things display correctly (stencil, depth, etc...)
 	add<RenderSystem>(std::make_shared<RenderSystem>(_world, _visManager));
-
-
-
 }
 
 void ClientEngine::createWorld() {

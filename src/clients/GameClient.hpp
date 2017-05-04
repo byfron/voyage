@@ -13,6 +13,10 @@ public:
 
 	GameClient() {
 		auto console = spd::stdout_logger_mt("Client");
+		#if CLIENT
+		std::cout << "CLIENT!" << std::endl;
+		#endif
+		
 	}
 
 	~GameClient() {}

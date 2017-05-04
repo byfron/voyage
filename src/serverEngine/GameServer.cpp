@@ -28,9 +28,6 @@ GameServer::GameServer(int portNum) {
 
 	_gameEngine.getNetManager().registerHandler(std::make_shared<ServerDataHandler>
 						      (this), {ID_CS_USER_ACTION});
-
-
-
 }
 
 void GameServer::stop() {
@@ -56,7 +53,6 @@ PlayerSession::Ptr GameServer::createPlayerSession(RakNet::RakNetGUID guid) {
 	return psPtr;
 }
 
-
 void GameServer::broadcastWorldState() {
 
 	for (auto session : _playerSessions) {
@@ -68,11 +64,9 @@ void GameServer::broadcastWorldState() {
 
 			spd::get("Server")->info("has waiting");
 
-
 			playerWorldState.mutable_player_update()->CopyFrom(_gameEngine.getNetManager().
 								     popPlayerStateMsg(session->getPlayerId()));
 		}
-
 
 		// send if we have something ready
 		if (playerWorldState.entity_update().size() > 0 ||
@@ -84,7 +78,6 @@ void GameServer::broadcastWorldState() {
 					     (ID_SC_WORLD_STATE, playerWorldState));
 		}
 	}
-
 }
 
 void GameServer::start() {

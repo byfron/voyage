@@ -57,15 +57,13 @@ voyage::sc_worldState ServerEngine::computeWorldState(uint32_t player_entity_id 
 		 }
 	     });
 
-
 	// how to fill spawn/destroy messages?
-
 
 	return ws;
 }
 
-
 void ServerEngine::createWorld() {
+	
 	_world = std::make_shared<World>();
 
 	//TODO: load this after migrating config manager to voyage
@@ -73,9 +71,7 @@ void ServerEngine::createWorld() {
 	FbxLoader loader(std::string(SCENE_FILE_PATH) + fbx_file);
 
 	_world->loadGameLevel(loader);
-
 }
-
 
 Entity ServerEngine::createPlayerEntity(int player_id) {
 
@@ -86,12 +82,10 @@ Entity ServerEngine::createPlayerEntity(int player_id) {
 	_entityManager.assign<NetworkComponent>(entity.id());
 	_entityManager.assign<CollisionComponent>(entity.id());
 
-
 	// initial position of player?
 	BodyComponent *body = _entityManager.getComponentPtr<BodyComponent>(entity.id());
 	body->m_position(0) = 0.0;
 	body->m_position(1) = 0.0;
-
 
 	return entity;
 }
