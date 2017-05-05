@@ -18,6 +18,7 @@ struct UserAction {
 		seq_num = ua.seq_num();
 
 //		TODO: if (ua.has blabla)
+		lookat_vec = Vec3f::UnitX();
 		motion_vec = Vec3f::Zero();
 		motion_vec(0) = ua.motion_x();
 		motion_vec(1) = ua.motion_y();
@@ -28,6 +29,7 @@ struct UserAction {
 
 	int player_id = -1;
 	Vec3f motion_vec;
+	Vec3f lookat_vec;
 	float angle = 0;
 	uint32_t action_code = 0;
 	uint32_t seq_num;

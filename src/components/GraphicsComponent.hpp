@@ -137,7 +137,7 @@ public:
 				ParticleGraphicsComponent &go,
 				BodyComponent &body) {
 
-				//go.m_particle.setTransform(body.getTransform());
+				go.m_particle.setTransform(body.getTransform());
 				go.m_particle.update(delta);
 
 

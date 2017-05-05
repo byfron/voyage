@@ -126,7 +126,8 @@ public:
 				if (action.action_code & (1 << int(Action::SHOOTING))) {
 					InventoryComponent* inv = em.getComponentPtr<InventoryComponent>(entity.id());
 					WeaponComponent* weapon = em.getComponentPtr<WeaponComponent>(inv->getActiveWeaponId());
-					Vec2f from, direction;
+					Vec3f from = body.m_position; //TODO: compute_weapon_endpoint()
+					Vec3f direction = action.lookat_vec.normalized();
 					weapon->fire(delta, em, from, direction);
 					std::cout << "firing weapon" << std::endl;
 				}

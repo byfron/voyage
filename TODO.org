@@ -1,15 +1,17 @@
 ** Bugs
 
 **** clip2tri fails with an assert on the Edge constructor
+**** Framerate looks really bad. Check what's going on.
 
 ** Misc
 
 **** 0 Fix the Entity Identity system
 **** 1 Clean engine
-**** 2 Fix relationship components/graphics/...
+***** DONE Fix relationship components/graphics/...
 **** 3 Check leaks / initialization and correctness
+
 *** Port to other platforms
-	
+
 ** Graphic Engine features
 
 *** Shadows and light manager (light color, light switching, etc...)
@@ -22,6 +24,7 @@
 
 **** Migrate config manager to voyage
 Now we are hardcoding the game level load in ServerEngine.cpp
+
 
 ** Game Content
 

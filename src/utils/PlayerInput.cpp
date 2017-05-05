@@ -14,6 +14,7 @@ namespace PlayerInput {
 		getLookatVector(lookat_vec, lookat_dir, action_code);
 
 		UserAction action;
+		action.lookat_vec = lookat_vec;
 		action.motion_vec = motion_vec;
 		action.angle = pumpkin::InputManager::m_mouse_angle;
 		action.action_code = action_code;

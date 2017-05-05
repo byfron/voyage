@@ -10,10 +10,10 @@
 #include <visibility/VisibilityManager.hpp>
 #include <components/BodyComponent.hpp>
 #include <components/ClientPlayerSystem.hpp>
-#include <components/AnimationComponent.hpp>
 #include <components/CollisionComponent.hpp>
 #include <components/GraphicsComponent.hpp>
 #include <components/ScriptSystem.hpp>
+#include <components/ParticleComponent.hpp>
 #include <components/RenderSystem.hpp>
 
 //#include "handlers/ClientMapHandler.hpp"
@@ -57,6 +57,7 @@ void ClientEngine::createSubsystems() {
 	add<ClientPlayerSystem>(ps);
 	add<ScriptSystem<BodyComponent> >(std::make_shared<ScriptSystem<BodyComponent> >());
 	add<CollisionSystem>(std::make_shared<CollisionSystem>(_world));
+	add<ParticleSystem>(std::make_shared<ParticleSystem>());
 
 
     // Client-only SYSTEMS!

@@ -8,7 +8,7 @@
 #endif
 
 void WeaponComponent::fire(float delta, EntityManager & em,
-						   const Vec2f & from, const Vec2f & direction) {
+						   const Vec3f & from, const Vec3f & direction) {
 	if (is_firing) {
 		if (bulletInChamber(delta)) {
 			time_since_last_shot = 0.0f;
@@ -24,16 +24,15 @@ void WeaponComponent::fire(float delta, EntityManager & em,
 	}
 }
 
-void WeaponComponent::generateBullets(EntityManager & em, const Vec2f & from,
-									  const Vec2f & direction) {
+void WeaponComponent::generateBullets(EntityManager & em, const Vec3f & from,
+									  const Vec3f & direction) {
 	// how many bullets
 	Entity bullet = em.createLocal();
-	em.assign<BodyComponent>(bullet.id(), bullet_speed, TO_3DVEC(direction), TO_3DVEC(from));
+	em.assign<BodyComponent>(bullet.id(), bullet_speed, direction, from);
 	em.assign<NetworkComponent>(bullet.id());
 	em.assign<CollisionComponent>(bullet.id());
 	uint16_t particle_type = 0;
 	em.assign<ParticleComponent>(bullet.id(), particle_type);
-	std::cout << "generating bullets 2222 asd" << std::endl;
 
 	//assign graphics if is the client!
 #if CLIENT

@@ -32,8 +32,6 @@
 - Contains Raknet peer
 - Handles message I/O
 
-
-
 ** Graphics
 
 * The basic components handle just the entity state, which is handled in the server

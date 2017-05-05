@@ -1,7 +1,6 @@
 #pragma once
 
 #include <components/BodyComponent.hpp>
-#include <components/AnimationComponent.hpp>
 #include <clientEngine/ClientEngine.hpp>
 #include <pumpkin.hpp>
 #include <Eigen/Dense>
@@ -13,10 +12,6 @@ public:
 
 	GameClient() {
 		auto console = spd::stdout_logger_mt("Client");
-		#if CLIENT
-		std::cout << "CLIENT!" << std::endl;
-		#endif
-		
 	}
 
 	~GameClient() {}
