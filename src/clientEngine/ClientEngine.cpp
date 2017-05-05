@@ -57,7 +57,7 @@ void ClientEngine::createSubsystems() {
 	add<ClientPlayerSystem>(ps);
 	add<ScriptSystem<BodyComponent> >(std::make_shared<ScriptSystem<BodyComponent> >());
 	add<CollisionSystem>(std::make_shared<CollisionSystem>(_world));
-	add<ParticleSystem>(std::make_shared<ParticleSystem>());
+	add<ParticleSystem>(std::make_shared<ParticleSystem>(_world));
 
 
     // Client-only SYSTEMS!

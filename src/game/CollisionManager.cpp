@@ -3,6 +3,21 @@
 
 namespace CollisionManager {
 
+	bool isColliding(World::Ptr world, const Vec3f & body_pos, const Vec3f & move_vec) {
+
+		GameLevel & level = world->getGameLevel();
+		std::vector<GeometryUtils::Polygon> collision_candidates =
+			level.getCollisionPolygonsNearby(body_pos);
+
+		float scale = 0.1;
+		GeometryUtils::Polygon ent = GeometryUtils::getQuadCentered(body_pos, scale);
+
+		for (auto cand: collision_candidates) {
+			if (GeometryUtils::Intersect(ent, cand)) return true;
+		}
+		return false;
+	}
+
 	Vec3f computeCorrectionVector(World::Ptr world,
 				      const Vec3f & body_pos,
 				      GeometryUtils::Polygon player,

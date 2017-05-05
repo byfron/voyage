@@ -2,6 +2,15 @@
 
 namespace GeometryUtils {
 
+	Polygon getQuadCentered(const Vec3f &centroid, float scale) {
+		Polygon q;
+		q.vertices.push_back(Vec2f(-1.0,-1.0) * scale + centroid.head(2));
+		q.vertices.push_back(Vec2f( 1.0,-1.0) * scale + centroid.head(2));
+		q.vertices.push_back(Vec2f( 1.0, 1.0) * scale + centroid.head(2));
+		q.vertices.push_back(Vec2f(-1.0, 1.0) * scale + centroid.head(2));
+		return q;
+	}
+
 	Polygon convertToPolygon(FbxLoader::FPolygon p) {
 		Polygon pp;
 		for (int i = 0; i < p.rows(); i++) {
@@ -9,7 +18,7 @@ namespace GeometryUtils {
 		}
 		return pp;
 	}
-	
+
 	void CalculateInterval(Vec2f Axis, GeometryUtils::Polygon P, float& min, float& max)
 	{
 		float d = Axis.dot(P.vertices[0]);
@@ -71,6 +80,8 @@ namespace GeometryUtils {
 			if (AxisSeparatePolygons(N, A, B))
 				return false;
 		}
+
+		return true;
 	}
 
 	Vec2f FindMTD(Vec2f* PushVector, int iNumVectors)
@@ -94,7 +105,7 @@ namespace GeometryUtils {
 //		assert(false);
 		return true;
 	}
-	
+
 	bool IntersectMTD(GeometryUtils::Polygon A, GeometryUtils::Polygon B, Vec2f& MTD)
 	{
 		// potential separation axes. they get converted into push

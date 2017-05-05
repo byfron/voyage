@@ -14,6 +14,7 @@
 
 ** Graphic Engine features
 
+*** Display FPS
 *** Shadows and light manager (light color, light switching, etc...)
 **** Finish vision cone (fix visibility so that shadow polygon spans from the wall-base)
 *** Effects manager (particles and other FX)

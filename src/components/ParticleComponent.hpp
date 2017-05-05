@@ -1,16 +1,20 @@
 #pragma once
 
 #include <entities/System.hpp>
+#include <game/World.hpp>
 
 class ParticleSystem : public System<ParticleSystem>{
 
 public:
 
-	ParticleSystem()
+	ParticleSystem(World::Ptr world) : m_world(world)
 	{
 	}
 
 	void update(EntityManager & em, EventManager &evm, float delta);
+
+protected:
+	World::Ptr m_world;
 
 };
 
