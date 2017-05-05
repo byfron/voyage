@@ -92,7 +92,7 @@ void ClientEngine::createWorld() {
                                           config,
                                           loader);
 
-    // Create world
+    // create world
     _world->loadGameLevel(loader);
 
 }

@@ -98,17 +98,17 @@ Eigen::MatrixXf BodyComponent::getTransform() {
 												m_position(2))).matrix() * m_rotation;
 }
 
+// This update is not being used right now!
+// Body component is update within other systems. BAD!
 void BodySystem::update(EntityManager & em, EventManager &evm, float delta ) {
-
-	em.each<BodyComponent>([delta](Entity entity, BodyComponent & body) {
-				
-			body.m_position += body.m_moveVec;
-			
-			Eigen::AngleAxis<float> aa(body.m_rotAngle, Vec3f(0.0,0.0,1.0));
-			Eigen::MatrixXf rot = Eigen::MatrixXf::Identity(4,4);
-			rot.block(0,0,3,3) = aa.matrix();
-			
-			body.m_rotation = rot;
-
-		});
+	
+	em.each<BodyComponent>([delta](Entity entity, BodyComponent & body) {			
+		body.m_position += body.m_moveVec;
+		Eigen::AngleAxis<float> aa(body.m_rotAngle, Vec3f(0.0,0.0,1.0));
+		Eigen::MatrixXf rot = Eigen::MatrixXf::Identity(4,4);
+		rot.block(0,0,3,3) = aa.matrix();		   
+		body.m_rotation = rot;
+	});
 }
+
+ 

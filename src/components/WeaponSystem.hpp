@@ -17,7 +17,7 @@ public:
 						 const Vec2f & direction);
 
 	bool is_firing = true;
-	float bullet_speed = 0.0;
+	float bullet_speed = 0.1;
 	WeaponType type;
 	int num_bullets;
 	float damage;
