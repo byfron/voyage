@@ -4,6 +4,8 @@ SET (COMPONENTS_SRC
   CollisionComponent.cpp
   PlayerComponent.hpp
   PlayerComponent.cpp
+  ParticleComponent.hpp
+  ParticleComponent.cpp
   WeaponSystem.hpp
   WeaponSystem.cpp
   BodyComponent.hpp

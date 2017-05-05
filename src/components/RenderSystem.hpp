@@ -15,7 +15,7 @@ public:
 
     void render(float delta)
     {
-        m_scene->render(delta);
+        //m_scene->render(delta);
     }
 protected:
 
@@ -67,11 +67,19 @@ public:
 				ac.render(delta);
 			});
 
-		// Render game level
+		//Render particles
+		renderParticles(delta);
+
+		//Render game level
 		renderScene(em, delta);
+
 
 		// Render debug stuff
 		//m_visibilityManager.render(delta);
+
+	}
+
+	void renderParticles(float delta) {
 
 	}
 

@@ -16,6 +16,22 @@ public:
 
 };
 
+class ParticleGraphicsComponent {
+
+public:
+
+	ParticleGraphicsComponent(uint16_t type) : m_renderer_id(type) {
+	}
+
+	void render(float delta) {
+		GraphicsSystem::particleRendererPool[m_renderer_id].push_back(render(pumpkin::RENDER_PASS_GEOMETRY, m_particle_graphics);
+	}
+
+	uint16_t m_renderer_id = 0;
+	pumpkin::ParticleGraphicsObject m_particle;
+};
+
+
 class GraphicsComponent {
 public:
 
@@ -30,14 +46,14 @@ public:
 	pumpkin::GraphicsObject *m_graphics;
 };
 
-class GraphicsSystem : public System<GraphicsSystem> {
+class GraphicsUpdateSystem : public System<GraphicsUpdateSystem> {
 public:
 
 	GraphicsSystem() {};
 
 	void update(EntityManager & em, EventManager &evm, float delta ) {
 
-		// Draw all graphic elements
+		// update all graphic elements
 		em.each<GraphicsComponent, BodyComponent>(
 			[delta](Entity entity,
 				GraphicsComponent &go,
@@ -47,11 +63,28 @@ public:
 				go.m_graphics->update(delta);
 		});
 
+		// update particle graphics
+		em.each<ParticleGraphicsComponent, BodyComponent>(
+			[delta](Entity entity,
+				ParticleGraphicsComponent &go,
+				BodyComponent &body) {
+
+				go.m_particle.setTransform(body.getTransform());
+				go.m_particle.update(delta);
+
+				// push into particle renderer
+
+		});
+
+
+
 		// Draw visibility component (in the client there should be only one)
 
 
 
 	}
+
+	static std::vector<pumpkin::ParticleRenderer> particleRendererPool;
 
 };
 
@@ -68,7 +101,6 @@ public:
 				DebugGraphicsComponent &debug,
 				CollisionComponent &col,
 				BodyComponent &body) {
-
 
 			debug.update(delta);
 
