@@ -62,10 +62,10 @@ void ClientEngine::createSubsystems() {
     // Client-only SYSTEMS!
 
 	// updates animations
-	add<AnimationSystem>(std::make_shared<AnimationSystem>());
+//	add<AnimationSystem>(std::make_shared<AnimationSystem>());
 
 	// updates graphics objects
-	add<GraphicsSystem>(std::make_shared<GraphicsSystem>());
+	add<GraphicsUpdateSystem>(std::make_shared<GraphicsUpdateSystem>());
 
 	// handles particles
 	// std::vector<pumpkin::ParticleRenderer> renderers = {pumpkin::ParticleRenderer(0)};

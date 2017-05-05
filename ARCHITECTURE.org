@@ -1,12 +1,12 @@
 
 * Components/
-** 
+**
 
 * Game/
 ** GameEngine
 - Contains entity/event/system manager
 - Contains the World object
-  
+
 ** World
 - Contains GameLevels
 
@@ -14,12 +14,15 @@
 - Room vector
 - Handles room/collision polygon
 
+
 * ClientEngine/
+
 ** ClientEngine : GameEngine
 - Contains NetworkMsgPool
 - Contains VisibilityManager
 - Contains ClientNetworkManager
 - Creates world and systems : Needs refactoring
+
 
 * ServerEngine/
 ** ServerEngine : GameEngine
@@ -27,13 +30,22 @@
 
 ** PlayerSession : Session
 - Contains Raknet peer
-- Handles message I/O 
+- Handles message I/O
 
 
 
-PUMPKIN:
+** Graphics
+
+* The basic components handle just the entity state, which is handled in the server
+* The graphics components handle the graphics stuff and this shows only in the client
+
+* The GraphicsUpdateSystem updates state/transformation of the graphic elements
+* The RenderSystem renders all the elements in order
+
+*** TODO: put together animation system and graphicsUpdateSystem
+
 
 ** Particles
 
-- ParticleComponent keeps a list of ParticleRenderers
-- ParticleRenderers are in charge of rendering ParticleGraphicsObject
+* The ParticleSystem handles update of ParticleComponents
+* The ParticleGraphicComponent is updated and rendered as other objects are

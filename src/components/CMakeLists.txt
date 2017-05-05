@@ -14,6 +14,8 @@ SET (COMPONENTS_SRC
 add_library(components_client
   GraphicsComponent.hpp
   ParticleComponent.hpp
+  RenderSystem.hpp
+  RenderSystem.cpp
   ${COMPONENTS_SRC})
 
 add_library(components_server

@@ -1,10 +1,11 @@
 #include "BodyComponent.hpp"
-#if CLIENT
-#include "GraphicsComponent.hpp"
 #include "ParticleComponent.hpp"
-#endif
 #include "PlayerComponent.hpp"
 #include "WeaponSystem.hpp"
+
+#if CLIENT
+#include "GraphicsComponent.hpp"
+#endif
 
 void WeaponComponent::fire(float delta, EntityManager & em,
 						   const Vec2f & from, const Vec2f & direction) {
@@ -30,17 +31,15 @@ void WeaponComponent::generateBullets(EntityManager & em, const Vec2f & from,
 	em.assign<BodyComponent>(bullet.id(), bullet_speed, TO_3DVEC(direction), TO_3DVEC(from));
 	em.assign<NetworkComponent>(bullet.id());
 	em.assign<CollisionComponent>(bullet.id());
-
+	uint16_t particle_type = 0;
+	em.assign<ParticleComponent>(bullet.id(), particle_type);
 	std::cout << "generating bullets 2222 asd" << std::endl;
-	
-	//assign graphics if is the client! 
-	//Is this the best way to deal with this?
 
+	//assign graphics if is the client!
 #if CLIENT
-		uint16_t particle_type = 0;
-		em.assign<ParticleComponent>(bullet.id(), particle_type);
+		em.assign<ParticleGraphicsComponent>(bullet.id(), particle_type);
 #endif
-	
+
 }
 
 bool WeaponComponent::bulletInChamber(float delta) {
