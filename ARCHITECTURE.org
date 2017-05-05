@@ -1,0 +1,39 @@
+
+* Components/
+** 
+
+* Game/
+** GameEngine
+- Contains entity/event/system manager
+- Contains the World object
+  
+** World
+- Contains GameLevels
+
+** GameLevel
+- Room vector
+- Handles room/collision polygon
+
+* ClientEngine/
+** ClientEngine : GameEngine
+- Contains NetworkMsgPool
+- Contains VisibilityManager
+- Contains ClientNetworkManager
+- Creates world and systems : Needs refactoring
+
+* ServerEngine/
+** ServerEngine : GameEngine
+- Contains ServerNetworkManager
+
+** PlayerSession : Session
+- Contains Raknet peer
+- Handles message I/O 
+
+
+
+PUMPKIN:
+
+** Particles
+
+- ParticleComponent keeps a list of ParticleRenderers
+- ParticleRenderers are in charge of rendering ParticleGraphicsObject
